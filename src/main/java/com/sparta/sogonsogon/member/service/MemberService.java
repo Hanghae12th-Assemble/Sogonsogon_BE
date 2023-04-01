@@ -75,7 +75,7 @@ public class MemberService {
             throw new BadCredentialsException(ErrorMessage.WRONG_PASSWORD.getMessage()); // HTTP 401 Unauthorized
         }
 
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getEmail(), MemberRoleEnum.USER));
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getMembername(), MemberRoleEnum.USER));
         return new MemberResponseDto(member);
 
     }
