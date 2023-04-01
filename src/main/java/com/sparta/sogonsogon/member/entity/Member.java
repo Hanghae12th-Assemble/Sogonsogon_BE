@@ -1,5 +1,9 @@
 package com.sparta.sogonsogon.member.entity;
 
+import com.sparta.sogonsogon.follow.entity.Follow;
+import com.sparta.sogonsogon.member.dto.MemberRequestDto;
+import com.sparta.sogonsogon.member.dto.SignUpRequestDto;
+import com.sparta.sogonsogon.noti.entity.Notification;
 import lombok.*;
 
 import javax.persistence.*;
