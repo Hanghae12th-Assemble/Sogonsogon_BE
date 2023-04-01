@@ -16,7 +16,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
 
     @Query(
-            value = "SELECT u FROM users u WHERE u.nickname LIKE %:nickname%"
+            value = "SELECT u FROM member u WHERE u.nickname LIKE %:nickname%"
     )
     List<Member> searchAllByNicknameLike(@Param(value = "nickname") String nickname);
 
