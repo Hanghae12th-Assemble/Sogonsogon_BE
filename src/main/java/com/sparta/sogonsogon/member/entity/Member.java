@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity(name = "member")
 public class Member extends TimeStamped{
 
     @Id
