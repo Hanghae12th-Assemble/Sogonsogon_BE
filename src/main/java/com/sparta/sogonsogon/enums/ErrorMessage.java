@@ -22,6 +22,11 @@ public enum ErrorMessage {
     NOT_FOUND_RADIO("해당하는 라디오가 없습니다."),
     NOT_FOUND_ENTER_MEMBER("해당 라디오에 참여하지 않습니다."),
 
+    //audioclip
+    NOT_FOUND_AUDIOCLIP("해당 오디오 클립을 찾을 수 없습니다."),
+    WRONG_FILE_TYPE("파일의 타입이 잘못되었습니다. "),
+
+
     // category
     NOT_FOUND_CATEGORY("해당하는 카테고리가 없습니다.")
 
