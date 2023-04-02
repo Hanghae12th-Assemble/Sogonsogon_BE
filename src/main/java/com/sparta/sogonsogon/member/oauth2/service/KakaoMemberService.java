@@ -174,7 +174,7 @@ public class KakaoMemberService {
     }
 
     private void forceLogin(Member kakaoMember) {
-        UserDetails userDetails = new UserDetailsImpl(kakaoMember);
+        UserDetails userDetails = new UserDetailsImpl(kakaoMember, kakaoMember.getMembername());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

@@ -28,12 +28,13 @@ public class JwtUtil {
     public static final String AUTHORIZATION_KEY = "auth";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final long TOKEN_TIME = 60 * 60 * 1000L * 24 * 365;
-    private final UserDetailsServiceImpl userDetailsService;
 
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    private final UserDetailsServiceImpl userDetailsService;
+
 
     @PostConstruct
     public void init() {
@@ -51,12 +52,12 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String membername, MemberRoleEnum role) {
+    public String createToken(String username, MemberRoleEnum role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(membername)
+                        .setSubject(username)
                         .claim(AUTHORIZATION_KEY, role)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date)
@@ -78,19 +79,16 @@ public class JwtUtil {
         } catch (IllegalArgumentException e) {
             log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
-        catch (SignatureException e) {
-            log.info("SignatureExcepted JWT token, JWT 토큰의 문자열이 지워졌습니다.");
-        }
         return false;
     }
 
-    public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+    // 토큰에서 사용자 정보 가져오기
+    public Claims getUserInfoFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
-    public Authentication createAuthentication(String membername) {
-        log.info(membername);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(membername);
+    public Authentication createAuthentication(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }
