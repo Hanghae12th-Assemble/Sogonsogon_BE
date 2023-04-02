@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioclip.entity;
 
+import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.Builder;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,6 +38,10 @@ public class AudioClip extends TimeStamped{
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "audioclip", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OrderBy("createdAt desc")
+    List<Comment> commentList = new ArrayList<>();
 
 
     @Builder
