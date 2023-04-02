@@ -3,6 +3,8 @@ package com.sparta.sogonsogon.audioclip.service;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
+import com.sparta.sogonsogon.audioclip.like.entity.AudioClipLike;
+import com.sparta.sogonsogon.audioclip.like.repository.AudioClipLikeRepository;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.ErrorMessage;
@@ -17,12 +19,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AudioClipService {
 
     private final MemberRepository memberRepository;
     private final AudioClipRepository audioClipRepository;
+    private final AudioClipLikeRepository audioClipLikeRepository;
 
     //오디오 클립 생성
     @Transactional
@@ -71,7 +76,18 @@ public class AudioClipService {
 
     }
 
+    //오디오 클립 상세 조회
+    public StatusResponseDto<AudioClipResponseDto> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails){
+        AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
+        );
 
+        Optional<AudioClipLike> audioClipLike = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser());
+
+        boolean isLikeCheck = audioClipLike.isPresent();
+        AudioClipResponseDto responseDto = new AudioClipResponseDto(audioClip, isLikeCheck);
+        return StatusResponseDto.success(HttpStatus.OK, responseDto);
+    }
 
 
 }

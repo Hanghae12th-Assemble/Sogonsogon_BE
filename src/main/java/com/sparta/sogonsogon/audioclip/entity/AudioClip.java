@@ -2,6 +2,7 @@ package com.sparta.sogonsogon.audioclip.entity;
 
 import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
+import com.sparta.sogonsogon.audioclip.like.entity.AudioClipLike;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +43,9 @@ public class AudioClip extends TimeStamped{
     @OneToMany(mappedBy = "audioclip", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @OrderBy("createdAt desc")
     List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "audioclip", cascade = CascadeType.REMOVE)
+    List<AudioClipLike> audioClipLikes = new ArrayList<>();
 
 
     @Builder
