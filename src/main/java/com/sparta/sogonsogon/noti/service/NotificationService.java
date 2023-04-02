@@ -28,16 +28,14 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     private final MemberRepository memberRepository;
-    private static final Long DEFAULT_TIMEOUT = 60 * 10000L;
+    private static final Long DEFAULT_TIMEOUT = 60 * 1000L; //1분
 
     public SseEmitter subscribe(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member id: " + memberId));
 
-//        if (member.getIsSubscribed() == false) {
         member.setIsSubscribed(true);
         memberRepository.save(member);
-//        }
 
         String emitterId = makeTimeIncludeId(memberId);
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
@@ -123,15 +121,6 @@ public class NotificationService {
                 .collect(Collectors.toList());
 
     }
-
-//
-//    // 받은 알림 선택하여 조회
-//    public NotificationResponseDto getNotification(Long notificationId, UserDetailsImpl userDetails) {
-//        Notification notification = notificationRepository.findById(notificationId)
-//                .orElseThrow(() -> new IllegalArgumentException("Invalid notification ID: " + notificationId));
-//        return NotificationResponseDto.create(notification);
-//    }
-
 
 
     // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
