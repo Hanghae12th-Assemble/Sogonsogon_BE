@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,15 +83,15 @@ public class MemberService {
 
     // 회원 정보 수정
     @Transactional
-    public MemberResponseDto update(Long id, MemberRequestDto memberRequestDto, UserDetailsImpl userDetails) {
-//        String profileImageUrl = s3Uploader.uploadFiles(memberRequestDto.getProfileImageUrl(), "profileImages");
+    public MemberResponseDto update(Long id, MemberRequestDto memberRequestDto, UserDetailsImpl userDetails) throws IOException {
+        String profileImageUrl = s3Uploader.uploadFiles(memberRequestDto.getProfileImage(), "profileImages");
 
         Member member = memberRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
 
         if (member.getRole() == MemberRoleEnum.USER  && member.getMembername().equals(userDetails.getUser().getMembername())) {
-            member.update(memberRequestDto);
+            member.update(memberRequestDto, profileImageUrl);
             return new MemberResponseDto(member);
         } else {
             throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
