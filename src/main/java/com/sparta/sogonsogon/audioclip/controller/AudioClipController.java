@@ -65,9 +65,9 @@ public class AudioClipController {
         return audioClipService.detailsAudioClip(audioclipId, userDetails);
     }
 
-    @GetMapping("")
-    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 전체 클립을 볼 수 있습니다. ")
-    public
+//    @GetMapping("")
+//    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 전체 클립을 볼 수 있습니다. ")
+//    public
 
 
 
