@@ -18,6 +18,7 @@ public class MemberResponseDto {
     private String introduction;
     private String email;
     private Boolean isFollowCheck;
+    private Boolean isSubscribed;
     private int followers;
     private int followings;
 
@@ -29,6 +30,7 @@ public class MemberResponseDto {
         this.email = member.getEmail();
         this.profileImageUrl = member.getProfileImageUrl();
         this.introduction = member.getMemberInfo();
+        this.isSubscribed = member.getIsSubscribed();
         if (member.getFollowing().isEmpty()){
             this.isFollowCheck = false;
         }else {

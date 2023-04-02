@@ -92,14 +92,29 @@ public class FollowService {
         if (followStatus == null) {
             Follow newFollow = new Follow(new FollowRequestDto(follow, follower));
             followRepository.save(newFollow);
-            notificationService.send(follow, AlarmType.eventFollower, "회원 " + follower.getNickname() + " 님이 회원님을 팔로우하였습니다.",follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
             isFollow = true;
-            return FollowResponseDto.of(newFollow,follow.getNickname() + "님을 팔로우하였습니다. ", isFollow);
+
+            // 유저가 알림 구독 중인지 확인
+            if (follow.getIsSubscribed() == true) {
+                String message = "회원 " + follower.getNickname() + " 님이 회원님을 팔로우하였습니다.";
+                notificationService.send(follow, AlarmType.eventFollower, message,follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
+            }
+
+            return FollowResponseDto.of(newFollow,follow.getNickname() + "님을 팔로우하였습니다.", isFollow);
+
         } else {
             followRepository.deleteById(followStatus.getId());
-            notificationService.send(follow, AlarmType.eventFollower, "회원 "+ follower.getNickname() +" 님이 회원님을 팔로우 취소하였습니다.",follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
             isFollow = false;
+
+            // 유저가 알림 구독 중인지 조회
+            if (follow.getIsSubscribed() == true) {
+                String message = "회원 " + follower.getNickname() + " 님이 회원님을 팔로우 취소하였습니다.";
+                notificationService.send(follow, AlarmType.eventFollower, message,follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
+            }
+
             return FollowResponseDto.of(followStatus,follow.getNickname() + "님을 팔로우 취소하였습니다.",isFollow);
         }
+
+
     }
 }

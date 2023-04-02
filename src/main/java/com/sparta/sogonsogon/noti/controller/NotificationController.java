@@ -12,9 +12,11 @@ import com.sparta.sogonsogon.noti.service.NotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import reactor.core.publisher.Flux;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -26,14 +28,16 @@ public class NotificationController {
     private final NotificationRepository notificationRepository;
 
     private final NotificationService notificationService;
+
+
+
+
     @ApiOperation(value = "알림 구독", notes = "알림을 구독한다.")
     @Operation(summary = "알림 구독", description = "알림 구독")
     @GetMapping(value = "/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)///subscribe 엔드포인트로 들어오는 요청을 처리. produces 속성은 해당 메서드가 반환하는 데이터 형식을 지정
     @ResponseStatus(HttpStatus.OK)
-    // 해당 메서드가 반환하는 HTTP 응답 코드를 지정합니다.
-    // 이 경우 HttpStatus.OK 즉, 200을 반환합니다.
     public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return notificationService.subscribe( userDetails.getUser().getId() );
+        return notificationService.subscribe( userDetails.getUser().getId());
     }
     //@ApiOperation 어노테이션은 Swagger를 사용하여 API 문서를 생성하는 데 사용됩니다.
 // 이 어노테이션은 "알림 구독"이라는 이름과 함께 간단한 설명을 제공합니다.
