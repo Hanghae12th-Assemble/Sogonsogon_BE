@@ -1,7 +1,12 @@
 package com.sparta.sogonsogon.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.sogonsogon.dto.SecurityExceptionDto;
+import com.sparta.sogonsogon.dto.StatusResponseDto;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
-@RequiredArgsConstructor //서비스 생성할 때 겸해서 같이 같이온다(repository)
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -23,24 +28,36 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String token = jwtUtil.resolveToken(request);
-        //회원가입할 때는 토큰이 필요하지 않으므로 분기처리 필요
-        if (jwtUtil.validateToken(token)) {
-            String info = jwtUtil.getEmailFromToken(token);
-            setAuthentication(info);
+
+        if(token != null) {
+            if(!jwtUtil.validateToken(token)){
+                jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
+            Claims info = jwtUtil.getUserInfoFromToken(token);
+            setAuthentication(info.getSubject());
         }
         filterChain.doFilter(request,response);
     }
 
-    //Authentication -> context -> SecurityContextHolder
-    public void setAuthentication(String membername) {
-        log.info(membername);
+    public void setAuthentication(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = jwtUtil.createAuthentication(membername);
+        Authentication authentication = jwtUtil.createAuthentication(username);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
     }
 
-
+    public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
+        response.setStatus(statusCode);
+        response.setContentType("application/json");
+        try {
+            String json = new ObjectMapper().writeValueAsString(new SecurityExceptionDto(statusCode, msg));
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
 
 }
