@@ -41,8 +41,8 @@ public class MemberController {
     //로그인
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인 기능")
-    public StatusResponseDto<MemberResponseDto> login(@RequestBody LoginRequestDto requestDto, @Parameter(hidden = true) HttpServletResponse response) {
-        return StatusResponseDto.success(HttpStatus.OK, memberService.login(requestDto, response));
+    public ResponseEntity<StatusResponseDto<MemberResponseDto>> login(@RequestBody LoginRequestDto requestDto) {
+        return memberService.login(requestDto);
     }
 
     //회원 정보 수정

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.http.HttpHeaders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +66,7 @@ public class MemberService {
 
     //로그인
     @Transactional(readOnly = true)
-    public MemberResponseDto login(LoginRequestDto requestDto, HttpServletResponse response) {
+    public ResponseEntity<StatusResponseDto<MemberResponseDto>>  login(LoginRequestDto requestDto) {
         String email = requestDto.getEmail();
         String password = requestDto.getPassword();
 
@@ -76,8 +78,15 @@ public class MemberService {
             throw new BadCredentialsException(ErrorMessage.WRONG_PASSWORD.getMessage()); // HTTP 401 Unauthorized
         }
 
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getMembername(), MemberRoleEnum.USER));
-        return new MemberResponseDto(member);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        String token = jwtUtil.createToken(member.getMembername(), member.getRole());
+        responseHeaders.set("Authorization",token);
+
+        MemberResponseDto memberResponseDto = new MemberResponseDto(member);
+
+        return ResponseEntity.ok()
+                .headers(responseHeaders)
+                .body(StatusResponseDto.success(HttpStatus.OK, memberResponseDto));
 
     }
 
