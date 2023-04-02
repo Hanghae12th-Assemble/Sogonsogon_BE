@@ -46,4 +46,11 @@ public class AudioClip extends TimeStamped{
         this.member = member;
     }
 
+    public void update (AudioClipRequestDto requestDto){
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+        this.audioclipUrl = requestDto.getAudioclipUrl();
+        this.audioclipImageUrl = requestDto.getAudioclipImageUrl();
+    }
+
 }
