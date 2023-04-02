@@ -175,7 +175,7 @@ public class NaverMemberService {
 
     // 강제 로그인 처리
     private void forceLogin(Member naverAccount) {
-        UserDetails userDetails = new UserDetailsImpl(naverAccount);
+        UserDetails userDetails = new UserDetailsImpl(naverAccount, naverAccount.getMembername());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

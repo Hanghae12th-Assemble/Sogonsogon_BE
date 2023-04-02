@@ -13,21 +13,22 @@ import java.util.Collection;
 @Slf4j
 public class UserDetailsImpl implements UserDetails {
 
-    private final Member member;
-//    private final String username;
+    private final Member user;
+    private final String username;
 
-    public UserDetailsImpl(Member member) {
-        this.member = member;
+    public UserDetailsImpl(Member user, String username) {
+        this.user = user;
+        this.username = username;
     }
 
-    public Member getUser() {   //Getter가 없어서 안씀
-        return member;
+    public Member getUser() {
+        return user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        MemberRoleEnum role = member.getRole();
-        String authority = role.getAuthority();//나중에 수정 해야 할지도...
+        MemberRoleEnum role = user.getRole();
+        String authority = role.getAuthority();
 
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
@@ -38,9 +39,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        log.info(member.getMembername());
-        return member.getMembername();
-
+        return this.username;
     }
 
     @Override
