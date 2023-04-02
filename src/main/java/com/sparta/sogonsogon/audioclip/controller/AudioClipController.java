@@ -53,6 +53,12 @@ public class AudioClipController {
         return audioClipService.updateAudioClip(audioclipId, requestDto, userDetails);
     }
 
+    @DeleteMapping("/deleted/{audioclid}")
+    @Operation(summary = "오디오 클립 삭제", description = "오디오클립 전체를 삭제 할 수 있습니다.")
+    public StatusResponseDto<String> deleteAudioClip(@PathVariable Long audioclid, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return audioClipService.deleteAudioClip(audioclid, userDetails);
+    }
+
 
 
 }
