@@ -24,6 +24,7 @@ public class AudioClipService {
     private final MemberRepository memberRepository;
     private final AudioClipRepository audioClipRepository;
 
+    //오디오 클립 생성
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> createdAudioClip(AudioClipRequestDto requestDto, UserDetailsImpl userDetails){
         Member member = memberRepository.findByMembername(userDetails.getUsername()).orElseThrow(
@@ -35,6 +36,7 @@ public class AudioClipService {
         return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));
     }
 
+    //오디오 클립 수정
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> updateAudioClip(Long audioclipId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails){
         Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
@@ -51,6 +53,24 @@ public class AudioClipService {
             throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
         }
     }
+
+    //오디오 클립 삭제
+    @Transactional
+    public StatusResponseDto<String> deleteAudioClip(Long audioclipId, UserDetailsImpl userDetails){
+        Member member = userDetails.getUser();
+        AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
+        );
+
+        if (member.getRole() == MemberRoleEnum.USER  || member.getMembername().equals(userDetails.getUser().getMembername())) {
+            audioClipRepository.deleteById(audioclipId);
+            return StatusResponseDto.success(HttpStatus.OK, "오디오 클립이 삭제 되었습니다. ");
+        } else {
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
+        }
+
+    }
+
 
 
 
