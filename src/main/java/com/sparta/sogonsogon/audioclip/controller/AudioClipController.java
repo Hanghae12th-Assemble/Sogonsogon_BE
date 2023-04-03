@@ -25,32 +25,21 @@ public class AudioClipController {
     private final AudioClipService audioClipService;
     private final S3Uploader s3Uploader;
 
-    @PostMapping(value = "/uploaded",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/uploaded",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "오디오 클립 생성", description = "오디오 클립을 생성 할 수 있습니다. ")
-    public StatusResponseDto<AudioClipResponseDto> createdAudioClip(@RequestParam(value = "title") String title,
-                                                                    @RequestParam(value = "content") String content,
-                                                                    @RequestParam(value = "audioclipImage" )MultipartFile audioclipImage,
-                                                                    @RequestParam(value = "audioclip") MultipartFile audioclip,
+    public StatusResponseDto<AudioClipResponseDto> createdAudioClip(@ModelAttribute AudioClipRequestDto requestDto,
                                                                     @Parameter(hidden = true)
                                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.uploadFiles(audioclipImage, "audioclipImage/");
-        String audioclipUrl = s3Uploader.uploadFiles(audioclip, "audioclips/");
-        AudioClipRequestDto requestDto = new AudioClipRequestDto(title, content, audioclipImageUrl, audioclipUrl);
+
         return audioClipService.createdAudioClip(requestDto, userDetails);
     }
 
-    @PutMapping(value = "/updated/{audioclipId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/updated/{audioclipId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "오디오 클립 수정", description = "오디오 내부 내용을 전체 수정 할 수 있습니다. ")
     public StatusResponseDto<AudioClipResponseDto> updatedAudioClip(@PathVariable Long audioclipId,
-                                                                    @RequestParam(value = "title") String title,
-                                                                    @RequestParam(value = "content") String content,
-                                                                    @RequestParam(value = "audioclipImage" )MultipartFile audioclipImage,
-                                                                    @RequestParam(value = "audioclip") MultipartFile audioclip,
+                                                                    @ModelAttribute AudioClipRequestDto requestDto,
                                                                     @Parameter(hidden = true)
                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.uploadFiles(audioclipImage, "audioclipImage/");
-        String audioclipUrl = s3Uploader.uploadFiles(audioclip, "audioclips/");
-        AudioClipRequestDto requestDto = new AudioClipRequestDto(title, content, audioclipImageUrl, audioclipUrl);
         return audioClipService.updateAudioClip(audioclipId, requestDto, userDetails);
     }
 
