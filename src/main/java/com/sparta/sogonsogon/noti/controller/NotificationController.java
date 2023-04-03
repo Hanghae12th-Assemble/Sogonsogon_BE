@@ -18,7 +18,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor //생성자를 자동으로 생성
+@RequiredArgsConstructor
 @RequestMapping("/api/notificaiton")
 public class NotificationController {
 
