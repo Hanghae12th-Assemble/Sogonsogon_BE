@@ -1,6 +1,7 @@
 package com.sparta.sogonsogon.audioAlbum.dto;
 
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
+import com.sparta.sogonsogon.enums.CategoryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class AudioAlbumResponseDto {
 
     private String backgroundImageUrl;
 
+    private CategoryType categoryType;
+
     // TODO : CategoryType 생성, 적용
     // private CategrouType categoryType;
     public AudioAlbumResponseDto(AudioAlbum audioAlbum) {
@@ -27,6 +30,7 @@ public class AudioAlbumResponseDto {
         this.title = audioAlbum.getTitle();
         this.instruction = audioAlbum.getInstruction();
         this.backgroundImageUrl = audioAlbum.getBackgroundImageUrl();
+        this.categoryType = audioAlbum.getCategoryType();
     }
 
 

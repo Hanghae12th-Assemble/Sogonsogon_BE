@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioAlbum.dto;
 
+import com.sparta.sogonsogon.enums.CategoryType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +23,6 @@ public class AudioAlbumRequestDto {
 
     private MultipartFile backgroundImageUrl;
 
-    // TODO : categotyType 생성 및 지정
-    // private CategoryType categoryType;
+     private CategoryType categoryType;
 
 }

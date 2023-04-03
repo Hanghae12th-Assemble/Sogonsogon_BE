@@ -54,10 +54,10 @@ public class AudioAlbumService {
                 .title(requestDto.getTitle())
                 .instruction(requestDto.getInstruction())
                 .backgroundImageUrl(imageUrl)
-                // categoryType(requestDto.getCategoryType())
+                .categoryType(requestDto.getCategoryType())
                 .build();
 
-        audioAlbum = audioAlbumRepository.save(audioAlbum);
+        audioAlbumRepository.save(audioAlbum);
         return AudioAlbumResponseDto.of(audioAlbum);
     }
 

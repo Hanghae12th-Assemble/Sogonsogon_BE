@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioAlbum.entity;
 
+import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.*;
 
@@ -23,8 +24,7 @@ public class AudioAlbum extends TimeStamp {
 
     private String backgroundImageUrl; // 앨범 사진
 
-    // TODO : 카테고리 타입 제작, 필드 생성
-    // private CategotyType categoryType;
+    private CategoryType categoryType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_Id")
