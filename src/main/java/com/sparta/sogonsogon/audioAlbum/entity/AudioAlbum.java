@@ -1,11 +1,9 @@
 package com.sparta.sogonsogon.audioAlbum.entity;
 
+import com.sparta.sogonsogon.member.entity.Member;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -28,6 +26,7 @@ public class AudioAlbum extends TimeStamp {
     // TODO : 카테고리 타입 제작, 필드 생성
     // private CategotyType categoryType;
 
-
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_Id")
+    private Member member; // 오디오앨범 생성자
 }
