@@ -131,34 +131,6 @@ public class MemberService {
         return StatusResponseDto.success(HttpStatus.OK, memberResponseDtos);
     }
 
-    //유사한 유저 닉네임으로 정보 조회 페이지네이션 방식 적용
-//    @Transactional(readOnly = true)
-//    public Page<MemberOneResponseDto> getPageBySimilarNickname(int page, int size, String sortBy, String nickname) {
-//        // 검색 조건 설정. 대소문자 상관없이 검색
-//        // Create Example Matcher for searching by nickname
-//        ExampleMatcher matcher = ExampleMatcher.matching()
-//                .withMatcher("nickname", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-//        Member member = new Member();
-//        member.setNickname(nickname);
-//        Example<Member> example = Example.of(member, matcher);
-//
-//        // Set up pagination and sorting options
-//        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
-//        Pageable pageable = PageRequest.of(page, size, sort);
-//
-//        // Find all members that match the given nickname
-//        Page<Member> nicknamePage = memberRepository.findAll(example, pageable);
-//        List<Member> memberList = nicknamePage.getContent();
-//
-//        // Convert members to DTOs
-//        List<MemberOneResponseDto> memberOneResponseDtoList = new ArrayList<>();
-//        for (Member member1 : memberList) {
-//            memberOneResponseDtoList.add(MemberOneResponseDto.of(member1));
-//        }
-//
-//        return new PageImpl<>(memberOneResponseDtoList, pageable, nicknamePage.getTotalElements());
-//    }
-
 
     // 유사한 유저 닉네임으로 정보 조회 무한스크롤 적용
     @Transactional(readOnly = true)
