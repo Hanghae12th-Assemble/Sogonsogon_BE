@@ -23,6 +23,10 @@ public class AudioAlbumResponseDto {
 
     private CategoryType categoryType;
 
+    private String createdAt;
+
+    private String modifiedAt;
+
     // TODO : CategoryType 생성, 적용
     // private CategrouType categoryType;
     public AudioAlbumResponseDto(AudioAlbum audioAlbum) {
@@ -31,6 +35,8 @@ public class AudioAlbumResponseDto {
         this.instruction = audioAlbum.getInstruction();
         this.backgroundImageUrl = audioAlbum.getBackgroundImageUrl();
         this.categoryType = audioAlbum.getCategoryType();
+        this.createdAt = audioAlbum.getCreatedAt().toString();
+        this.modifiedAt = audioAlbum.getModifiedAt().toString();
     }
 
 
