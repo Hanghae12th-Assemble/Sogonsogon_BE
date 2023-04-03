@@ -81,7 +81,7 @@ public class AudioAlbumService {
     }
 
     @Transactional
-    public Object findAudioAlbum(Long audioAlbumId) {
+    public AudioAlbumResponseDto findAudioAlbum(Long audioAlbumId) {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
