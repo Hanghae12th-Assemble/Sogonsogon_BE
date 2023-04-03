@@ -79,4 +79,12 @@ public class AudioAlbumService {
 
         return responseBody;
     }
+
+    @Transactional
+    public Object findAudioAlbum(Long audioAlbumId) {
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+        return AudioAlbumResponseDto.of(audioAlbum);
+    }
 }

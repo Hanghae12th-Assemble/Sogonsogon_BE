@@ -41,4 +41,10 @@ public class AudioAlbumController {
                                                                  @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAllAudioAlbum(page - 1, size, sortBy));
     }
+
+    @GetMapping("/find/{audioAlbumId}")
+    @Operation(summary = "선택한 오디오앨범 조회", description = "선택한 오디오앨범 하나를 조회한다.")
+    public StatusResponseDto<AudioAlbumResponseDto> getAudioAlbum(@PathVariable Long audioAlbumId) {
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAudioAlbum(audioAlbumId));
+    }
 }
