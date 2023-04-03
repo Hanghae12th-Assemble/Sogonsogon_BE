@@ -26,10 +26,10 @@ public class AudioClipCommentController {
         return audioClipCommentService.createComment(audioclipId, content, userDetails);
     }
 
-    @PutMapping("/{audioclipId}")
+    @PutMapping("/{commentId}")
     @Operation(summary = "오디오 클립 댓글 수정", description = "해당 오디오 클립에 있는 댓글을 수정 할수 있습니다. ")
-    public StatusResponseDto<CommentResponseDto> updatedComment(@PathVariable Long audioclipId, @RequestBody CommentRequestDto requestDto, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return audioClipCommentService.updateComment(audioclipId, requestDto, userDetails);
+    public StatusResponseDto<CommentResponseDto> updatedComment(@PathVariable Long commentId, @RequestBody CommentRequestDto requestDto, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return audioClipCommentService.updateComment(commentId, requestDto, userDetails);
     }
 
     @DeleteMapping("/{commentId}")

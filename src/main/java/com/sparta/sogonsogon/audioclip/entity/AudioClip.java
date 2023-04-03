@@ -36,7 +36,7 @@ public class AudioClip extends TimeStamped{
     @Column(nullable = false)
     private String audioclipUrl;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
