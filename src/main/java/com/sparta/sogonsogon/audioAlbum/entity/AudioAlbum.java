@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioAlbum.entity;
 
+import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumRequestDto;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.*;

@@ -127,4 +127,33 @@ public class AudioAlbumService {
 
         return responseBody;
     }
+
+    // 오디오앨범 수정
+    @Transactional
+    public AudioAlbumResponseDto updateAudioAlbum(Long audioAlbumId, AudioAlbumRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
+
+        // 수정할 오디오앨범이 있는지 확인
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+
+        Member member = userDetails.getUser();
+
+        // 오디오 앨범 수정을 요청한 유저가 해당 오디오 앨범 생성자인지 확인
+        if (!member.getId().equals(audioAlbum.getMember().getId())) {
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
+        }
+
+        // 오디오앨범 사진 추가
+        String imageUrl = s3Uploader.uploadFiles(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
+
+        AudioAlbum.builder()
+                .title(requestDto.getTitle())
+                .instruction(requestDto.getInstruction())
+                .categoryType(requestDto.getCategoryType())
+                .backgroundImageUrl(imageUrl)
+                .build();
+
+        return AudioAlbumResponseDto.of(audioAlbum);
+    }
 }

@@ -44,12 +44,20 @@ public class AudioAlbumController {
     }
 
     @GetMapping("/{categoryType}")
-    @Operation(summary = "오디오앨범 카테고리 검색", description = "음악, 일상, 도서, ASMR의 카테고리별 생성된 오디오앨범 조회")
+    @Operation(summary = "오디오앨범 카테고리 조회", description = "음악, 일상, 도서, ASMR의 카테고리별 생성된 오디오앨범 조회")
     public StatusResponseDto<Map<String, Object>> getAudioAlbumByCategory(@PathVariable CategoryType categoryType,
                                                                                   @RequestParam(defaultValue = "1") int page,
                                                                                   @RequestParam(defaultValue = "10") int size,
                                                                                   @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findByCategory(page - 1, size, sortBy, categoryType));
+    }
+
+    @PostMapping(value = "/update/{audioAlbumId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "오디오앨범 수정", description = "선택한 오디오앨범을 수정, 오디오앨범을 생성한 사람만 수정할 수 있다.")
+    public StatusResponseDto<AudioAlbumResponseDto> updateAudioAlbum(@PathVariable Long audioAlbumId,
+                                                                     @ModelAttribute AudioAlbumRequestDto requestDto,
+                                                                     @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.updateAudioAlbum(audioAlbumId, requestDto, userDetails));
     }
 
     @GetMapping("/find/{audioAlbumId}")
