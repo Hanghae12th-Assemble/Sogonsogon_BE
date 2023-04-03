@@ -40,7 +40,7 @@ public class AudioClipLikeService {
 
         // 좋아요를 눌렀을때 오디오 클립 생성자에게 알림 보내기
         if (audioClip.getMember().getIsSubscribed() == true) {
-            String message = userDetails.getUser().getNickname() + " 님이" + audioClip.getTitle() + "의 좋아요를 눌렀습니다. ";
+            String message = userDetails.getUser().getNickname() + " 님이 제목: " + audioClip.getTitle() + " 오디오의 좋아요를 눌렀습니다. ";
             notificationService.send(audioClip.getMember(), AlarmType.eventAudioClipLike, message, userDetails.getUsername(), userDetails.getUser().getNickname(), userDetails.getUser().getProfileImageUrl());
         }
 
