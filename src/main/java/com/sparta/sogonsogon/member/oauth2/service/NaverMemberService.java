@@ -84,7 +84,7 @@ public class NaverMemberService {
 
         forceLogin(naverMember);
 
-        String token = jwtUtil.createToken(naverMember.getEmail(), MemberRoleEnum.USER);
+        String token = jwtUtil.createToken(naverMember.getMembername(), MemberRoleEnum.USER);
 
         response.addHeader("Authorization", token);
 

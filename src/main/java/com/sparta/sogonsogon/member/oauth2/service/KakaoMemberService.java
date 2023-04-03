@@ -57,8 +57,11 @@ public class KakaoMemberService {
         log.info(kakaoMember.toString());
 
         forceLogin(kakaoMember);
+        String email = kakaoMemberInfo.getEmail();
+        //고유 아이디 랜덤 생성
+        String membername =email.substring(0, email.indexOf('@'));
 
-        String token = jwtUtil.createToken(kakaoMemberInfo.getEmail(), MemberRoleEnum.USER);
+        String token = jwtUtil.createToken(membername, MemberRoleEnum.USER);
         log.info(token);
 
         response.addHeader("Authorization", token);
