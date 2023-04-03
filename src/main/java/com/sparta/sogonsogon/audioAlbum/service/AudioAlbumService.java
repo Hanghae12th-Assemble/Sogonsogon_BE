@@ -137,6 +137,12 @@ public class AudioAlbumService {
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
 
+        // 변경될 오디오앨범 제목 중복 확인
+        Optional<AudioAlbum> found = audioAlbumRepository.findByTitle(requestDto.getTitle());
+        if (found.isPresent()) {
+            throw new DuplicateKeyException(ErrorMessage.DUPLICATE_AUDIOALBUM_NAME.getMessage()); // 409 Conflict
+        }
+
         Member member = userDetails.getUser();
 
         // 오디오 앨범 수정을 요청한 유저가 해당 오디오 앨범 생성자인지 확인
