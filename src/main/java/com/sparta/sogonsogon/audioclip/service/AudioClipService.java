@@ -23,7 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.List;
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -33,17 +35,23 @@ public class AudioClipService {
     private final MemberRepository memberRepository;
     private final AudioClipRepository audioClipRepository;
     private final AudioClipLikeRepository audioClipLikeRepository;
+
     private final NotificationService notificationService;
     private final FollowRepository followRepository;
 
+    private final S3Uploader s3Uploader;
+
+
     //오디오 클립 생성
     @Transactional
-    public StatusResponseDto<AudioClipResponseDto> createdAudioClip(AudioClipRequestDto requestDto, UserDetailsImpl userDetails){
+    public StatusResponseDto<AudioClipResponseDto> createdAudioClip(AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
+        String audioclipImageUrl = s3Uploader.uploadFiles(requestDto.getAudioclipImage(), "audioclipImage/");
+        String audioclipUrl = s3Uploader.uploadFiles(requestDto.getAudioclip(), "audioclips/");
         Member member = memberRepository.findByMembername(userDetails.getUsername()).orElseThrow(
                 ()-> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
 
-        AudioClip audioClip = new AudioClip(requestDto, member);
+        AudioClip audioClip = new AudioClip(requestDto, member, audioclipUrl, audioclipImageUrl);
         audioClipRepository.save(audioClip);
 
         // 본인이 알림 구독을 하였는지 확인
@@ -65,7 +73,9 @@ public class AudioClipService {
 
     //오디오 클립 수정
     @Transactional
-    public StatusResponseDto<AudioClipResponseDto> updateAudioClip(Long audioclipId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails){
+    public StatusResponseDto<AudioClipResponseDto> updateAudioClip(Long audioclipId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
+        String audioclipImageUrl = s3Uploader.uploadFiles(requestDto.getAudioclipImage(), "audioclipImage/");
+        String audioclipUrl = s3Uploader.uploadFiles(requestDto.getAudioclip(), "audioclips/");
         Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 ()-> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
@@ -74,7 +84,7 @@ public class AudioClipService {
         );
 
         if (member.getRole() == MemberRoleEnum.USER  || member.getMembername().equals(userDetails.getUser().getMembername())) {
-            audioClip.update(requestDto);
+            audioClip.update(requestDto, audioclipUrl, audioclipImageUrl);
             return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));
         } else {
             throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
