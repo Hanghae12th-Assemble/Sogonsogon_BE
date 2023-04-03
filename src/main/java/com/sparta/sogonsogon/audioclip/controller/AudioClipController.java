@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,7 @@ public class AudioClipController {
     private final AudioClipService audioClipService;
     private final S3Uploader s3Uploader;
 
-    @PostMapping("/uploaded")
+    @PostMapping(value = "/uploaded",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "오디오 클립 생성", description = "오디오 클립을 생성 할 수 있습니다. ")
     public StatusResponseDto<AudioClipResponseDto> createdAudioClip(@RequestParam(value = "title") String title,
                                                                     @RequestParam(value = "content") String content,
@@ -38,7 +39,7 @@ public class AudioClipController {
         return audioClipService.createdAudioClip(requestDto, userDetails);
     }
 
-    @PutMapping("/updated/{audioclipId}")
+    @PutMapping(value = "/updated/{audioclipId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "오디오 클립 수정", description = "오디오 내부 내용을 전체 수정 할 수 있습니다. ")
     public StatusResponseDto<AudioClipResponseDto> updatedAudioClip(@PathVariable Long audioclipId,
                                                                     @RequestParam(value = "title") String title,
