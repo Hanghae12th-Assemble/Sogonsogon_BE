@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AudioAlbum extends TimeStamp {
+public class AudioAlbum extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
