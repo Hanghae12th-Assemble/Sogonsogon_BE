@@ -17,10 +17,10 @@ public enum ErrorMessage {
     // follow
     WRONG_SELF_REQUEST("자기자신을 팔로우할 수 없습니다."),
 
-    // radio
-    DUPLICATE_RADIO_NAME("중복된 라디오명입니다."),
-    NOT_FOUND_RADIO("해당하는 라디오가 없습니다."),
-    NOT_FOUND_ENTER_MEMBER("해당 라디오에 참여하지 않습니다."),
+    // audioAlbum
+    DUPLICATE_AUDIOALBUM_NAME("중복된 오디오앨범명입니다."),
+    NOT_FOUND_AUDIOALBUM("해당하는 오디오앨범이 없습니다."),
+//    NOT_FOUND_ENTER_MEMBER("해당 라디오에 참여하지 않습니다."),
 
     //audioclip
     NOT_FOUND_AUDIOCLIP("해당 오디오 클립을 찾을 수 없습니다."),
