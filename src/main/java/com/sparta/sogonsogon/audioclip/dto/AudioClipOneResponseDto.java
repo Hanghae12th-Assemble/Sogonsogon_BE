@@ -15,8 +15,8 @@ public class AudioClipOneResponseDto {
     private String contents;
     private String audioclipImageUrl;
     private String audioclipUrl;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private String createdAt;
+    private String modifiedAt;
     private String membernickname;
     private String membername; //오디오 올린 주인 고유 아이디
 
@@ -32,8 +32,8 @@ public class AudioClipOneResponseDto {
         this.audioclipUrl = audioClip.getAudioclipUrl();
         this.membernickname = audioClip.getMember().getNickname();
         this.membername = audioClip.getMember().getMembername();
-        this.createdAt = audioClip.getCreatedAt();
-        this.modifiedAt = audioClip.getModifiedAt();
+        this.createdAt = audioClip.getCreatedAt().toString();
+        this.modifiedAt = audioClip.getModifiedAt().toString();
         this.isLikeCount = audioClip.getAudioClipLikes().size();
         this.isLikeCheck = isLikeCheck;
     }
