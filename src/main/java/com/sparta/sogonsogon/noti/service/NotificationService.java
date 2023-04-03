@@ -28,7 +28,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     private final MemberRepository memberRepository;
-    private static final Long DEFAULT_TIMEOUT = 60 * 5000L;
+    private static final Long DEFAULT_TIMEOUT = 60 * 10000L;
 
     public SseEmitter subscribe(Long memberId) {
         Member member = memberRepository.findById(memberId)
