@@ -24,8 +24,9 @@ public class AudioAlbumResponseDto {
     private String createdAt;
 
     private String modifiedAt;
-    private Member member;
+    private String memberName;
 
+    private String meberNickname;
     @Builder
     public AudioAlbumResponseDto(AudioAlbum audioAlbum) {
         this.id = audioAlbum.getId();
@@ -35,7 +36,8 @@ public class AudioAlbumResponseDto {
         this.categoryType = audioAlbum.getCategoryType();
         this.createdAt = audioAlbum.getCreatedAt().toString();
         this.modifiedAt = audioAlbum.getModifiedAt().toString();
-        this.member = audioAlbum.getMember();
+        this.memberName = audioAlbum.getMember().getMembername();
+        this.meberNickname = audioAlbum.getMember().getNickname();
     }
 
 
