@@ -1,6 +1,5 @@
 package com.sparta.sogonsogon.audioAlbum.entity;
 
-import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumRequestDto;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.*;
@@ -25,6 +24,7 @@ public class AudioAlbum extends TimeStamp {
 
     private String backgroundImageUrl; // 앨범 사진
 
+    @Enumerated(EnumType.STRING)
     private CategoryType categoryType;
 
     @ManyToOne(fetch = FetchType.LAZY)
