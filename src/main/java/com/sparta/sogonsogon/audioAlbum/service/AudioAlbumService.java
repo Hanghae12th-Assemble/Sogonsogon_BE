@@ -56,6 +56,7 @@ public class AudioAlbumService {
                 .instruction(requestDto.getInstruction())
                 .backgroundImageUrl(imageUrl)
                 .categoryType(requestDto.getCategoryType())
+                .member(member)
                 .build();
 
         audioAlbumRepository.save(audioAlbum);
@@ -114,7 +115,7 @@ public class AudioAlbumService {
     public Map<String, Object> findByCategory(int page, int size, String sortBy, CategoryType categoryType) {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
-        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAllByCategory(categoryType,sortedPageable);
+        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAllByCategoryType(categoryType,sortedPageable);
         List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent().stream().map(AudioAlbumResponseDto::new).toList();
 
         // 생성된 오디오앨범의 개수

@@ -12,5 +12,5 @@ public interface AudioAlbumRepository extends JpaRepository<AudioAlbum, Long> {
 
     Optional<AudioAlbum> findByTitle(String title);
 
-    Page<AudioAlbum> findAllByCategory(CategoryType categoryType, Pageable sortedPageable);
+    Page<AudioAlbum> findAllByCategoryType(CategoryType categoryType, Pageable sortedPageable);
 }

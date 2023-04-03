@@ -16,9 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.awt.*;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,16 +24,16 @@ import java.util.Map;
 @RequestMapping("/api/audioAlbum")
 public class AudioAlbumController {
 
-    private AudioAlbumService audioAlbumService;
+    private final AudioAlbumService audioAlbumService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "오디오앨범 생성", description = "오디오앨범을 생성한다.")
     public StatusResponseDto<AudioAlbumResponseDto> createAudioAlbum(@Valid @ModelAttribute AudioAlbumRequestDto requestDto,
                                                                      @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         return StatusResponseDto.success(HttpStatus.CREATED, audioAlbumService.createAudioAlbum(requestDto, userDetails));
     }
 
-    @GetMapping("/")
+    @GetMapping()
     @Operation(summary = "전체 오디오앨범 조회", description = "생성된 오디오앨범 전체를 조회한다.")
     public StatusResponseDto<Map<String, Object>> getAudioAlbums(@RequestParam(defaultValue = "1") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
@@ -56,7 +54,7 @@ public class AudioAlbumController {
     @Operation(summary = "오디오앨범 수정", description = "선택한 오디오앨범을 수정, 오디오앨범을 생성한 사람만 수정할 수 있다.")
     public StatusResponseDto<AudioAlbumResponseDto> updateAudioAlbum(@PathVariable Long audioAlbumId,
                                                                      @ModelAttribute AudioAlbumRequestDto requestDto,
-                                                                     @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                                     @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.updateAudioAlbum(audioAlbumId, requestDto, userDetails));
     }
 
@@ -66,7 +64,7 @@ public class AudioAlbumController {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAudioAlbum(audioAlbumId));
     }
 
-    @DeleteMapping("/{audioAlbumId}")
+    @DeleteMapping("/delete/{audioAlbumId}")
     @Operation(summary = "선택한 오디오앨범 삭제", description = "선택한 오디오앨범을 생성한 당사자라면 자격 확인 후 삭제")
     public StatusResponseDto<AudioAlbum> deleteAudioAlbum(@PathVariable Long audioAlbumId,
                                                           @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
