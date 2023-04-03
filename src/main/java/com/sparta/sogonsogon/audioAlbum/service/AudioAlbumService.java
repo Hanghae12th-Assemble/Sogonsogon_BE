@@ -80,11 +80,31 @@ public class AudioAlbumService {
         return responseBody;
     }
 
+    // 선택한 오디오앨범 조회
     @Transactional
     public AudioAlbumResponseDto findAudioAlbum(Long audioAlbumId) {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
         return AudioAlbumResponseDto.of(audioAlbum);
+    }
+
+    // 선택한 오디오앨범 삭제
+    @Transactional
+    public void deleteAudioAlbum(Long audioAlbumId, UserDetailsImpl userDetails) {
+
+        // 삭제할 오디오앨범이 있는지 확인
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+
+        Member member = userDetails.getUser();
+
+        // 오디오앨범 삭제를 요청한 유저가 해당 오디오앨범의 생성자인지 확인
+        if (!member.getId().equals(audioAlbum.getMember().getId())) {
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
+        }
+
+        audioAlbumRepository.deleteById(audioAlbumId);
     }
 }

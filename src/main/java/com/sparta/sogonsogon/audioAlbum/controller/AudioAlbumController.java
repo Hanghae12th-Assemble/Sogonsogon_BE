@@ -2,6 +2,7 @@ package com.sparta.sogonsogon.audioAlbum.controller;
 
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumRequestDto;
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumResponseDto;
+import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.service.AudioAlbumService;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
@@ -46,5 +47,13 @@ public class AudioAlbumController {
     @Operation(summary = "선택한 오디오앨범 조회", description = "선택한 오디오앨범 하나를 조회한다.")
     public StatusResponseDto<AudioAlbumResponseDto> getAudioAlbum(@PathVariable Long audioAlbumId) {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAudioAlbum(audioAlbumId));
+    }
+
+    @DeleteMapping("/{audioAlbumId}")
+    @Operation(summary = "선택한 오디오앨범 삭제", description = "선택한 오디오앨범을 생성한 당사자라면 자격 확인 후 삭제")
+    public StatusResponseDto<AudioAlbum> deleteAudioAlbum(@PathVariable Long audioAlbumId,
+                                                          @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        audioAlbumService.deleteAudioAlbum(audioAlbumId, userDetails);
+        return StatusResponseDto.success(HttpStatus.OK, null);
     }
 }
