@@ -4,6 +4,7 @@ import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumRequestDto;
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumResponseDto;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
+import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.enums.ErrorMessage;
 import com.sparta.sogonsogon.member.entity.Member;
 import com.sparta.sogonsogon.member.repository.MemberRepository;
@@ -106,5 +107,24 @@ public class AudioAlbumService {
         }
 
         audioAlbumRepository.deleteById(audioAlbumId);
+    }
+
+    // 카테고리별 오디오앨범 조회
+    @Transactional
+    public Map<String, Object> findByCategory(int page, int size, String sortBy, CategoryType categoryType) {
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAllByCategory(categoryType,sortedPageable);
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent().stream().map(AudioAlbumResponseDto::new).toList();
+
+        // 생성된 오디오앨범의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioAlbumCount", audioAlbumPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioAlbumResponseDtoList);
+        responseBody.put("metadata", metadata);
+
+        return responseBody;
     }
 }

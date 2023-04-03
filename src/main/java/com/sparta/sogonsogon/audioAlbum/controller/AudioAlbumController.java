@@ -5,6 +5,7 @@ import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumResponseDto;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.service.AudioAlbumService;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
+import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.awt.*;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -39,6 +41,15 @@ public class AudioAlbumController {
                                                                  @RequestParam(defaultValue = "10") int size,
                                                                  @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAllAudioAlbum(page - 1, size, sortBy));
+    }
+
+    @GetMapping("/{categoryType}")
+    @Operation(summary = "오디오앨범 카테고리 검색", description = "음악, 일상, 도서, ASMR의 카테고리별 생성된 오디오앨범 조회")
+    public StatusResponseDto<Map<String, Object>> getAudioAlbumByCategory(@PathVariable CategoryType categoryType,
+                                                                                  @RequestParam(defaultValue = "1") int page,
+                                                                                  @RequestParam(defaultValue = "10") int size,
+                                                                                  @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findByCategory(page - 1, size, sortBy, categoryType));
     }
 
     @GetMapping("/find/{audioAlbumId}")
