@@ -11,11 +11,18 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,5 +59,24 @@ public class AudioAlbumService {
 
         audioAlbum = audioAlbumRepository.save(audioAlbum);
         return AudioAlbumResponseDto.of(audioAlbum);
+    }
+
+    // 오디오앨범 전체 조회
+    @Transactional
+    public Map<String, Object> findAllAudioAlbum(int page, int size, String sortBy) {
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAll(sortedPageable);
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent().stream().map(AudioAlbumResponseDto::new).toList();
+
+        // 생성된 오디오앨범의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioAlbumCount", audioAlbumPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioAlbumResponseDtoList);
+        responseBody.put("metadata", metadata);
+
+        return responseBody;
     }
 }
