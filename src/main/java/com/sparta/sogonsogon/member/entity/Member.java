@@ -66,6 +66,7 @@ public class Member extends TimeStamped{
         this.nickname = requestDto.getNickname();
         this.email = requestDto.getEmail();
         this.password = password;
+        this.profileImageUrl = "https://my-aws-bucket-image.s3.ap-northeast-2.amazonaws.com/%E1%84%83%E1%85%A2%E1%84%8C%E1%85%B5+161.png";
         this.role = MemberRoleEnum.USER;
     }
 
