@@ -132,7 +132,7 @@ public class MemberService {
     }
 
 
-    //유사한 유저 닉네임으로 정보 조회 무한스크롤 적용
+    // 유사한 유저 닉네임으로 정보 조회 무한스크롤 적용
     @Transactional(readOnly = true)
     public List<MemberOneResponseDto> getListBySimilarNickname(int page, int size, String sortBy, String nickname) {
         // 검색 조건 설정. 대소문자 상관없이 검색

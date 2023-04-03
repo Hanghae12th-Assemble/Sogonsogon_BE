@@ -62,6 +62,9 @@ public class Member extends TimeStamped{
     @OneToMany(mappedBy = "follower")
     private List<Follow> following = new ArrayList<>();
 
+    @Column
+    private Boolean isSubscribed = false;
+
     public Member(SignUpRequestDto requestDto, String password){
         this.membername = requestDto.getMembername();
         this.nickname = requestDto.getNickname();

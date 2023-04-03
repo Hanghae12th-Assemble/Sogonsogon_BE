@@ -7,6 +7,8 @@ import com.sparta.sogonsogon.audioclip.like.repository.AudioClipLikeRepository;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.ErrorMessage;
+import com.sparta.sogonsogon.noti.service.NotificationService;
+import com.sparta.sogonsogon.noti.util.AlarmType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class AudioClipLikeService {
 
     private final AudioClipRepository audioClipRepository;
     private final AudioClipLikeRepository audioClipLikeRepository;
+    private final NotificationService notificationService;
 
     //오디오 클립 좋아요 기능
     @Transactional
@@ -33,6 +36,12 @@ public class AudioClipLikeService {
         if(audioClipLike.isPresent()){
             audioClipLikeRepository.deleteById(audioClipLike.get().getId());
             return StatusResponseDto.success(HttpStatus.OK, new AudioClipIsLikeResponseDto("해당 오디오 클립에 좋아요가 취소 되었습니다. ", false));
+        }
+
+        // 좋아요를 눌렀을때 오디오 클립 생성자에게 알림 보내기
+        if (audioClip.getMember().getIsSubscribed() == true) {
+            String message = userDetails.getUser().getNickname() + " 님이 제목: " + audioClip.getTitle() + " 오디오의 좋아요를 눌렀습니다. ";
+            notificationService.send(audioClip.getMember(), AlarmType.eventAudioClipLike, message, userDetails.getUsername(), userDetails.getUser().getNickname(), userDetails.getUser().getProfileImageUrl());
         }
 
         audioClipLikeRepository.save(new AudioClipLike(audioClip, userDetails.getUser()));

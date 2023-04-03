@@ -10,6 +10,7 @@ import com.sparta.sogonsogon.util.S3Uploader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -72,12 +73,13 @@ public class MemberController {
         return memberService.getListByNickname(nickname);
     }
 
+
     @GetMapping("/similar-nickname")
     @Operation(summary = "유사한 닉네임으로 유저 조회", description = "유사한 닉네임 조회 무한스크롤 적용")
     public ResponseEntity<List<MemberOneResponseDto>> getMembersBySimilarNickname(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                    @RequestParam(value = "size",defaultValue = "10") int size,
-                                                                    @RequestParam(value = "sortBy",defaultValue = "id") String sortBy,
-                                                                    @RequestParam(value = "nickname") String nickname) {
+                                                                                  @RequestParam(value = "size",defaultValue = "10") int size,
+                                                                                  @RequestParam(value = "sortBy",defaultValue = "id") String sortBy,
+                                                                                  @RequestParam(value = "nickname") String nickname) {
         return ResponseEntity.ok(memberService.getListBySimilarNickname(page, size, sortBy, nickname));
 
     }

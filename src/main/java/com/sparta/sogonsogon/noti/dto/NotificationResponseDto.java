@@ -20,6 +20,7 @@ public class NotificationResponseDto {
     private String message;
 
     private Boolean readStatus;
+    private Boolean isSubscribed;
 
     private AlarmType alarmType;
 
@@ -32,11 +33,12 @@ public class NotificationResponseDto {
 
     @Builder
     public NotificationResponseDto(Long id, String message,Boolean readStatus,
-                                   AlarmType alarmType, String createdAt,
+                                   AlarmType alarmType, String createdAt,Boolean isSubscribed,
                                    String senderMembername,String senderNickname,String senderProfileImageUrl) {
         this.notificationId = id;
         this.message = message;
         this.readStatus = readStatus;
+        this.isSubscribed = isSubscribed;
         this.alarmType = alarmType;
         this.senderMembername = senderMembername;
         this.senderNickname = senderNickname;
@@ -48,6 +50,7 @@ public class NotificationResponseDto {
         this.notificationId = notification.getId();
         this.message = notification.getMessage();
         this.readStatus = notification.getIsRead();
+        this.isSubscribed = notification.getReceiver().getIsSubscribed();
         this.alarmType = notification.getAlarmType();
         this.senderMembername = notification.getSenderMembername();
         this.senderNickname = notification.getSenderNickname();
@@ -63,6 +66,7 @@ public class NotificationResponseDto {
                 .message(notification.getMessage())
                 .alarmType(notification.getAlarmType())
                 .readStatus(notification.getIsRead())
+                .isSubscribed(notification.getReceiver().getIsSubscribed())
                 .senderMembername(notification.getSenderMembername())
                 .senderNickname(notification.getSenderNickname())
                 .senderProfileImageUrl(notification.getSenderProfileImageUrl())
