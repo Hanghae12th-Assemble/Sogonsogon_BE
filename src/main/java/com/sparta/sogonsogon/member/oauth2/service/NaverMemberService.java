@@ -77,7 +77,6 @@ public class NaverMemberService {
                         .profileImageUrl(profileImageUrl)
                         .nickname(nickname)
                         .password(encodedPassword)
-                        .role(MemberRoleEnum.USER)
                         .build();
             }
             memberRepository.save(naverMember);
