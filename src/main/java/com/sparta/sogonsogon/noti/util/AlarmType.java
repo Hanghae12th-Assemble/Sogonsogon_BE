@@ -1,8 +1,9 @@
 package com.sparta.sogonsogon.noti.util;
 
 public enum AlarmType {
-    eventRadioStart,
-    eventRadioEnd,
+    eventAudioClipUploaded,
+    eventAudioClipLike,
+    eventCreateComment,
     eventFollower,
     eventSystem,
 
