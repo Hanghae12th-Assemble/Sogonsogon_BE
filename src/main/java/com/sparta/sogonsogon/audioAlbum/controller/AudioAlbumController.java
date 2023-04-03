@@ -26,7 +26,6 @@ public class AudioAlbumController {
 
     private AudioAlbumService audioAlbumService;
 
-    // 오디오앨범 생성
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "오디오앨범 생성", description = "오디오앨범을 생성한다.")
     public StatusResponseDto<AudioAlbumResponseDto> createAudioAlbum(@Valid @ModelAttribute AudioAlbumRequestDto requestDto,
@@ -34,7 +33,6 @@ public class AudioAlbumController {
         return StatusResponseDto.success(HttpStatus.CREATED, audioAlbumService.createAudioAlbum(requestDto, userDetails));
     }
 
-    // 전체 오디오앨범 조회
     @GetMapping("/")
     @Operation(summary = "전체 오디오앨범 조회", description = "생성된 오디오앨범 전체를 조회한다.")
     public StatusResponseDto<Map<String, Object>> getAudioAlbums(@RequestParam(defaultValue = "1") int page,
