@@ -32,9 +32,10 @@ public class AudioAlbum extends Timestamped {
     @JoinColumn(name = "member_Id")
     private Member member; // 오디오앨범 생성자
 
-    public void update(AudioAlbumRequestDto requestDto) {
+    public void update(AudioAlbumRequestDto requestDto, String imageurl) {
         this.title = requestDto.getTitle();
         this.instruction = requestDto.getInstruction();
         this.categoryType = requestDto.getCategoryType();
+        this.backgroundImageUrl = imageurl;
     }
 }
