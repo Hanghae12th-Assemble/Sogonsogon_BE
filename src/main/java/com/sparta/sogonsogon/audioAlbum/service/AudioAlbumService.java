@@ -1,9 +1,13 @@
 package com.sparta.sogonsogon.audioAlbum.service;
 
+import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumIsLikeResponseDto;
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumRequestDto;
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumResponseDto;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
+import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbumLike;
+import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumLikeRepository;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
+import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.enums.ErrorMessage;
 import com.sparta.sogonsogon.member.entity.Member;
@@ -16,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +37,7 @@ public class AudioAlbumService {
 
     private final MemberRepository memberRepository;
     private final AudioAlbumRepository audioAlbumRepository;
+    private final AudioAlbumLikeRepository audioAlbumLikeRepository;
     private final S3Uploader s3Uploader;
 
     // 오디오앨범 생성
@@ -157,5 +163,21 @@ public class AudioAlbumService {
         audioAlbum.update(requestDto, imageUrl);
 
         return AudioAlbumResponseDto.of(audioAlbum);
+    }
+
+    @Transactional
+    public StatusResponseDto<AudioAlbumIsLikeResponseDto> likeAudioAlbum(Long audioAlbumId, UserDetailsImpl userDetails) {
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+
+        Optional<AudioAlbumLike> audioAlbumLike = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser());
+        if (audioAlbumLike.isPresent()) {
+            audioAlbumLikeRepository.deleteById(audioAlbumLike.get().getId());
+            return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 취소 되었습니다.", false));
+        }
+
+        audioAlbumLikeRepository.save(new AudioAlbumLike(audioAlbum, userDetails.getUser()));
+        return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
     }
 }
