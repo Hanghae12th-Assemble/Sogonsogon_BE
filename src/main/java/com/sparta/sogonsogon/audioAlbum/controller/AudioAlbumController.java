@@ -66,9 +66,13 @@ public class AudioAlbumController {
 
     @DeleteMapping("/delete/{audioAlbumId}")
     @Operation(summary = "선택한 오디오앨범 삭제", description = "선택한 오디오앨범을 생성한 당사자라면 자격 확인 후 삭제")
-    public StatusResponseDto<AudioAlbum> deleteAudioAlbum(@PathVariable Long audioAlbumId,
+    public StatusResponseDto<AudioAlbumResponseDto> deleteAudioAlbum(@PathVariable Long audioAlbumId,
                                                           @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         audioAlbumService.deleteAudioAlbum(audioAlbumId, userDetails);
         return StatusResponseDto.success(HttpStatus.OK, null);
     }
+
+    @PostMapping("/like/{audioAlbumId}")
+    @Operation(summary = "선택한 오디오앨범 좋아요", description = "선택한 오디오앨범에 좋아요를 추가하거나 취소한다.")
+    public StatusResponseDto<Audio>
 }
