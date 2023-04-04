@@ -169,4 +169,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+### data 폴더
+data/
+
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,gradle
