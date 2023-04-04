@@ -28,7 +28,7 @@ public class NotificationController {
     @GetMapping(value = "/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return notificationService.subscribe(userDetails.getUser().getId() );
+        return notificationService.subscribe(userDetails);
     }
 
 

@@ -8,6 +8,7 @@ import com.sparta.sogonsogon.noti.entity.Notification;
 import com.sparta.sogonsogon.noti.repository.EmitterRepository;
 import com.sparta.sogonsogon.noti.repository.NotificationRepository;
 import com.sparta.sogonsogon.noti.util.AlarmType;
+import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Subscription;
@@ -30,14 +31,17 @@ public class NotificationService {
     private final MemberRepository memberRepository;
     private static final Long DEFAULT_TIMEOUT =  60 * 60000L;
 
-    public SseEmitter subscribe(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member id: " + memberId));
+    public SseEmitter subscribe(UserDetailsImpl userDetails) {
+        Member member = memberRepository.findById(userDetails.getUser().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member id: " + userDetails.getUser().getId()));
+
 
         member.setIsSubscribed(true);
         memberRepository.save(member);
+        send(userDetails.getUser(), AlarmType.eventSystem, "회원님이 알림 구독하였습니다.", null, null, null);
 
-        String emitterId = makeTimeIncludeId(memberId);
+
+        String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
         emitter.onCompletion(() -> {
             emitterRepository.deleteById(emitterId);
@@ -50,10 +54,9 @@ public class NotificationService {
             memberRepository.save(member);
         });
 
-        String eventId = makeTimeIncludeId(memberId);
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + memberId + "]");
+        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
+        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
 
-        send(member, AlarmType.eventSystem, "회원님이 알림 구독하였습니다.",null,null,null);
         return emitter;
     }
 
