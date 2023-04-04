@@ -154,12 +154,8 @@ public class AudioAlbumService {
         // 오디오앨범 사진 추가
         String imageUrl = s3Uploader.uploadFiles(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
 
-        AudioAlbum.builder()
-                .title(requestDto.getTitle())
-                .instruction(requestDto.getInstruction())
-                .categoryType(requestDto.getCategoryType())
-                .backgroundImageUrl(imageUrl)
-                .build();
+        audioAlbum.update(requestDto);
+        audioAlbum.setBackgroundImageUrl(imageUrl);
 
         return AudioAlbumResponseDto.of(audioAlbum);
     }

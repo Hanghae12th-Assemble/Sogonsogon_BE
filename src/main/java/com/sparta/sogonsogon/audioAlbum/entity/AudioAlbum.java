@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioAlbum.entity;
 
+import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumRequestDto;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.*;
@@ -30,4 +31,10 @@ public class AudioAlbum extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_Id")
     private Member member; // 오디오앨범 생성자
+
+    public void update(AudioAlbumRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.instruction = requestDto.getInstruction();
+        this.categoryType = requestDto.getCategoryType();
+    }
 }
