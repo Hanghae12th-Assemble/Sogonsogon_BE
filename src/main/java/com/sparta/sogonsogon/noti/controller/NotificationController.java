@@ -30,29 +30,20 @@ public class NotificationController {
     @Operation(summary = "알림 구독", description = "알림 구독")
     @GetMapping(value = "/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)///subscribe 엔드포인트로 들어오는 요청을 처리. produces 속성은 해당 메서드가 반환하는 데이터 형식을 지정
     @ResponseStatus(HttpStatus.OK)
-    // 해당 메서드가 반환하는 HTTP 응답 코드를 지정합니다.
-    // 이 경우 HttpStatus.OK 즉, 200을 반환합니다.
     public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return notificationService.subscribe( userDetails.getUser().getId() );
+        return notificationService.subscribe( userDetails);
     }
+        /*  subscribe() 메서드는 불필요한 코드가 아니며, 삭제하면 클라이언트(유저)는 SSE 구독을 요청할 수 없게 됩니다.
+    send() 메서드를 통해 알림 메시지를 전송할 수는 있지만,
+    클라이언트(유저)는 이를 수신할 수 있는 SSE 연결이 없기 때문에 알림 메시지를 실시간으로 받을 수 없게 됩니다. */
 
 
     @Operation(summary = "받은 알림 전체 조회", description = "받은 알림 전체 조회")
     @GetMapping("/AllNotifications")
     public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        List<Notification> notifications = notificationService.getNotificationsByReceiverId(receiverId, userDetails);
-//        return notifications.stream()
-//                .map(NotificationResponseDto::create)
-//                .collect(Collectors.toList());
+
         return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId()));
     }
-
-//    @GetMapping("/{notificationId}")
-//    @Operation(summary = "받은 알림 선택하여 조회", description = "받은 알림 선택하여 조회")
-//    public NotificationResponseDto getNotification(@PathVariable Long notificationId,
-//                                                   @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return notificationService.getNotification(notificationId,userDetails);
-//    }
 
     @PutMapping("/{notificationId}/confirm")
     @Operation(summary = "알림확인", description = "알림확인")

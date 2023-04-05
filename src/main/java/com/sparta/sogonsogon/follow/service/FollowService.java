@@ -96,7 +96,7 @@ public class FollowService {
 
             String message = "회원 " + follower.getNickname() + " 님이 회원님을 팔로우하였습니다.";
             notificationService.send(follow, AlarmType.eventFollower, message,follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
-
+            log.info("팔로우했지");
             return FollowResponseDto.of(newFollow,follow.getNickname() + "님을 팔로우하였습니다.", isFollow);
 
         } else {
@@ -106,7 +106,7 @@ public class FollowService {
             // 유저가 알림 구독 중인지 조회
             String message = "회원 " + follower.getNickname() + " 님이 회원님을 팔로우 취소하였습니다.";
             notificationService.send(follow, AlarmType.eventFollower, message,follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
-
+            log.info("팔로우 취소");
             return FollowResponseDto.of(followStatus,follow.getNickname() + "님을 팔로우 취소하였습니다.",isFollow);
         }
 

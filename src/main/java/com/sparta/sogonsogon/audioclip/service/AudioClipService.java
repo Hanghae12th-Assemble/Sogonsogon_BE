@@ -19,6 +19,7 @@ import com.sparta.sogonsogon.noti.util.AlarmType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AudioClipService {
 
     private final MemberRepository memberRepository;
@@ -62,6 +64,7 @@ public class AudioClipService {
         for (Follow following : followings) {
             String message = audioClip.getMember().getNickname() +"님이 제목:" + audioClip.getTitle() + "오디오 클립을 생성하였습니다. ";
             notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
+            log.info("생성하였습니다. ");
         }
 
         return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));

@@ -50,7 +50,6 @@ public class NotificationResponseDto {
         this.notificationId = notification.getId();
         this.message = notification.getMessage();
         this.readStatus = notification.getIsRead();
-        this.isSubscribed = notification.getReceiver().getIsSubscribed();
         this.alarmType = notification.getAlarmType();
         this.senderMembername = notification.getSenderMembername();
         this.senderNickname = notification.getSenderNickname();
@@ -66,7 +65,6 @@ public class NotificationResponseDto {
                 .message(notification.getMessage())
                 .alarmType(notification.getAlarmType())
                 .readStatus(notification.getIsRead())
-                .isSubscribed(notification.getReceiver().getIsSubscribed())
                 .senderMembername(notification.getSenderMembername())
                 .senderNickname(notification.getSenderNickname())
                 .senderProfileImageUrl(notification.getSenderProfileImageUrl())
