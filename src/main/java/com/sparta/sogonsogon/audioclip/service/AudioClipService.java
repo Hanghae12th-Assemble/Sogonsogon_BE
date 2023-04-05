@@ -55,17 +55,13 @@ public class AudioClipService {
         audioClipRepository.save(audioClip);
 
         // 본인이 알림 구독을 하였는지 확인
-        if (member.getIsSubscribed() == true) {
-            notificationService.send(member, AlarmType.eventAudioClipUploaded, "제목: " + audioClip.getTitle() + "오디오 클립이 생성되었습니다. ", null, null, null);
-        }
+        notificationService.send(member, AlarmType.eventAudioClipUploaded, "제목: " + audioClip.getTitle() + "오디오 클립이 생성되었습니다. ", null, null, null);
 
         // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
         for (Follow following : followings) {
-            if (following.getFollowing().getIsSubscribed() == true){
-                String message = audioClip.getMember().getNickname() +"님이 제목:" + audioClip.getTitle() + "오디오 클립을 생성하였습니다. ";
-                notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
-            }
+            String message = audioClip.getMember().getNickname() +"님이 제목:" + audioClip.getTitle() + "오디오 클립을 생성하였습니다. ";
+            notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
         }
 
         return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));
@@ -102,14 +98,11 @@ public class AudioClipService {
         if (member.getRole() == MemberRoleEnum.USER  || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClipRepository.deleteById(audioclipId);
 
-
             // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
             List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
             for (Follow following : followings) {
-                if (following.getFollower().getIsSubscribed() == true){
-                    String message = audioClip.getMember().getNickname() +"님이 제목:" + audioClip.getTitle() + "오디오 클립을 삭제하였습니다. ";
-                    notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
-                }
+                String message = audioClip.getMember().getNickname() +"님이 제목:" + audioClip.getTitle() + "오디오 클립을 삭제하였습니다. ";
+                notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
             }
 
             return StatusResponseDto.success(HttpStatus.OK, "오디오 클립이 삭제 되었습니다. ");

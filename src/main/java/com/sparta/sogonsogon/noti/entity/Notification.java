@@ -67,13 +67,6 @@ public class Notification extends TimeStamped{
         this.senderProfileImageUrl = senderProfileImageUrl;
     }
 
-//    public boolean getIsRead() {
-//        return isRead=false;
-//    }
-//
-//    public void setIsRead(boolean isRead) {
-//        this.isRead = isRead;
-//    }
 
 
 

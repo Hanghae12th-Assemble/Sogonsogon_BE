@@ -8,10 +8,8 @@ import com.sparta.sogonsogon.noti.entity.Notification;
 import com.sparta.sogonsogon.noti.repository.EmitterRepository;
 import com.sparta.sogonsogon.noti.repository.NotificationRepository;
 import com.sparta.sogonsogon.noti.util.AlarmType;
-import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.Subscription;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -29,33 +27,17 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     private final MemberRepository memberRepository;
-    private static final Long DEFAULT_TIMEOUT =  60 * 60000L;
+    //DEFAULT_TIMEOUT을 기본값으로 설정
+    private static final Long DEFAULT_TIMEOUT = 60 * 10000L;
 
-    public SseEmitter subscribe(UserDetailsImpl userDetails) {
-        Member member = memberRepository.findById(userDetails.getUser().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member id: " + userDetails.getUser().getId()));
-
-
-        member.setIsSubscribed(true);
-        memberRepository.save(member);
-        send(userDetails.getUser(), AlarmType.eventSystem, "회원님이 알림 구독하였습니다.", null, null, null);
-
-
-        String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
+    public SseEmitter subscribe(Long memberId) {
+        String emitterId = makeTimeIncludeId(memberId);
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        emitter.onCompletion(() -> {
-            emitterRepository.deleteById(emitterId);
-            member.setIsSubscribed(false);
-            memberRepository.save(member);
-        });
-        emitter.onTimeout(() -> {
-            emitterRepository.deleteById(emitterId);
-            member.setIsSubscribed(false);
-            memberRepository.save(member);
-        });
+        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); //onCompletion 메서드: SseEmitter가 완료될 때 호출되는 콜백 함수를 정의
+        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); //  SSEEmitter를 찾아 emitterRepository에서 삭제하는 메서드
 
-        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+        String eventId = makeTimeIncludeId(memberId);
+        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + memberId + "]");
 
         return emitter;
     }
@@ -87,9 +69,12 @@ public class NotificationService {
     }
 
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
+        //send() 메서드는 Member 객체와 AlarmType 열거형, 알림 메시지(String)와 알림 상태(Boolean) 값을 인자로 받아 기능을 구현한다.
         Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message,senderMembername,senderNickname,senderProfileImageUrl));
 
+        // Notification 객체의 수신자 ID를 추출하고,
         String receiverId = String.valueOf(receiver.getId());
+        // 현재 시간을 포함한 고유한 eventId를 생성한다.
         String eventId = receiverId + "_" + System.currentTimeMillis();
 
         Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
@@ -101,6 +86,7 @@ public class NotificationService {
         );
     }
 
+
     private Notification createNotification(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
         Notification notification = new Notification();
         notification.setReceiver(receiver);
@@ -111,8 +97,6 @@ public class NotificationService {
         notification.setSenderProfileImageUrl(senderProfileImageUrl);
         return notificationRepository.save(notification);
     }
-
-
 
 
     //받은 알림 전체 조회
@@ -140,7 +124,6 @@ public class NotificationService {
             notification.setIsRead(true);
             notificationRepository.save(notification);
         }
-
         return new NotificationResponseDto(notification);
     }
 
@@ -155,7 +138,5 @@ public class NotificationService {
         }
         notificationRepository.deleteById(notificationId);
 
-
     }
-
 }

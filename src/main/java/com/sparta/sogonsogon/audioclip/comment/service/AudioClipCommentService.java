@@ -38,11 +38,8 @@ public class AudioClipCommentService {
         Comment comment = new Comment(userDetails.getUser(), audioClip, content);
         audioClipCommentRepository.save(comment);
 
-        // 오디오 생성 유저가 알림 구독하였을 경우, 메세지 전송
-        if (audioClip.getMember().getIsSubscribed() == true) {
-            // 댓글 생성될 때 오디오 클립 생성한 유저한테 알림 가기
-            notificationService.send(audioClip.getMember(), AlarmType.eventCreateComment, "제목: " + audioClip.getTitle() + "오디오 클립에 댓글이 생성되었습니다.  ", comment.getMember().getMembername(), comment.getMember().getNickname(), comment.getMember().getProfileImageUrl());
-        }
+        // 댓글 생성될 때 오디오 클립 생성한 유저한테 알림 가기
+        notificationService.send(audioClip.getMember(), AlarmType.eventCreateComment, "제목: " + audioClip.getTitle() + "오디오 클립에 댓글이 생성되었습니다.  ", comment.getMember().getMembername(), comment.getMember().getNickname(), comment.getMember().getProfileImageUrl());
 
         return StatusResponseDto.success(HttpStatus.OK, new CommentResponseDto(comment));
     }

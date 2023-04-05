@@ -45,21 +45,6 @@ public class EmitterRepositoryImpl implements EmitterRepository {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-//    @Override
-//    public Map<String, SseEmitter> findAllEmitterStartWithByMemberId(String memberId) {
-//
-//        return emitters.entrySet().stream()
-//                .filter(entry -> Arrays.stream(entry.getKey().split("_")).findFirst().get().equals(memberId))
-//                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-//    }
-//
-//    @Override
-//    public Map<String, Object> findAllEventCacheStartWithByMemberId(String memberId) {
-//        return eventCache.entrySet().stream()
-//                .filter(entry -> Arrays.stream(entry.getKey().split("_")).findFirst().get().equals(memberId))
-//                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-//    }
-
     @Override
     public void deleteById(String id) {
         emitters.remove(id);
