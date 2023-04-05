@@ -1,9 +1,7 @@
 package com.sparta.sogonsogon.audioclip.entity;
 
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
-import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
-import com.sparta.sogonsogon.audioclip.like.entity.AudioClipLike;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;

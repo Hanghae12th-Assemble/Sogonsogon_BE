@@ -1,9 +1,9 @@
-package com.sparta.sogonsogon.audioclip.like.service;
+package com.sparta.sogonsogon.audioclip.service;
 
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
-import com.sparta.sogonsogon.audioclip.like.dto.AudioClipIsLikeResponseDto;
-import com.sparta.sogonsogon.audioclip.like.entity.AudioClipLike;
-import com.sparta.sogonsogon.audioclip.like.repository.AudioClipLikeRepository;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipIsLikeResponseDto;
+import com.sparta.sogonsogon.audioclip.entity.AudioClipLike;
+import com.sparta.sogonsogon.audioclip.repository.AudioClipLikeRepository;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.ErrorMessage;

@@ -1,6 +1,6 @@
-package com.sparta.sogonsogon.audioclip.comment.entity;
+package com.sparta.sogonsogon.audioclip.entity;
 
-import com.sparta.sogonsogon.audioclip.comment.dto.CommentRequestDto;
+import com.sparta.sogonsogon.audioclip.dto.CommentRequestDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.audioclip.entity.TimeStamped;
 import com.sparta.sogonsogon.member.entity.Member;

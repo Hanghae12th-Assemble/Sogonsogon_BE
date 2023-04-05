@@ -1,4 +1,4 @@
-package com.sparta.sogonsogon.audioclip.like.dto;
+package com.sparta.sogonsogon.audioclip.dto;
 
 import lombok.Builder;
 import lombok.Getter;

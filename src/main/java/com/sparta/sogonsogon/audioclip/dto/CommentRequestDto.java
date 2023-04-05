@@ -1,4 +1,4 @@
-package com.sparta.sogonsogon.audioclip.comment.dto;
+package com.sparta.sogonsogon.audioclip.dto;
 
 import lombok.Data;
 

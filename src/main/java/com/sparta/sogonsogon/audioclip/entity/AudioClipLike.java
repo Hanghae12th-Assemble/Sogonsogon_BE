@@ -1,4 +1,4 @@
-package com.sparta.sogonsogon.audioclip.like.entity;
+package com.sparta.sogonsogon.audioclip.entity;
 
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.member.entity.Member;
