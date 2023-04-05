@@ -1,6 +1,7 @@
 package com.sparta.sogonsogon.noti.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import com.sparta.sogonsogon.enums.ErrorMessage;
 import com.sparta.sogonsogon.member.entity.Member;
 import com.sparta.sogonsogon.member.repository.MemberRepository;
 import com.sparta.sogonsogon.noti.dto.NotificationResponseDto;
@@ -118,8 +119,11 @@ public class NotificationService {
 
     //받은 알림 전체 조회
     public List<NotificationResponseDto> getAllNotifications(Long memberId) {
-
-        List<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
+        Member receiverId = memberRepository.findById(memberId).orElseThrow(
+                ()-> new IllegalArgumentException("조회된 유저 없음")
+        );
+        List<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(receiverId.getId());
+        log.info("알림 전체 조회했어");
         return notifications.stream()
                 .map(NotificationResponseDto::create)
                 .collect(Collectors.toList());

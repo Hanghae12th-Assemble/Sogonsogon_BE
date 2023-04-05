@@ -20,7 +20,6 @@ public class NotificationResponseDto {
     private String message;
 
     private Boolean readStatus;
-    private Boolean isSubscribed;
 
     private AlarmType alarmType;
 
@@ -38,7 +37,6 @@ public class NotificationResponseDto {
         this.notificationId = id;
         this.message = message;
         this.readStatus = readStatus;
-        this.isSubscribed = isSubscribed;
         this.alarmType = alarmType;
         this.senderMembername = senderMembername;
         this.senderNickname = senderNickname;
