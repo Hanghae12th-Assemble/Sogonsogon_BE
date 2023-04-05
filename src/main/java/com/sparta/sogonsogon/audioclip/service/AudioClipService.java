@@ -1,5 +1,7 @@
 package com.sparta.sogonsogon.audioclip.service;
 
+import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
+import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
@@ -27,20 +29,24 @@ import java.util.Optional;
 public class AudioClipService {
 
     private final MemberRepository memberRepository;
+    private final AudioAlbumRepository audioAlbumRepository;
     private final AudioClipRepository audioClipRepository;
     private final AudioClipLikeRepository audioClipLikeRepository;
     private final S3Uploader s3Uploader;
 
     //오디오 클립 생성
     @Transactional
-    public StatusResponseDto<AudioClipResponseDto> createdAudioClip(AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
+    public StatusResponseDto<AudioClipResponseDto> createdAudioClip(Long audioablumId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
         String audioclipImageUrl = s3Uploader.uploadFiles(requestDto.getAudioclipImage(), "audioclipImage/");
         String audioclipUrl = s3Uploader.uploadFiles(requestDto.getAudioclip(), "audioclips/");
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioablumId).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
         Member member = memberRepository.findByMembername(userDetails.getUsername()).orElseThrow(
                 ()-> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
 
-        AudioClip audioClip = new AudioClip(requestDto, member, audioclipUrl, audioclipImageUrl);
+        AudioClip audioClip = new AudioClip(requestDto, member, audioclipUrl, audioclipImageUrl, audioAlbum);
         audioClipRepository.save(audioClip);
         return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));
     }

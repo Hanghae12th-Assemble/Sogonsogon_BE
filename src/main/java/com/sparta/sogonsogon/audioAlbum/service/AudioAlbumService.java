@@ -18,6 +18,7 @@ import com.sparta.sogonsogon.member.repository.MemberRepository;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AudioAlbumService {
 
@@ -58,6 +60,7 @@ public class AudioAlbumService {
         // 오디오앨범 사진 추가
         String imageUrl = s3Uploader.uploadFiles(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
 
+        log.info(requestDto.getCategoryType().toString());
         AudioAlbum audioAlbum = AudioAlbum.builder()
                 .title(requestDto.getTitle())
                 .instruction(requestDto.getInstruction())

@@ -24,7 +24,7 @@ public class AudioAlbumResponseDto {
 
     private String backgroundImageUrl;
 
-    private CategoryType categoryType;
+    private String categoryType;
 
     private String createdAt;
 
@@ -45,7 +45,7 @@ public class AudioAlbumResponseDto {
         this.title = audioAlbum.getTitle();
         this.instruction = audioAlbum.getInstruction();
         this.backgroundImageUrl = audioAlbum.getBackgroundImageUrl();
-        this.categoryType = audioAlbum.getCategoryType();
+        this.categoryType = audioAlbum.getCategoryType().getValue();
         this.createdAt = audioAlbum.getCreatedAt().toString();
         this.modifiedAt = audioAlbum.getModifiedAt().toString();
         this.memberName = audioAlbum.getMember().getMembername();
@@ -58,7 +58,7 @@ public class AudioAlbumResponseDto {
         this.title = audioAlbum.getTitle();
         this.instruction = audioAlbum.getInstruction();
         this.backgroundImageUrl = audioAlbum.getBackgroundImageUrl();
-        this.categoryType = audioAlbum.getCategoryType();
+        this.categoryType = audioAlbum.getCategoryType().getValue();
         this.createdAt = audioAlbum.getCreatedAt().toString();
         this.modifiedAt = audioAlbum.getModifiedAt().toString();
         this.memberName = audioAlbum.getMember().getMembername();

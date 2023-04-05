@@ -54,12 +54,13 @@ public class AudioClip extends TimeStamped{
 
 
     @Builder
-    public AudioClip(AudioClipRequestDto requestDto, Member member, String audioclipUrl, String audioclipImageUrl){
+    public AudioClip(AudioClipRequestDto requestDto, Member member, String audioclipUrl, String audioclipImageUrl, AudioAlbum audio_album){
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
         this.audioclipImageUrl = audioclipImageUrl;
         this.audioclipUrl = audioclipUrl;
         this.member = member;
+        this.audio_album = audio_album;
     }
 
     public void update (AudioClipRequestDto requestDto, String audioclipUrl, String audioclipImageUrl){
