@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Slf4j
 public class AudioAlbumService {
@@ -66,6 +67,7 @@ public class AudioAlbumService {
         // 오디오앨범 사진 추가
         String imageUrl = s3Uploader.uploadFiles(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
 
+        log.info(requestDto.getCategoryType().toString());
         AudioAlbum audioAlbum = AudioAlbum.builder()
                 .title(requestDto.getTitle())
                 .instruction(requestDto.getInstruction())
