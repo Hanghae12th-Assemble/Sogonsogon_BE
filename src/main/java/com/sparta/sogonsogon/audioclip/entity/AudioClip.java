@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioclip.entity;
 
+import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
 import com.sparta.sogonsogon.audioclip.like.entity.AudioClipLike;
@@ -46,6 +47,10 @@ public class AudioClip extends TimeStamped{
 
     @OneToMany(mappedBy = "audioclip", cascade = CascadeType.REMOVE)
     List<AudioClipLike> audioClipLikes = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "audio_album_id")
+    private AudioAlbum audio_album;
 
 
     @Builder

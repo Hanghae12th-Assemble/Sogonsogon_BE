@@ -6,4 +6,5 @@ public enum CategoryType {
     일상,
     도서,
     ASMR;
+
 }
