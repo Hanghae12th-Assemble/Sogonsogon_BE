@@ -119,9 +119,9 @@ public class NotificationService {
 
     //받은 알림 전체 조회
     public List<NotificationResponseDto> getAllNotifications(Long memberId) {
-        Member receiverId = memberRepository.findById(memberId).orElseThrow(
-                ()-> new IllegalArgumentException("조회된 유저 없음")
-        );
+//        Member receiverId = memberRepository.findById(memberId).orElseThrow(
+//                ()-> new IllegalArgumentException("조회된 유저 없음")
+//        );
         List<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
         log.info("알림 전체 조회했어");
         return notifications.stream()
