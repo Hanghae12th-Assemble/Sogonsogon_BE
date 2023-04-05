@@ -32,7 +32,7 @@ public class NotificationResponseDto {
 
     @Builder
     public NotificationResponseDto(Long id, String message,Boolean readStatus,
-                                   AlarmType alarmType, String createdAt,Boolean isSubscribed,
+                                   AlarmType alarmType, String createdAt,
                                    String senderMembername,String senderNickname,String senderProfileImageUrl) {
         this.notificationId = id;
         this.message = message;

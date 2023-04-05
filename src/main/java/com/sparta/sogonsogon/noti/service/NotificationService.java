@@ -122,7 +122,7 @@ public class NotificationService {
         Member receiverId = memberRepository.findById(memberId).orElseThrow(
                 ()-> new IllegalArgumentException("조회된 유저 없음")
         );
-        List<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(receiverId.getId());
+        List<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
         log.info("알림 전체 조회했어");
         return notifications.stream()
                 .map(NotificationResponseDto::create)
