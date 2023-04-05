@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class AudioClipOneResponseDto {
 
     private Long id;
+    private String aublumTitle;
     private String title;
     private String contents;
     private String audioclipImageUrl;
@@ -27,6 +28,7 @@ public class AudioClipOneResponseDto {
     public AudioClipOneResponseDto(AudioClip audioClip, boolean isLikeCheck){
         this.id = audioClip.getId();
         this.title = audioClip.getTitle();
+        this.aublumTitle = audioClip.getAudio_album().getTitle();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
         this.audioclipUrl = audioClip.getAudioclipUrl();

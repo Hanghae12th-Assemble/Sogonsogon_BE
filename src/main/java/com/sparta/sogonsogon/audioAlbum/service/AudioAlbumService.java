@@ -7,6 +7,9 @@ import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbumLike;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumLikeRepository;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
+import com.sparta.sogonsogon.audioclip.entity.AudioClip;
+import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.enums.ErrorMessage;
@@ -15,6 +18,7 @@ import com.sparta.sogonsogon.member.repository.MemberRepository;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,17 +30,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AudioAlbumService {
 
     private final MemberRepository memberRepository;
     private final AudioAlbumRepository audioAlbumRepository;
+    private final AudioClipRepository audioClipRepository;
     private final AudioAlbumLikeRepository audioAlbumLikeRepository;
     private final S3Uploader s3Uploader;
 
@@ -57,6 +60,7 @@ public class AudioAlbumService {
         // 오디오앨범 사진 추가
         String imageUrl = s3Uploader.uploadFiles(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
 
+        log.info(requestDto.getCategoryType().toString());
         AudioAlbum audioAlbum = AudioAlbum.builder()
                 .title(requestDto.getTitle())
                 .instruction(requestDto.getInstruction())
@@ -75,7 +79,10 @@ public class AudioAlbumService {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
         Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAll(sortedPageable);
-        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent().stream().map(AudioAlbumResponseDto::new).toList();
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent()
+                .stream()
+                .map(AudioAlbumResponseDto::new)
+                .toList();
 
         // 생성된 오디오앨범의 개수
         Map<String, Object> metadata = new HashMap<>();
@@ -90,11 +97,29 @@ public class AudioAlbumService {
 
     // 선택한 오디오앨범 조회
     @Transactional
-    public AudioAlbumResponseDto findAudioAlbum(Long audioAlbumId) {
+    public AudioAlbumResponseDto findAudioAlbum(Long audioAlbumId, UserDetailsImpl userDetails) {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
-        return AudioAlbumResponseDto.of(audioAlbum);
+
+
+        List<AudioClip> foundAudioClip = audioClipRepository.findTop10ByAudioAlbumIdOrderByCreatedAtDesc(audioAlbumId)
+                .stream()
+                .limit(10)
+                .toList();
+        List<AudioClipResponseDto> audioAlbumResponseDtos = new ArrayList<>();
+        if(!foundAudioClip.isEmpty()){
+            for(AudioClip audioClip : foundAudioClip){
+                audioAlbumResponseDtos.add(new AudioClipResponseDto(audioClip));
+            }
+        }else {
+            audioAlbumResponseDtos = null;
+        }
+        boolean isLikeCheck = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser()).isPresent();
+        boolean isMine = audioAlbum.getMember().getId().equals(userDetails.getUser().getId());
+
+
+        return new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine);
     }
 
     // 선택한 오디오앨범 삭제
