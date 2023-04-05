@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -56,7 +58,7 @@ public class NotificationResponseDto {
     }
 
     public static NotificationResponseDto create(Notification notification) {
-        String createdAt = Chrono.timesAgo(notification.getCreatedAt());
+//        String createdAt = Chrono.timesAgo(notification.getCreatedAt());
 
         return NotificationResponseDto.builder()
                 .id(notification.getId())
@@ -66,7 +68,7 @@ public class NotificationResponseDto {
                 .senderMembername(notification.getSenderMembername())
                 .senderNickname(notification.getSenderNickname())
                 .senderProfileImageUrl(notification.getSenderProfileImageUrl())
-                .createdAt(createdAt)
+                .createdAt(String.valueOf(LocalDateTime.now()))
                 .build();
     }
 
