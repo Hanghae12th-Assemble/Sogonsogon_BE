@@ -42,14 +42,6 @@ public class AudioAlbumController {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAllAudioAlbum(page - 1, size, sortBy));
     }
 
-    @GetMapping("/like")
-    @Operation(summary = "전체 오디오앨범 조회", description = "생성된 오디오앨범 전체를 조회한다. 최신순으로 정렬 ")
-    public StatusResponseDto<Map<String, Object>> getAudioAlbums(@RequestParam(defaultValue = "1") int page,
-                                                                 @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
-        return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAllAudioAlbumSortByLike(page - 1, size, sortBy));
-    }
-
     @GetMapping("/{categoryType}")
     @Operation(summary = "오디오앨범 카테고리 조회", description = "음악, 일상, 도서, ASMR의 카테고리별 생성된 오디오앨범 조회")
     public StatusResponseDto<Map<String, Object>> getAudioAlbumByCategory(@PathVariable CategoryType categoryType,
