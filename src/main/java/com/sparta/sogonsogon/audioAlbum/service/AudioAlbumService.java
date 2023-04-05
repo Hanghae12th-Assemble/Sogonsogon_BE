@@ -205,4 +205,5 @@ public class AudioAlbumService {
         audioAlbumLikeRepository.save(new AudioAlbumLike(audioAlbum, userDetails.getUser()));
         return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
     }
+
 }

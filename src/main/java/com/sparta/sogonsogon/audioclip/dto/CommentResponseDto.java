@@ -1,11 +1,9 @@
-package com.sparta.sogonsogon.audioclip.comment.dto;
+package com.sparta.sogonsogon.audioclip.dto;
 
-import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
+import com.sparta.sogonsogon.audioclip.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 @Builder
 @Data

@@ -1,7 +1,7 @@
-package com.sparta.sogonsogon.audioclip.like.repository;
+package com.sparta.sogonsogon.audioclip.repository;
 
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
-import com.sparta.sogonsogon.audioclip.like.entity.AudioClipLike;
+import com.sparta.sogonsogon.audioclip.entity.AudioClipLike;
 import com.sparta.sogonsogon.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 

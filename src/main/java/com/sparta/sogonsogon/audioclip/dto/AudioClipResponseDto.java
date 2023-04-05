@@ -1,13 +1,11 @@
 package com.sparta.sogonsogon.audioclip.dto;
 
-import com.sparta.sogonsogon.audioclip.comment.dto.CommentResponseDto;
-import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
+import com.sparta.sogonsogon.audioclip.entity.Comment;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
