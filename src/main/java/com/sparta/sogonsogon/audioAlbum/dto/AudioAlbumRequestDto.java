@@ -22,7 +22,6 @@ public class AudioAlbumRequestDto {
     private String instruction;
 
     private MultipartFile backgroundImageUrl;
-
-     private CategoryType categoryType;
+    private CategoryType categoryType;
 
 }

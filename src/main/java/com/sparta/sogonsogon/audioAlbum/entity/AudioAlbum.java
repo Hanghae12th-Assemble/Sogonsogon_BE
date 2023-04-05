@@ -1,11 +1,14 @@
 package com.sparta.sogonsogon.audioAlbum.entity;
 
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumRequestDto;
+import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -13,6 +16,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "audio_album")
 public class AudioAlbum extends Timestamped {
 
     @Id
@@ -31,6 +35,10 @@ public class AudioAlbum extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_Id")
     private Member member; // 오디오앨범 생성자
+
+    @OneToMany(mappedBy = "audio_album", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    List<AudioClip> audioClips = new ArrayList<>();
+
 
     public void update(AudioAlbumRequestDto requestDto, String imageurl) {
         this.title = requestDto.getTitle();

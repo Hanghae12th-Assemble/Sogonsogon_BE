@@ -16,6 +16,7 @@ import java.util.List;
 public class AudioClipResponseDto {
 
     private Long id;
+    private String ablumTile;
     private String title;
     private String contents;
     private String audioclipImageUrl;
@@ -33,6 +34,7 @@ public class AudioClipResponseDto {
     @Builder
     public AudioClipResponseDto(AudioClip audioClip){
         this.id = audioClip.getId();
+        this.ablumTile = audioClip.getAudio_album().getTitle();
         this.title = audioClip.getTitle();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
