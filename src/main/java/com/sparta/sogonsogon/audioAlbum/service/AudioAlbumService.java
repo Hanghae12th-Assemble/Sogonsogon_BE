@@ -39,7 +39,6 @@ import java.util.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Slf4j
 public class AudioAlbumService {
 
     private final MemberRepository memberRepository;
