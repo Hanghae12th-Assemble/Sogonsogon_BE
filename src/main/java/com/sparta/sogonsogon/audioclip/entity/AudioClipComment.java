@@ -1,8 +1,6 @@
 package com.sparta.sogonsogon.audioclip.entity;
 
-import com.sparta.sogonsogon.audioclip.dto.CommentRequestDto;
-import com.sparta.sogonsogon.audioclip.entity.AudioClip;
-import com.sparta.sogonsogon.audioclip.entity.TimeStamped;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipCommentRequestDto;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +35,7 @@ public class AudioClipComment extends TimeStamped{
         this.member = member;
     }
 
-    public void update(CommentRequestDto requestDto){
+    public void update(AudioClipCommentRequestDto requestDto){
         this.content = requestDto.getContent();
     }
 

@@ -3,7 +3,7 @@ package com.sparta.sogonsogon.audioclip.dto;
 import lombok.Data;
 
 @Data
-public class CommentRequestDto {
+public class AudioClipCommentRequestDto {
 
     private String content;
 }

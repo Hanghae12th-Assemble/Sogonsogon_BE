@@ -8,7 +8,7 @@ import lombok.Data;
 @Builder
 @Data
 @AllArgsConstructor
-public class CommentResponseDto {
+public class AudioClipCommentResponseDto {
 
     private Long id;
     private String content;
@@ -17,7 +17,7 @@ public class CommentResponseDto {
     private String createdAt;
     private String modifiedAt;
 
-    public CommentResponseDto(AudioClipComment comment){
+    public AudioClipCommentResponseDto(AudioClipComment comment){
         this.id = comment.getId();
         this.content = comment.getContent();
         this.membername = comment.getMember().getMembername();
@@ -26,8 +26,8 @@ public class CommentResponseDto {
         this.modifiedAt = comment.getModifiedAt().toString();
     }
 
-    public static CommentResponseDto from(AudioClipComment comment){
-        return CommentResponseDto.builder()
+    public static AudioClipCommentResponseDto from(AudioClipComment comment){
+        return AudioClipCommentResponseDto.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
                 .membername(comment.getMember().getMembername())

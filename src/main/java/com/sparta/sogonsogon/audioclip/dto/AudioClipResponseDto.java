@@ -27,7 +27,7 @@ public class AudioClipResponseDto {
     private int isLikeCount;
     private boolean isLikeCheck;
 
-    private List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
+    private List<AudioClipCommentResponseDto> audioClipCommentResponseDtos = new ArrayList<>();
 
     @Builder
     public AudioClipResponseDto(AudioClip audioClip){
@@ -43,7 +43,7 @@ public class AudioClipResponseDto {
         this.modifiedAt = audioClip.getModifiedAt().toString();
         this.isLikeCount = audioClip.getAudioClipLikes().size();
         for (Comment comment : audioClip.getCommentList()) {
-            this.commentResponseDtos.add(CommentResponseDto.from(comment));
+            this.audioClipCommentResponseDtos.add(AudioClipCommentResponseDto.from(comment));
         }
     }
 
@@ -63,7 +63,7 @@ public class AudioClipResponseDto {
         this.isLikeCount = audioClip.getAudioClipLikes().size();
         this.isLikeCheck = isLikeCheck;
         for (Comment comment : audioClip.getCommentList()) {
-            this.commentResponseDtos.add(CommentResponseDto.from(comment));
+            this.audioClipCommentResponseDtos.add(AudioClipCommentResponseDto.from(comment));
         }
 
 
