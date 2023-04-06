@@ -15,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "audioclip_comment")
-public class Comment extends TimeStamped{
+public class AudioClipComment extends TimeStamped{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class Comment extends TimeStamped{
     @JoinColumn(name = "audioclip_id")
     private AudioClip audioclip;
 
-    public Comment(Member member, AudioClip audioClip, String content){
+    public AudioClipComment(Member member, AudioClip audioClip, String content){
         this.content = content;
         this.audioclip = audioClip;
         this.member = member;
