@@ -190,20 +190,4 @@ public class AudioAlbumService {
         return AudioAlbumResponseDto.of(audioAlbum);
     }
 
-    @Transactional
-    public StatusResponseDto<AudioAlbumIsLikeResponseDto> likeAudioAlbum(Long audioAlbumId, UserDetailsImpl userDetails) {
-        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
-                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
-        );
-
-        Optional<AudioAlbumLike> audioAlbumLike = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser());
-        if (audioAlbumLike.isPresent()) {
-            audioAlbumLikeRepository.deleteById(audioAlbumLike.get().getId());
-            return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 취소 되었습니다.", false));
-        }
-
-        audioAlbumLikeRepository.save(new AudioAlbumLike(audioAlbum, userDetails.getUser()));
-        return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
-    }
-
 }

@@ -73,11 +73,4 @@ public class AudioAlbumController {
         return StatusResponseDto.success(HttpStatus.OK, null);
     }
 
-    @PostMapping("/like/{audioAlbumId}")
-    @Operation(summary = "선택한 오디오앨범 좋아요", description = "선택한 오디오앨범에 좋아요를 추가하거나 취소한다.")
-    public StatusResponseDto<AudioAlbumIsLikeResponseDto> likeAudioAlbum(@PathVariable Long audioAlbumId,
-                                                                         @Parameter(hidden = true)
-                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return audioAlbumService.likeAudioAlbum(audioAlbumId, userDetails);
-    }
 }
