@@ -5,8 +5,8 @@ import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
-import com.sparta.sogonsogon.audioclip.like.entity.AudioClipLike;
-import com.sparta.sogonsogon.audioclip.like.repository.AudioClipLikeRepository;
+import com.sparta.sogonsogon.audioclip.entity.AudioClipLike;
+import com.sparta.sogonsogon.audioclip.repository.AudioClipLikeRepository;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.ErrorMessage;
@@ -45,7 +45,6 @@ public class AudioClipService {
     private final FollowRepository followRepository;
 
     private final S3Uploader s3Uploader;
-
 
     //오디오 클립 생성
     @Transactional

@@ -1,6 +1,6 @@
-package com.sparta.sogonsogon.audioclip.comment.repository;
+package com.sparta.sogonsogon.audioclip.repository;
 
-import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
+import com.sparta.sogonsogon.audioclip.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

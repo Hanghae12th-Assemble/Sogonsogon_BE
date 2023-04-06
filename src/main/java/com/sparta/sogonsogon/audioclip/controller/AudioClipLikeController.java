@@ -1,7 +1,7 @@
-package com.sparta.sogonsogon.audioclip.like.controller;
+package com.sparta.sogonsogon.audioclip.controller;
 
-import com.sparta.sogonsogon.audioclip.like.dto.AudioClipIsLikeResponseDto;
-import com.sparta.sogonsogon.audioclip.like.service.AudioClipLikeService;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipIsLikeResponseDto;
+import com.sparta.sogonsogon.audioclip.service.AudioClipLikeService;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;

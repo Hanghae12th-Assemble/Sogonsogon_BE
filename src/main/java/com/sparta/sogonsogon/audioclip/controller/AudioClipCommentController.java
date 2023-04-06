@@ -1,8 +1,8 @@
-package com.sparta.sogonsogon.audioclip.comment.controller;
+package com.sparta.sogonsogon.audioclip.controller;
 
-import com.sparta.sogonsogon.audioclip.comment.dto.CommentRequestDto;
-import com.sparta.sogonsogon.audioclip.comment.dto.CommentResponseDto;
-import com.sparta.sogonsogon.audioclip.comment.service.AudioClipCommentService;
+import com.sparta.sogonsogon.audioclip.dto.CommentRequestDto;
+import com.sparta.sogonsogon.audioclip.dto.CommentResponseDto;
+import com.sparta.sogonsogon.audioclip.service.AudioClipCommentService;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;

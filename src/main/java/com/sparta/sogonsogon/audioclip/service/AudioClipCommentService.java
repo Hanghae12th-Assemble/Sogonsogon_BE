@@ -1,9 +1,9 @@
-package com.sparta.sogonsogon.audioclip.comment.service;
+package com.sparta.sogonsogon.audioclip.service;
 
-import com.sparta.sogonsogon.audioclip.comment.dto.CommentRequestDto;
-import com.sparta.sogonsogon.audioclip.comment.dto.CommentResponseDto;
-import com.sparta.sogonsogon.audioclip.comment.entity.Comment;
-import com.sparta.sogonsogon.audioclip.comment.repository.AudioClipCommentRepository;
+import com.sparta.sogonsogon.audioclip.dto.CommentRequestDto;
+import com.sparta.sogonsogon.audioclip.dto.CommentResponseDto;
+import com.sparta.sogonsogon.audioclip.entity.Comment;
+import com.sparta.sogonsogon.audioclip.repository.AudioClipCommentRepository;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
