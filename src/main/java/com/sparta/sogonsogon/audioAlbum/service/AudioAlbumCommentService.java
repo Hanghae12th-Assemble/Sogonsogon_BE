@@ -45,4 +45,19 @@ public class AudioAlbumCommentService {
             throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
         }
     }
+
+    @Transactional
+    public String deleteComment(Long audioAlbumCommentId, UserDetailsImpl userDetails) {
+        Member member = userDetails.getUser();
+        AudioAlbumComment comment = audioAlbumCommentRepository.findById(audioAlbumCommentId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_COMMENT.getMessage())
+        );
+
+        if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(comment.getMember().getMembername())) {
+            audioAlbumCommentRepository.delete(comment);
+            return "해당 댓글이 삭제되었습니다.";
+        } else {
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
+        }
+    }
 }

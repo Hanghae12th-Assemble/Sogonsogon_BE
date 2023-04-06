@@ -38,5 +38,13 @@ public class AudioAlbumCommentController {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.updateComment(audioAlbumCommentId, requestDto, userDetails));
     }
 
+    @DeleteMapping("/{commentId}")
+    @Operation(summary = "오디오앨범 댓글 삭제", description = "해당 오디오앨범에 있는 댓글을 삭제합니다.")
+    public StatusResponseDto<String> deleteComment(@PathVariable Long AudioAlbumCommentId,
+                                                   @Parameter(hidden = true)
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.deleteComment(AudioAlbumCommentId, userDetails));
+    }
+
 
 }

@@ -58,13 +58,13 @@ public class AudioClipCommentService {
     public StatusResponseDto<String> deleteComment(Long commetId, UserDetailsImpl userDetails) {
         Member member = userDetails.getUser();
         AudioClipComment comment = audioClipCommentRepository.findById(commetId).orElseThrow(
-                () -> new NullPointerException("댓글을 찾을 수 없음")
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_COMMENT.getMessage())
         );
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(comment.getMember().getMembername())) {
             audioClipCommentRepository.delete(comment);
             return StatusResponseDto.success(HttpStatus.OK, "해당 댓글이 삭제 되었습니다.");
         } else {
-            throw new IllegalArgumentException("작성자만 수정이 가능합니다.");
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
         }
 
     }
