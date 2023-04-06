@@ -49,7 +49,7 @@ public class AudioClipCommentService {
             comment.update(audioClipCommentRequestDto);
             return StatusResponseDto.success(HttpStatus.OK, new AudioClipCommentResponseDto(comment));
         } else {
-            throw new IllegalArgumentException("작성자만 수정이 가능합니다.");
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage();
         }
     }
 
