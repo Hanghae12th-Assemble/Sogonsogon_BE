@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AudioAlbumCommentService {
@@ -59,5 +62,15 @@ public class AudioAlbumCommentService {
         } else {
             throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
         }
+    }
+
+    @Transactional
+    public List<AudioAlbumCommentResponseDto> getComments(Long audioAlbumId) {
+        List<AudioAlbumComment> list = audioAlbumCommentRepository.findAllByAudioAlbumId(audioAlbumId);
+        List<AudioAlbumCommentResponseDto> responseDtos = new ArrayList<>();
+        for (AudioAlbumComment comment : list) {
+            responseDtos.add(AudioAlbumCommentResponseDto.from(comment));
+        }
+        return responseDtos;
     }
 }

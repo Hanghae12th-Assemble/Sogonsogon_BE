@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/audioAlbum/comment")
@@ -44,6 +46,12 @@ public class AudioAlbumCommentController {
                                                    @Parameter(hidden = true)
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.deleteComment(AudioAlbumCommentId, userDetails));
+    }
+
+    @GetMapping("/{audioAlbumId}")
+    @Operation(summary = "오디오앨범 댓글 전체 조회", description = "오디오앨범에 있는 댓글 전체를 조회합니다.")
+    public StatusResponseDto<List<AudioAlbumCommentResponseDto>> getComments(@PathVariable Long audioAlbumId) {
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.getComments(audioAlbumId));
     }
 
 
