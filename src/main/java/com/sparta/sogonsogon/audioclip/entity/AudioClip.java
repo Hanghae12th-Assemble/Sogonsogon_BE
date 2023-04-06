@@ -41,7 +41,7 @@ public class AudioClip extends TimeStamped{
 
     @OneToMany(mappedBy = "audioclip", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @OrderBy("createdAt desc")
-    List<Comment> commentList = new ArrayList<>();
+    List<AudioClipComment> commentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "audioclip", cascade = CascadeType.REMOVE)
     List<AudioClipLike> audioClipLikes = new ArrayList<>();
