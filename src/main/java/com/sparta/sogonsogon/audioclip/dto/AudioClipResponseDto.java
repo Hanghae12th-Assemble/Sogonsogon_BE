@@ -1,7 +1,7 @@
 package com.sparta.sogonsogon.audioclip.dto;
 
-import com.sparta.sogonsogon.audioclip.entity.Comment;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
+import com.sparta.sogonsogon.audioclip.entity.AudioClipComment;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +42,7 @@ public class AudioClipResponseDto {
         this.createdAt = audioClip.getCreatedAt().toString();
         this.modifiedAt = audioClip.getModifiedAt().toString();
         this.isLikeCount = audioClip.getAudioClipLikes().size();
-        for (Comment comment : audioClip.getCommentList()) {
+        for (AudioClipComment comment : audioClip.getCommentList()) {
             this.audioClipCommentResponseDtos.add(AudioClipCommentResponseDto.from(comment));
         }
     }
@@ -62,7 +62,7 @@ public class AudioClipResponseDto {
         this.modifiedAt = audioClip.getModifiedAt().toString();
         this.isLikeCount = audioClip.getAudioClipLikes().size();
         this.isLikeCheck = isLikeCheck;
-        for (Comment comment : audioClip.getCommentList()) {
+        for (AudioClipComment comment : audioClip.getCommentList()) {
             this.audioClipCommentResponseDtos.add(AudioClipCommentResponseDto.from(comment));
         }
 

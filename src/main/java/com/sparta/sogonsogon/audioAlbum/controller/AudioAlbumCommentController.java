@@ -31,21 +31,21 @@ public class AudioAlbumCommentController {
         return StatusResponseDto.success(HttpStatus.CREATED, audioAlbumCommentService.createComment(audioAlbumId, content, userDetails));
     }
 
-    @PostMapping("/{commentId}")
+    @PutMapping("/{commentId}")
     @Operation(summary = "오디오 앨범 댓글 수정", description = "해당 오디오 앨범에 있는 댓글을 수정한다.")
-    public StatusResponseDto<AudioAlbumCommentResponseDto> updateComment(@PathVariable Long audioAlbumCommentId,
+    public StatusResponseDto<AudioAlbumCommentResponseDto> updateComment(@PathVariable Long commentId,
                                                                          @RequestBody AudioAlbumCommentRequestDto requestDto,
                                                                          @Parameter(hidden = true)
                                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.updateComment(audioAlbumCommentId, requestDto, userDetails));
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.updateComment(commentId, requestDto, userDetails));
     }
 
     @DeleteMapping("/{commentId}")
     @Operation(summary = "오디오앨범 댓글 삭제", description = "해당 오디오앨범에 있는 댓글을 삭제합니다.")
-    public StatusResponseDto<String> deleteComment(@PathVariable Long AudioAlbumCommentId,
+    public StatusResponseDto<String> deleteComment(@PathVariable Long commentId,
                                                    @Parameter(hidden = true)
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.deleteComment(AudioAlbumCommentId, userDetails));
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.deleteComment(commentId, userDetails));
     }
 
     @GetMapping("/{audioAlbumId}")

@@ -35,9 +35,9 @@ public class AudioAlbumCommentService {
     }
 
     @Transactional
-    public AudioAlbumCommentResponseDto updateComment(Long audioAlbumCommentId, AudioAlbumCommentRequestDto requestDto, UserDetailsImpl userDetails) {
+    public AudioAlbumCommentResponseDto updateComment(Long commentId, AudioAlbumCommentRequestDto requestDto, UserDetailsImpl userDetails) {
         Member member = userDetails.getUser();
-        AudioAlbumComment comment = audioAlbumCommentRepository.findById(audioAlbumCommentId).orElseThrow(
+        AudioAlbumComment comment = audioAlbumCommentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_COMMENT.getMessage())
         );
 
@@ -50,9 +50,9 @@ public class AudioAlbumCommentService {
     }
 
     @Transactional
-    public String deleteComment(Long audioAlbumCommentId, UserDetailsImpl userDetails) {
+    public String deleteComment(Long commentId, UserDetailsImpl userDetails) {
         Member member = userDetails.getUser();
-        AudioAlbumComment comment = audioAlbumCommentRepository.findById(audioAlbumCommentId).orElseThrow(
+        AudioAlbumComment comment = audioAlbumCommentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_COMMENT.getMessage())
         );
 
