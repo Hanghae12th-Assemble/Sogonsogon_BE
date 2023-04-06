@@ -1,11 +1,14 @@
 package com.sparta.sogonsogon.audioAlbum.service;
 
+import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumCommentRequestDto;
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumCommentResponseDto;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbumComment;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumCommentRepository;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
 import com.sparta.sogonsogon.enums.ErrorMessage;
+import com.sparta.sogonsogon.member.entity.Member;
+import com.sparta.sogonsogon.member.entity.MemberRoleEnum;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,5 +29,20 @@ public class AudioAlbumCommentService {
         AudioAlbumComment comment = new AudioAlbumComment(userDetails.getUser(), audioAlbum, content);
         audioAlbumCommentRepository.save(comment);
         return new AudioAlbumCommentResponseDto(comment);
+    }
+
+    @Transactional
+    public AudioAlbumCommentResponseDto updateComment(Long audioAlbumCommentId, AudioAlbumCommentRequestDto requestDto, UserDetailsImpl userDetails) {
+        Member member = userDetails.getUser();
+        AudioAlbumComment comment = audioAlbumCommentRepository.findById(audioAlbumCommentId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_COMMENT.getMessage())
+        );
+
+        if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(comment.getMember().getMembername())) {
+            comment.update(requestDto);
+            return new AudioAlbumCommentResponseDto(comment);
+        } else {
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
+        }
     }
 }

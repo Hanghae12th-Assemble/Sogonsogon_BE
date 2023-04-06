@@ -49,7 +49,7 @@ public class AudioClipCommentService {
             comment.update(audioClipCommentRequestDto);
             return StatusResponseDto.success(HttpStatus.OK, new AudioClipCommentResponseDto(comment));
         } else {
-            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage();
+            throw new IllegalArgumentException(ErrorMessage.ACCESS_DENIED.getMessage());
         }
     }
 

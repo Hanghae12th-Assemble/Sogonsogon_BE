@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioAlbum.controller;
 
+import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumCommentRequestDto;
 import com.sparta.sogonsogon.audioAlbum.dto.AudioAlbumCommentResponseDto;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbumComment;
 import com.sparta.sogonsogon.audioAlbum.service.AudioAlbumCommentService;
@@ -26,6 +27,15 @@ public class AudioAlbumCommentController {
                                                                          @Parameter(hidden = true)
                                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(HttpStatus.CREATED, audioAlbumCommentService.createComment(audioAlbumId, content, userDetails));
+    }
+
+    @PostMapping("/{commentId}")
+    @Operation(summary = "오디오 앨범 댓글 수정", description = "해당 오디오 앨범에 있는 댓글을 수정한다.")
+    public StatusResponseDto<AudioAlbumCommentResponseDto> updateComment(@PathVariable Long audioAlbumCommentId,
+                                                                         @RequestBody AudioAlbumCommentRequestDto requestDto,
+                                                                         @Parameter(hidden = true)
+                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumCommentService.updateComment(audioAlbumCommentId, requestDto, userDetails));
     }
 
 
