@@ -14,5 +14,6 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
     List<Notification> findByReceiver_IdOrderByCreatedAtDesc(Long receiverId);
 
     List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId);
+
 //    List<Notification> findByMemberId(Long MemberId);
 }

@@ -29,6 +29,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+// h2
+    implementation 'com.h2database:h2'
+
     testImplementation 'org.springframework.security:spring-security-test'
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
@@ -64,9 +67,3 @@ dependencies {
 
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-jar {
-    enabled = false
-}
