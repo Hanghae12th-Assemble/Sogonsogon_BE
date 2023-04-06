@@ -1,6 +1,6 @@
 package com.sparta.sogonsogon.audioclip.dto;
 
-import com.sparta.sogonsogon.audioclip.entity.Comment;
+import com.sparta.sogonsogon.audioclip.entity.AudioClipComment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +17,7 @@ public class CommentResponseDto {
     private String createdAt;
     private String modifiedAt;
 
-    public CommentResponseDto(Comment comment){
+    public CommentResponseDto(AudioClipComment comment){
         this.id = comment.getId();
         this.content = comment.getContent();
         this.membername = comment.getMember().getMembername();
@@ -26,7 +26,7 @@ public class CommentResponseDto {
         this.modifiedAt = comment.getModifiedAt().toString();
     }
 
-    public static CommentResponseDto from(Comment comment){
+    public static CommentResponseDto from(AudioClipComment comment){
         return CommentResponseDto.builder()
                 .id(comment.getId())
                 .content(comment.getContent())

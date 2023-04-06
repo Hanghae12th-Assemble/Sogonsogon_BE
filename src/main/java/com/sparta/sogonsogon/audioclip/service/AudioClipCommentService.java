@@ -2,7 +2,7 @@ package com.sparta.sogonsogon.audioclip.service;
 
 import com.sparta.sogonsogon.audioclip.dto.CommentRequestDto;
 import com.sparta.sogonsogon.audioclip.dto.CommentResponseDto;
-import com.sparta.sogonsogon.audioclip.entity.Comment;
+import com.sparta.sogonsogon.audioclip.entity.AudioClipComment;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipCommentRepository;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
@@ -32,7 +32,7 @@ public class AudioClipCommentService {
         AudioClip audioClip = audioClipRepository.findById(id).orElseThrow(
                 ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
-        Comment comment = new Comment(userDetails.getUser(), audioClip, content);
+        AudioClipComment comment = new AudioClipComment(userDetails.getUser(), audioClip, content);
         audioClipCommentRepository.save(comment);
         return StatusResponseDto.success(HttpStatus.OK, new CommentResponseDto(comment));
     }
@@ -41,7 +41,7 @@ public class AudioClipCommentService {
     @Transactional
     public StatusResponseDto<CommentResponseDto> updateComment(Long id, CommentRequestDto commentRequestDto, UserDetailsImpl userDetails) {
         Member member = userDetails.getUser();
-        Comment comment = audioClipCommentRepository.findById(id).orElseThrow(
+        AudioClipComment comment = audioClipCommentRepository.findById(id).orElseThrow(
                 () -> new NullPointerException(ErrorMessage.NOT_FOUND_COMMENT.getMessage())
         );
 
@@ -57,7 +57,7 @@ public class AudioClipCommentService {
     @Transactional
     public StatusResponseDto<String> deleteComment(Long commetId, UserDetailsImpl userDetails) {
         Member member = userDetails.getUser();
-        Comment comment = audioClipCommentRepository.findById(commetId).orElseThrow(
+        AudioClipComment comment = audioClipCommentRepository.findById(commetId).orElseThrow(
                 () -> new NullPointerException("댓글을 찾을 수 없음")
         );
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(comment.getMember().getMembername())) {
@@ -71,9 +71,9 @@ public class AudioClipCommentService {
 
     //오디오 클립 댓글 전체조회
     public StatusResponseDto<List<CommentResponseDto>> getComments(Long audioclipId) {
-        List<Comment> list = audioClipCommentRepository.findAllByAudioclipId(audioclipId);
+        List<AudioClipComment> list = audioClipCommentRepository.findAllByAudioclipId(audioclipId);
         List<CommentResponseDto> responseDtos = new ArrayList<>();
-        for(Comment comment : list){
+        for(AudioClipComment comment : list){
             responseDtos.add(CommentResponseDto.from(comment));
         }
         return StatusResponseDto.success(HttpStatus.OK, responseDtos);
