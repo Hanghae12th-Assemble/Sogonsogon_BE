@@ -57,14 +57,14 @@ public class AudioClipController {
         return audioClipService.detailsAudioClip(audioclipId, userDetails);
     }
 
-//    @GetMapping("/clips/{audioAblumId}")
-//    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 최신순으로 정렬 합니다. 전체 클립을 볼 수 있습니다. ")
-//    public StatusResponseDto<Map<String, Object>> findclip( @PathVariable Long audioAblumId,
-//                                                            @RequestParam(defaultValue = "1") int page,
-//                                                            @RequestParam(defaultValue = "10") int size,
-//                                                            @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
-//        return audioClipService.getclips(page -1, size, sortBy, audioAblumId);
-//    }
+    @GetMapping("/clips/{audioAblumId}")
+    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 최신순으로 정렬 합니다. 전체 클립을 볼 수 있습니다. ")
+    public StatusResponseDto<Map<String, Object>> findclip( @PathVariable Long audioAblumId,
+                                                            @RequestParam(defaultValue = "1") int page,
+                                                            @RequestParam(defaultValue = "10") int size,
+                                                            @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
+        return audioClipService.getclips(page -1, size, sortBy, audioAblumId);
+    }
 
 
 //   오디오 클립 좋아요순으로 전체 조회
