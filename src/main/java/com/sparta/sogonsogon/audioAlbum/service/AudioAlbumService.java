@@ -42,12 +42,14 @@ import java.util.*;
 public class AudioAlbumService {
 
     private final MemberRepository memberRepository;
-    private final AudioAlbumRepository audioAlbumRepository;
+    private  final AudioAlbumRepository audioAlbumRepository;
     private final AudioClipRepository audioClipRepository;
     private final AudioAlbumLikeRepository audioAlbumLikeRepository;
     private final S3Uploader s3Uploader;
     private final NotificationService notificationService;
     private final FollowRepository followRepository;
+
+
 
     // 오디오앨범 생성
     @Transactional
@@ -231,4 +233,29 @@ public class AudioAlbumService {
         return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
     }
 
+
+    public  StatusResponseDto<Map<String, Object>> getMine(String sortBy, int page, int size, UserDetailsImpl userDetails) {
+        Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_MEMBER.getMessage())
+        );
+
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findByMember(member, sortedPageable);
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent()
+                .stream()
+                .map(AudioAlbumResponseDto::new)
+                .toList();
+
+        // 생성된 오디오앨범의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioAlbumCount", audioAlbumPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioAlbumResponseDtoList);
+        responseBody.put("metadata", metadata);
+
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+
+    }
 }
