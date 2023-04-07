@@ -161,18 +161,26 @@ public class AudioClipService {
 //    }
 
 
-//    public StatusResponseDto<Map<String, Object>> getclips(int page, int size, String sortBy, Long audioAblumId) {
-//        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
-//                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
-//        );
-//
-//        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
-//        Pageable sortedPageable = PageRequest.of(page, size, sort);
-//        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
-//        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent()
-//                .stream()
-//                .map(AudioClipResponseDto::new)
-//                .toList();
-//
-//    }
+    public StatusResponseDto<Map<String, Object>> getclips(int page, int size, String sortBy, Long audioAblumId) {
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
+        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent()
+                .stream()
+                .map(AudioClipResponseDto::new)
+                .toList();
+        //        // 생성된 오디오클립의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioClipResponseDtoList);
+        responseBody.put("metadata", metadata);
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+
+    }
 }
