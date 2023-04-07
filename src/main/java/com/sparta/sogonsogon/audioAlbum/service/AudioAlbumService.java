@@ -13,8 +13,12 @@ import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.enums.ErrorMessage;
+import com.sparta.sogonsogon.follow.entity.Follow;
+import com.sparta.sogonsogon.follow.repository.FollowRepository;
 import com.sparta.sogonsogon.member.entity.Member;
 import com.sparta.sogonsogon.member.repository.MemberRepository;
+import com.sparta.sogonsogon.noti.service.NotificationService;
+import com.sparta.sogonsogon.noti.util.AlarmType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +42,14 @@ import java.util.*;
 public class AudioAlbumService {
 
     private final MemberRepository memberRepository;
-    private final AudioAlbumRepository audioAlbumRepository;
+    private  final AudioAlbumRepository audioAlbumRepository;
     private final AudioClipRepository audioClipRepository;
     private final AudioAlbumLikeRepository audioAlbumLikeRepository;
     private final S3Uploader s3Uploader;
+    private final NotificationService notificationService;
+    private final FollowRepository followRepository;
+
+
 
     // 오디오앨범 생성
     @Transactional
@@ -70,6 +78,15 @@ public class AudioAlbumService {
                 .build();
 
         audioAlbumRepository.save(audioAlbum);
+
+        // NotificationService를 통해 팔로우한  유저들에게 알림을 보낸다.
+        List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
+        for (Follow following : followings) {
+            String message = audioAlbum.getMember().getNickname() +"님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범을 생성하였습니다. ";
+            notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
+            log.info("앨범 생성하였습니다. ");
+        }
+
         return AudioAlbumResponseDto.of(audioAlbum);
     }
 
@@ -137,6 +154,11 @@ public class AudioAlbumService {
         }
 
         audioAlbumRepository.deleteById(audioAlbumId);
+
+        //  앨범 삭제하면 알림 보내기
+        String message = audioAlbum.getMember().getNickname() +"님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범이 삭제되었습니다.  ";
+        notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
+
     }
 
     // 카테고리별 오디오앨범 조회
@@ -201,7 +223,37 @@ public class AudioAlbumService {
         }
 
         audioAlbumLikeRepository.save(new AudioAlbumLike(audioAlbum, userDetails.getUser()));
+
+        // 좋아요 클릭하면 앨범생성자 한테 알림 보내기
+        String message = audioAlbum.getMember().getNickname() +"님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범에 좋아요가 추가 되었습니다. ";
+        notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
+
         return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
     }
 
+
+    public  StatusResponseDto<Map<String, Object>> getMine(String sortBy, int page, int size, UserDetailsImpl userDetails) {
+        Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_MEMBER.getMessage())
+        );
+
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findByMember(member, sortedPageable);
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent()
+                .stream()
+                .map(AudioAlbumResponseDto::new)
+                .toList();
+
+        // 생성된 오디오앨범의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioAlbumCount", audioAlbumPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioAlbumResponseDtoList);
+        responseBody.put("metadata", metadata);
+
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+
+    }
 }
