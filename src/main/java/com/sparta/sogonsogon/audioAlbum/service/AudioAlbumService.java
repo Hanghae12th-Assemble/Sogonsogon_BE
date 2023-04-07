@@ -101,8 +101,6 @@ public class AudioAlbumService {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
-
-
         List<AudioClip> foundAudioClip = audioClipRepository.findTop10ByAudioAlbumIdOrderByCreatedAtDesc(audioAlbumId)
                 .stream()
                 .limit(10)

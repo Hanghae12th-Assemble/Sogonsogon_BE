@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,10 +57,25 @@ public class AudioClipController {
         return audioClipService.detailsAudioClip(audioclipId, userDetails);
     }
 
-//    @GetMapping("")
-//    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 전체 클립을 볼 수 있습니다. ")
-//    public
+//    @GetMapping("/clips/{audioAblumId}")
+//    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 최신순으로 정렬 합니다. 전체 클립을 볼 수 있습니다. ")
+//    public StatusResponseDto<Map<String, Object>> findclip( @PathVariable Long audioAblumId,
+//                                                            @RequestParam(defaultValue = "1") int page,
+//                                                            @RequestParam(defaultValue = "10") int size,
+//                                                            @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
+//        return audioClipService.getclips(page -1, size, sortBy, audioAblumId);
+//    }
 
+
+//   오디오 클립 좋아요순으로 전체 조회
+//    @GetMapping("/like/{audioAblumId}")
+//    @Operation(summary = "좋아요순으로 오디오 클립 전체 가져오기", description = "오디오클립 전체 조회시 좋아요순 정렬")
+//    public StatusResponseDto<Map<String, Object>> findByclipOrderbyLike(@PathVariable Long audioAblumId,
+//                                                                        @RequestParam(defaultValue = "1") int page,
+//                                                                        @RequestParam(defaultValue = "10") int size,
+//                                                                        @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
+//        return audioClipService.findAllinAblumOrderbyLike(page -1, size, sortBy, audioAblumId);
+//    }
 
 
 }
