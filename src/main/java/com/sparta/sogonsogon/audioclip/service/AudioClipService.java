@@ -56,8 +56,8 @@ public class AudioClipService {
     //오디오 클립 생성
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> createdAudioClip(Long audioablumId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.uploadFiles(requestDto.getAudioclipImage(), "audioclipImage/");
-        String audioclipUrl = s3Uploader.uploadFiles(requestDto.getAudioclip(), "audioclips/");
+        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage/");
+        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips/");
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioablumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
@@ -85,8 +85,8 @@ public class AudioClipService {
     //오디오 클립 수정
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> updateAudioClip(Long audioclipId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.uploadFiles(requestDto.getAudioclipImage(), "audioclipImage/");
-        String audioclipUrl = s3Uploader.uploadFiles(requestDto.getAudioclip(), "audioclips/");
+        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage/");
+        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips/");
         Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );

@@ -66,7 +66,7 @@ public class AudioAlbumService {
         }
 
         // 오디오앨범 사진 추가
-        String imageUrl = s3Uploader.uploadFiles(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
+        String imageUrl = s3Uploader.upload(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
 
         log.info(requestDto.getCategoryType().toString());
         AudioAlbum audioAlbum = AudioAlbum.builder()
@@ -203,7 +203,7 @@ public class AudioAlbumService {
         }
 
         // 오디오앨범 사진 추가
-        String imageUrl = s3Uploader.uploadFiles(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
+        String imageUrl = s3Uploader.upload(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
 
         audioAlbum.update(requestDto, imageUrl);
 
