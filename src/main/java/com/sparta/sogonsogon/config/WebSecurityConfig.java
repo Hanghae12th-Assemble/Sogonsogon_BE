@@ -76,7 +76,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
             // 멤버조회
             .antMatchers("/api/member/**").permitAll()
             // 라디오조회
-            .antMatchers(HttpMethod.GET, "/api/radios/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/audioAlbum").permitAll()
                 .antMatchers("/webSocket").permitAll()
             .anyRequest().authenticated()
             // JWT 인증/인가를 사용하기 위한 설정
