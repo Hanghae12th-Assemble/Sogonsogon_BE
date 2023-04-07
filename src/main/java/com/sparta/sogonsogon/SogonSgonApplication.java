@@ -18,7 +18,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 //}
 @SpringBootApplication
 @EnableJpaAuditing
-@OpenAPIDefinition(servers = {@Server(url = "http://localhost:8080", description = "Local Server URL"),@Server(url= "http://13.124.100.26:8080", description = "http서버 입니다. ")})
+@OpenAPIDefinition(servers = {@Server(url = "https://sogonsogon.shop", description = "https Server"), @Server(url = "http://localhost:8080", description = "Local Server URL"),@Server(url= "http://43.201.171.120:8080", description = "http서버 입니다. ")})
 public class SogonSgonApplication {
 
     public static void main(String[] args) {
