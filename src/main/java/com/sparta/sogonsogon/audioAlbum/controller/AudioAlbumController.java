@@ -80,4 +80,13 @@ public class AudioAlbumController {
                                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return audioAlbumService.likeAudioAlbum(audioAlbumId, userDetails);
     }
+
+    //내 앨범 조희
+    @GetMapping("/mine")
+    @Operation(summary = "내가 만든 앨범만 가져 오기", description = "내가 만든 앨범만 출력 됩니다. ")
+    public StatusResponseDto<Map<String, Object>> getMine(@RequestParam(defaultValue = "1") int page,
+                                                          @RequestParam(defaultValue = "10") int size,
+                                                          @RequestParam(required = false, defaultValue = "createdAt") String sortBy, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return audioAlbumService.getMine(sortBy, page -1, size, userDetails);
+    }
 }

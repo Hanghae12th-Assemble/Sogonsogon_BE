@@ -10,8 +10,11 @@ import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.ErrorMessage;
 import com.sparta.sogonsogon.member.entity.Member;
 import com.sparta.sogonsogon.member.entity.MemberRoleEnum;
+import com.sparta.sogonsogon.noti.service.NotificationService;
+import com.sparta.sogonsogon.noti.util.AlarmType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +24,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AudioClipCommentService {
 
     private final AudioClipCommentRepository audioClipCommentRepository;
     private final AudioClipRepository audioClipRepository;
+    private final NotificationService notificationService;
 
     //오디오 클립 댓글 올리기
     @Transactional
@@ -34,6 +39,10 @@ public class AudioClipCommentService {
         );
         Comment comment = new Comment(userDetails.getUser(), audioClip, content);
         audioClipCommentRepository.save(comment);
+
+        // 댓글 생성될 때 오디오 클립 생성한 유저한테 알림 가기
+        notificationService.send(audioClip.getMember(), AlarmType.eventCreateComment, "제목: " + audioClip.getTitle() + "오디오 클립에 댓글이 생성되었습니다.  ", comment.getMember().getMembername(), comment.getMember().getNickname(), comment.getMember().getProfileImageUrl());
+        log.info("댓글 생성하였습니다.");
         return StatusResponseDto.success(HttpStatus.OK, new CommentResponseDto(comment));
     }
 

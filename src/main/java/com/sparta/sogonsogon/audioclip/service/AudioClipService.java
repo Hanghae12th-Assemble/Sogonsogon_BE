@@ -116,6 +116,7 @@ public class AudioClipService {
             // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
             List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
             for (Follow following : followings) {
+
                 String message = audioClip.getMember().getNickname() + "님이 제목:" + audioClip.getTitle() + "오디오 클립을 삭제하였습니다. ";
                 notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
             }

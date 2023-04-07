@@ -1,7 +1,6 @@
 package com.sparta.sogonsogon.audioAlbum.repository;
 
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
-import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbumLike;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.member.entity.Member;
 import org.springframework.data.domain.Page;
@@ -15,4 +14,6 @@ public interface AudioAlbumRepository extends JpaRepository<AudioAlbum, Long> {
     Optional<AudioAlbum> findByTitle(String title);
 
     Page<AudioAlbum> findAllByCategoryType(CategoryType categoryType, Pageable sortedPageable);
+
+    Page<AudioAlbum> findByMember(Member member, Pageable sortedPageable);
 }
