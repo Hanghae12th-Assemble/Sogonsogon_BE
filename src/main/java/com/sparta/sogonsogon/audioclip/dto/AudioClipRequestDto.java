@@ -19,7 +19,4 @@ public class AudioClipRequestDto {
     private MultipartFile audioclipImage;
 
     private MultipartFile audioclip;
-
-
-
 }
