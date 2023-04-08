@@ -32,7 +32,7 @@ public class AudioClipResponseDto {
     @Builder
     public AudioClipResponseDto(AudioClip audioClip){
         this.id = audioClip.getId();
-        this.ablumTile = audioClip.getAudio_album().getTitle();
+        this.ablumTile = audioClip.getAudio_album().getTitle().toString();
         this.title = audioClip.getTitle();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();

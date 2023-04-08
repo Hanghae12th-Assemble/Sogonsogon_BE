@@ -22,6 +22,10 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -49,13 +56,13 @@ public class AudioClipService {
     //오디오 클립 생성
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> createdAudioClip(Long audioablumId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.uploadFiles(requestDto.getAudioclipImage(), "audioclipImage/");
-        String audioclipUrl = s3Uploader.uploadFiles(requestDto.getAudioclip(), "audioclips/");
+        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage/");
+        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips/");
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioablumId).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
         Member member = memberRepository.findByMembername(userDetails.getUsername()).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
+                () -> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
 
         AudioClip audioClip = new AudioClip(requestDto, member, audioclipUrl, audioclipImageUrl, audioAlbum);
@@ -67,7 +74,7 @@ public class AudioClipService {
         // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
         for (Follow following : followings) {
-            String message = audioClip.getMember().getNickname() +"님이 제목:" + audioClip.getTitle() + "오디오 클립을 생성하였습니다. ";
+            String message = audioClip.getMember().getNickname() + "님이 제목:" + audioClip.getTitle() + "오디오 클립을 생성하였습니다. ";
             notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
             log.info("생성하였습니다. ");
         }
@@ -78,16 +85,16 @@ public class AudioClipService {
     //오디오 클립 수정
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> updateAudioClip(Long audioclipId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.uploadFiles(requestDto.getAudioclipImage(), "audioclipImage/");
-        String audioclipUrl = s3Uploader.uploadFiles(requestDto.getAudioclip(), "audioclips/");
+        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage/");
+        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips/");
         Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
+                () -> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
 
-        if (member.getRole() == MemberRoleEnum.USER  || member.getMembername().equals(userDetails.getUser().getMembername())) {
+        if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClip.update(requestDto, audioclipUrl, audioclipImageUrl);
             return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));
         } else {
@@ -97,19 +104,20 @@ public class AudioClipService {
 
     //오디오 클립 삭제
     @Transactional
-    public StatusResponseDto<String> deleteAudioClip(Long audioclipId, UserDetailsImpl userDetails){
+    public StatusResponseDto<String> deleteAudioClip(Long audioclipId, UserDetailsImpl userDetails) {
         Member member = userDetails.getUser();
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
 
-        if (member.getRole() == MemberRoleEnum.USER  || member.getMembername().equals(userDetails.getUser().getMembername())) {
+        if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClipRepository.deleteById(audioclipId);
 
             // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
             List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
             for (Follow following : followings) {
-                String message = audioClip.getMember().getNickname() +"님이 제목:" + audioClip.getTitle() + "오디오 클립을 삭제하였습니다. ";
+
+                String message = audioClip.getMember().getNickname() + "님이 제목:" + audioClip.getTitle() + "오디오 클립을 삭제하였습니다. ";
                 notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
             }
 
@@ -121,9 +129,9 @@ public class AudioClipService {
     }
 
     //오디오 클립 상세 조회
-    public StatusResponseDto<AudioClipResponseDto> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails){
+    public StatusResponseDto<AudioClipResponseDto> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails) {
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
 
         Optional<AudioClipLike> audioClipLike = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser());
@@ -133,5 +141,46 @@ public class AudioClipService {
         return StatusResponseDto.success(HttpStatus.OK, responseDto);
     }
 
+//    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId){
+//        Sort sort = Sort.by(Sort.Direction.DESC, SortBy);
+//        Pageable sortedPageable = PageRequest.of(page, size, sort);
+//        Page<AudioClip> audioClipPage = audioClipRepository.getAudioClipsByAlbumIdWithLikesSorted(audioAblumId, sortedPageable);
+//        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent()
+//                .stream()
+//                .map(AudioClipResponseDto::new)
+//                .toList();
+//
+//        // 생성된 오디오클립의 개수
+//        Map<String, Object> metadata = new HashMap<>();
+//        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+//
+//        Map<String, Object> responseBody = new HashMap<>();
+//        responseBody.put("result", audioClipResponseDtoList);
+//        responseBody.put("metadata", metadata);
+//        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+//    }
 
+
+    public StatusResponseDto<Map<String, Object>> getclips(int page, int size, String sortBy, Long audioAblumId) {
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
+        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent()
+                .stream()
+                .map(AudioClipResponseDto::new)
+                .toList();
+        //        // 생성된 오디오클립의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioClipResponseDtoList);
+        responseBody.put("metadata", metadata);
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+
+    }
 }

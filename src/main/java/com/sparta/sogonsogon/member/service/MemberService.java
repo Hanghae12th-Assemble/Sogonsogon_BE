@@ -93,7 +93,7 @@ public class MemberService {
     // 회원 정보 수정
     @Transactional
     public MemberResponseDto update(Long id, MemberRequestDto memberRequestDto, UserDetailsImpl userDetails) throws IOException {
-        String profileImageUrl = s3Uploader.uploadFiles(memberRequestDto.getProfileImage(), "profileImages");
+        String profileImageUrl = s3Uploader.upload(memberRequestDto.getProfileImage(), "profileImages");
 
         Member member = memberRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(ErrorMessage.WRONG_USERNAME.getMessage())
