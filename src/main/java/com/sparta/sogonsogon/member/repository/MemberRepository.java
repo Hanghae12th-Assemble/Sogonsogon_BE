@@ -22,16 +22,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByMembername(String membername);
 
-    List<Member> findAllByMembernameContaining(String membername);
+//    List<Member> findAllByMembernameContaining(String membername);
 
     Optional<Member> findByKakaoId(Long kakaoId);
 
     int countByNickname(String nickname);
 
-
-//    Optional<Member> findByNickname(String nickname);
-
     Optional<Member> findByNaverId(String naverId);
 
-    Optional<Member> findMemberByMembername(String membername);
+    Optional<Member> findMemberById(Long memberId);
 }

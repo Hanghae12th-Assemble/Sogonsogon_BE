@@ -15,18 +15,15 @@ import java.util.List;
 @Repository
 public interface AudioClipRepository extends JpaRepository<AudioClip, Long> {
 
-
-
     @Query("SELECT a FROM AudioClip a WHERE a.audio_album.id = :audioAlbumId ORDER BY a.createdAt DESC")
     List<AudioClip> findTop10ByAudioAlbumIdOrderByCreatedAtDesc(@Param("audioAlbumId") Long audioAlbumId);
 
-//    Page<AudioClip> findByAudio_album_Id(Long id, Pageable pageable);
     @Query("SELECT a from AudioClip a where a.audio_album.id = :audioAlbumId")
     Page<AudioClip> findAudioClipsByAudio_album_Id(@Param("audioAlbumId")Long audioAlbumId, Pageable sortedPageable);
 
 //    @Query("SELECT ac FROM AudioClip ac JOIN ac.audio_album a" +
 //            " WHERE a.id = :audioAlbumId ORDER BY " +
-//            "(SELECT COUNT(l) FROM AudioClipLike l WHERE l.audioclip = ac) DESC ")
+//            "(SELECT COUNT(l.id) FROM AudioClipLike l WHERE l.audioclip = ac) DESC ")
 //    Page<AudioClip> getAudioClipsByAlbumIdWithLikesSorted(@Param("audioAlbumId") Long audioAlbumId, Pageable pageable);
 
 
