@@ -142,9 +142,13 @@ public class AudioClipService {
     }
 
 //    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId){
+//        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
+//                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+//        );
+//
 //        Sort sort = Sort.by(Sort.Direction.DESC, SortBy);
 //        Pageable sortedPageable = PageRequest.of(page, size, sort);
-//        Page<AudioClip> audioClipPage = audioClipRepository.getAudioClipsByAlbumIdWithLikesSorted(audioAblumId, sortedPageable);
+//        Page<AudioClip> audioClipPage = audioClipRepository.findByAudio_albumOrderByAudioClipLikesDesc(audioAlbum, sortedPageable);
 //        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent()
 //                .stream()
 //                .map(AudioClipResponseDto::new)
