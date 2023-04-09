@@ -108,6 +108,7 @@ public class MemberService {
     }
 
     // 고유 아이디로 유저 정보 조회
+    @Transactional
     public MemberResponseDto getInfoByMembername(String membername) {
         Member member = memberRepository.findByMembername(membername).orElseThrow(
                 () -> new EntityNotFoundException(ErrorMessage.WRONG_USERNAME.getMessage())
