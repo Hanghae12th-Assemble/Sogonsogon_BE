@@ -28,7 +28,7 @@ public class NotificationService {
 
     private final MemberRepository memberRepository;
     //DEFAULT_TIMEOUT을 기본값으로 설정
-    private static final Long DEFAULT_TIMEOUT = 60 * 20 * 10000L;
+    private static final Long DEFAULT_TIMEOUT = 60 * 60 * 10000L;
 
 
     public SseEmitter subscribe(UserDetailsImpl userDetails) {
