@@ -33,11 +33,11 @@ public class AudioClipCommentService {
 
     //오디오 클립 댓글 올리기
     @Transactional
-    public StatusResponseDto<CommentResponseDto> createComment(Long id, String content, UserDetailsImpl userDetails) {
+    public StatusResponseDto<CommentResponseDto> createComment(Long id, CommentRequestDto commentRequestDto, UserDetailsImpl userDetails) {
         AudioClip audioClip = audioClipRepository.findById(id).orElseThrow(
                 ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
-        Comment comment = new Comment(userDetails.getUser(), audioClip, content);
+        Comment comment = new Comment(userDetails.getUser(), audioClip, commentRequestDto.getContent());
         audioClipCommentRepository.save(comment);
 
         // 댓글 생성될 때 오디오 클립 생성한 유저한테 알림 가기

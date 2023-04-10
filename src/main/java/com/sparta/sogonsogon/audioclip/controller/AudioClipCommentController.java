@@ -22,8 +22,8 @@ public class AudioClipCommentController {
 
     @PostMapping("/{audioclipId}")
     @Operation(summary = "오디오 클립 댓글 생성", description = "해당 오디오 클립에 있는 댓글을 생성 할수 있습니다. ")
-    public StatusResponseDto<CommentResponseDto> createdComment(@PathVariable Long audioclipId, @RequestBody String content, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return audioClipCommentService.createComment(audioclipId, content, userDetails);
+    public StatusResponseDto<CommentResponseDto> createdComment(@PathVariable Long audioclipId, @RequestBody CommentRequestDto requestDto, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return audioClipCommentService.createComment(audioclipId, requestDto, userDetails);
     }
 
     @PutMapping("/{commentId}")

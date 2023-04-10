@@ -23,7 +23,7 @@ public class AudioClipResponseDto {
     private String modifiedAt;
     private String membernickname;
     private String membername; //오디오 올린 주인 고유 아이디
-
+    private String memberprofileImageUrl;
     private int isLikeCount;
     private boolean isLikeCheck;
 
@@ -39,6 +39,7 @@ public class AudioClipResponseDto {
         this.audioclipUrl = audioClip.getAudioclipUrl();
         this.membernickname = audioClip.getMember().getNickname();
         this.membername = audioClip.getMember().getMembername();
+        this.memberprofileImageUrl = audioClip.getMember().getProfileImageUrl();
         this.createdAt = audioClip.getCreatedAt().toString();
         this.modifiedAt = audioClip.getModifiedAt().toString();
         this.isLikeCount = audioClip.getAudioClipLikes().size();
