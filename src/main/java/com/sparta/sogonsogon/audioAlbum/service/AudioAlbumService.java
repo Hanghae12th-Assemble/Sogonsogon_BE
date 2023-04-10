@@ -132,8 +132,6 @@ public class AudioAlbumService {
         }
         boolean isLikeCheck = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser()).isPresent();
         boolean isMine = audioAlbum.getMember().getId().equals(userDetails.getUser().getId());
-
-
         return new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine);
     }
 
@@ -232,6 +230,7 @@ public class AudioAlbumService {
     }
 
 
+    @Transactional
     public  StatusResponseDto<Map<String, Object>> getMine(String sortBy, int page, int size, UserDetailsImpl userDetails) {
         Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_MEMBER.getMessage())
