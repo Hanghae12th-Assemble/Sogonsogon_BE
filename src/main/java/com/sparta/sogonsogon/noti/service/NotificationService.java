@@ -32,12 +32,12 @@ public class NotificationService {
 
     private final MemberRepository memberRepository;
     //DEFAULT_TIMEOUT을 기본값으로 설정
-    private static final Long DEFAULT_TIMEOUT = 60 * 20 * 10000L;
+    private static final Long DEFAULT_TIMEOUT = 60 * 10 * 10000L;
 
 
     public SseEmitter subscribe(UserDetailsImpl userDetails) {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
-        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(0L));
+        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
         /* 이 코드는 SseEmitter 객체를 생성하고 emitterRepository를 사용하여 저장하는 부분입니다.
         SseEmitter는 Server-Sent Events(SSE)를 사용하여 실시간으로 클라이언트와 통신할 수 있는 객체입니다.
         save() 메서드를 사용하여 emitterId와 함께 emitterRepository에 저장하면,나중에 해당 emitter를 식별하고 관리할 수 있습니다.
