@@ -45,7 +45,7 @@ public class NotificationService {
         새로운 SseEmitter 객체를 생성하고 이를 emitterRepository에 저장합니다.
         이후 생성된 SseEmitter는 클라이언트에게 실시간으로 알림을 보내는 데 사용됩니다. */
 
-//        send(userDetails.getUser(),AlarmType.eventSystem,"회원님이 알림 구독하였습니다.",null,null,null);
+        send(userDetails.getUser(),AlarmType.eventSystem,"회원님이 알림 구독하였습니다.",null,null,null);
         log.info("본인 구독하였습니다.");
 
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); //onCompletion 메서드: SseEmitter가 완료될 때 호출되는 콜백 함수를 정의
