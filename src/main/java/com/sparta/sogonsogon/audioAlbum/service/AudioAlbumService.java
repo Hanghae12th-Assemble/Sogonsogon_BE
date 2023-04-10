@@ -132,8 +132,6 @@ public class AudioAlbumService {
         }
         boolean isLikeCheck = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser()).isPresent();
         boolean isMine = audioAlbum.getMember().getId().equals(userDetails.getUser().getId());
-
-
         return new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine);
     }
 
