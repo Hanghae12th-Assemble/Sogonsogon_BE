@@ -16,11 +16,13 @@ public class CommentResponseDto {
     private String nickname;
     private String createdAt;
     private String modifiedAt;
+    private String memberImageUrl;
 
     public CommentResponseDto(Comment comment){
         this.id = comment.getId();
         this.content = comment.getContent();
         this.membername = comment.getMember().getMembername();
+        this.memberImageUrl = comment.getMember().getProfileImageUrl();
         this.nickname = comment.getMember().getNickname();
         this.createdAt = comment.getCreatedAt().toString();
         this.modifiedAt = comment.getModifiedAt().toString();
@@ -31,6 +33,7 @@ public class CommentResponseDto {
                 .id(comment.getId())
                 .content(comment.getContent())
                 .membername(comment.getMember().getMembername())
+                .memberImageUrl(comment.getMember().getProfileImageUrl())
                 .createdAt(comment.getCreatedAt().toString())
                 .nickname(comment.getMember().getNickname())
                 .modifiedAt(comment.getModifiedAt().toString())
