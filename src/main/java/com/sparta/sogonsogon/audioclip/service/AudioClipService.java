@@ -129,6 +129,7 @@ public class AudioClipService {
     }
 
     //오디오 클립 상세 조회
+    @Transactional
     public StatusResponseDto<AudioClipResponseDto> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails) {
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
@@ -165,6 +166,7 @@ public class AudioClipService {
 //    }
 
 
+    @Transactional
     public StatusResponseDto<Map<String, Object>> getclips(int page, int size, String sortBy, Long audioAblumId) {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
