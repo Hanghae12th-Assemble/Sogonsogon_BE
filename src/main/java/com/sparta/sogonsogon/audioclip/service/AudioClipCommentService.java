@@ -79,6 +79,7 @@ public class AudioClipCommentService {
     }
 
     //오디오 클립 댓글 전체조회
+    @Transactional
     public StatusResponseDto<List<CommentResponseDto>> getComments(Long audioclipId) {
         List<Comment> list = audioClipCommentRepository.findAllByAudioclipId(audioclipId);
         List<CommentResponseDto> responseDtos = new ArrayList<>();
