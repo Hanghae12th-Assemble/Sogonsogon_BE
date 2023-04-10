@@ -5,12 +5,14 @@ import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@Slf4j
 public class AudioClipResponseDto {
 
     private Long id;
@@ -31,6 +33,7 @@ public class AudioClipResponseDto {
 
     @Builder
     public AudioClipResponseDto(AudioClip audioClip){
+        log.info(audioClip.getMember().getProfileImageUrl());
         this.id = audioClip.getId();
         this.ablumTile = audioClip.getAudio_album().getTitle().toString();
         this.title = audioClip.getTitle();
@@ -39,7 +42,7 @@ public class AudioClipResponseDto {
         this.audioclipUrl = audioClip.getAudioclipUrl();
         this.membernickname = audioClip.getMember().getNickname();
         this.membername = audioClip.getMember().getMembername();
-        this.memberprofileImageUrl = audioClip.getMember().getProfileImageUrl();
+        this.memberprofileImageUrl = audioClip.getMember().getProfileImageUrl().toString();
         this.createdAt = audioClip.getCreatedAt().toString();
         this.modifiedAt = audioClip.getModifiedAt().toString();
         this.isLikeCount = audioClip.getAudioClipLikes().size();
@@ -59,6 +62,7 @@ public class AudioClipResponseDto {
         this.audioclipUrl = audioClip.getAudioclipUrl();
         this.membernickname = audioClip.getMember().getNickname();
         this.membername = audioClip.getMember().getMembername();
+        this.memberprofileImageUrl = audioClip.getMember().getProfileImageUrl();
         this.createdAt = audioClip.getCreatedAt().toString();
         this.modifiedAt = audioClip.getModifiedAt().toString();
         this.isLikeCount = audioClip.getAudioClipLikes().size();
