@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AudioAlbumRepository extends JpaRepository<AudioAlbum, Long> {
@@ -17,4 +18,6 @@ public interface AudioAlbumRepository extends JpaRepository<AudioAlbum, Long> {
     Page<AudioAlbum> findAllByCategoryType(CategoryType categoryType, Pageable sortedPageable);
 
     Page<AudioAlbum> findByMember(Member member, Pageable sortedPageable);
+
+    List<AudioAlbum> findByTitleContaining(String title);
 }
