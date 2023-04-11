@@ -21,7 +21,7 @@ public interface AudioClipRepository extends JpaRepository<AudioClip, Long> {
     @Query("SELECT a from AudioClip a where a.audioalbum.id = :audioAlbumId")
     Page<AudioClip> findAudioClipsByAudio_album_Id(@Param("audioAlbumId")Long audioAlbumId, Pageable sortedPageable);
 
-    Page<AudioClip> findAudioClipsByAudioalbum(AudioAlbum audioAlbum, Pageable sortedPageable);
+//    Page<AudioClip> findAudioClipsByAudioalbum(AudioAlbum audioAlbum, Pageable sortedPageable);
 
 //    @Query("SELECT ac FROM AudioClip ac JOIN ac.audio_album a" +
 //            " WHERE a.id = :audioAlbumId ORDER BY " +

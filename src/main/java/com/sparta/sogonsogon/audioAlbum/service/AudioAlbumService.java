@@ -135,7 +135,6 @@ public class AudioAlbumService {
 
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("audioClipCount", foundAudioClip.size());
-
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("result", new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine));
         responseBody.put("metadata", metadata);
