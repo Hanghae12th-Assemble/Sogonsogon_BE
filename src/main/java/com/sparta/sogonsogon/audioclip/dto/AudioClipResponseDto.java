@@ -58,6 +58,7 @@ public class AudioClipResponseDto {
     public AudioClipResponseDto(AudioClip audioClip, boolean isLikeCheck) {
         this.id = audioClip.getId();
         this.title = audioClip.getTitle();
+        this.ablumTile = audioClip.getAudioalbum().getTitle();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
         this.audioclipUrl = audioClip.getAudioclipUrl();
