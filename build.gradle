@@ -79,7 +79,9 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
     // HikariCP 라이브러리를 프로젝트에 추가
-    implementation 'com.zaxxer:HikariCP:4.0.3'
+//    implementation 'com.zaxxer:HikariCP:4.0.3'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+
 
 
 }

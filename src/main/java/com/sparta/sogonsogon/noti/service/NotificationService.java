@@ -8,11 +8,18 @@ import com.sparta.sogonsogon.noti.entity.Notification;
 import com.sparta.sogonsogon.noti.repository.EmitterRepository;
 import com.sparta.sogonsogon.noti.repository.NotificationRepository;
 import com.sparta.sogonsogon.noti.util.AlarmType;
+import com.sparta.sogonsogon.noti.util.DataSourceConfig;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +37,24 @@ public class NotificationService {
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 60 * 60 * 10000L;
 
+    // Hikari Pool Dead Lock 해결책: connection pool 추가
+    // NotificationService 클래스에서 커넥션 풀을 사용하여 데이터베이스 연결을 가져온다
+    private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
+//    private final HikariConfig hikariConfig;
+//    private HikariDataSource hikariDataSource;
+
+    @PostConstruct
+    public void init() {
+        jdbcTemplate.setDataSource(dataSource);
+    }
+
+//    @PostConstruct
+//    public void init() {
+//        hikariConfig.setDataSource(dataSource);
+//        hikariDataSource = new HikariDataSource(hikariConfig);
+//        jdbcTemplate.setDataSource(hikariDataSource);
+//    }
 
     public SseEmitter subscribe(UserDetailsImpl userDetails) {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
