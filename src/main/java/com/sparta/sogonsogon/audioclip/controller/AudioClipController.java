@@ -59,7 +59,7 @@ public class AudioClipController {
     }
 
     @GetMapping("/clips/{audioAblumId}")
-    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 최신순으로 정렬 합니다. 전체 클립을 볼 수 있습니다. ")
+    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 최신순으로 정렬 합니다. 전체 클립을 볼 수 있습니다. likesCount")
     public StatusResponseDto<Map<String, Object>> findclip( @PathVariable Long audioAblumId,
                                                             @RequestParam(defaultValue = "1") int page,
                                                             @RequestParam(defaultValue = "10") int size,

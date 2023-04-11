@@ -193,32 +193,51 @@ public class AudioClipService {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
-
-        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
-        Pageable sortedPageable = PageRequest.of(page, size, sort);
-        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
-        List<AudioClip> audioClips = audioClipPage.getContent();
+        Page<AudioClip> audioClipPage ;
+        List<AudioClip> audioClips;
         List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
 
-        int index = audioAlbum.getAudioClips().size();
-        if(audioClipPage.getTotalElements() > 0) {
-            for (int i = 0; i < audioClips.size(); i++) {
-                AudioClip audioClip = audioClips.get(i);
-                boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
-                audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-                index -= 1;
-            }
-        }else{
-            audioClipResponseDtoList = null;
-        }
-
         if (sortBy.equals("likesCount")) {
+
+            Pageable sortedPageable = PageRequest.of(page, size);
+            audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
+            audioClips = audioClipPage.getContent();
+
+            int index = audioAlbum.getAudioClips().size();
+            if(audioClipPage.getTotalElements() > 0) {
+                for (int i = 0; i < audioClips.size(); i++) {
+                    AudioClip audioClip = audioClips.get(i);
+                    boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+                    audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
+                    index -= 1;
+                }
+            }else{
+                audioClipResponseDtoList = null;
+            }
+
             audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
                 @Override
                 public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
                     return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
                 }
             });
+        }else{
+            Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+            Pageable sortedPageable = PageRequest.of(page, size, sort);
+            audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
+            audioClips = audioClipPage.getContent();
+
+            int index = audioAlbum.getAudioClips().size();
+            if(audioClipPage.getTotalElements() > 0) {
+                for (int i = 0; i < audioClips.size(); i++) {
+                    AudioClip audioClip = audioClips.get(i);
+                    boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+                    audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
+                    index -= 1;
+                }
+            }else{
+                audioClipResponseDtoList = null;
+            }
         }
         //        // 생성된 오디오클립의 개수
         Map<String, Object> metadata = new HashMap<>();
