@@ -128,12 +128,13 @@ public class NotificationService {
         try (Connection con = DataSourceUtils.getConnection(dataSource)) {
             notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
             log.info("알림 전체 조회했어");
+            return notifications.stream()
+                    .map(NotificationResponseDto::create)
+                    .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return notifications.stream()
-                .map(NotificationResponseDto::create)
-                .collect(Collectors.toList());
+
     }
     // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
     @Transactional
