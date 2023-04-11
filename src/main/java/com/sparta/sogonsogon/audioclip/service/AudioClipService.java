@@ -163,7 +163,7 @@ public class AudioClipService {
             audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
             audioClips = audioClipPage.getContent();
 
-            int index = audioAlbum.getAudioClips().size();
+            int index = audioAlbum.getAudioClips().size() - audioClipPage.getNumber() * audioClipPage.getSize();
             if(audioClipPage.getTotalElements() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
                     AudioClip audioClip = audioClips.get(i);
@@ -187,7 +187,7 @@ public class AudioClipService {
             audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
             audioClips = audioClipPage.getContent();
 
-            int index = audioAlbum.getAudioClips().size();
+            int index = audioAlbum.getAudioClips().size() - audioClipPage.getNumber() * audioClipPage.getSize();
             if(audioClipPage.getTotalElements() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
                     AudioClip audioClip = audioClips.get(i);
