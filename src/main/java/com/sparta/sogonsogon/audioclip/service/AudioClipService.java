@@ -145,47 +145,47 @@ public class AudioClipService {
         return StatusResponseDto.success(HttpStatus.OK, responseDto);
     }
 
-    @Transactional
-    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId, UserDetailsImpl userDetails){
-        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
-        );
-
-        Sort sort = Sort.by(Sort.Direction.ASC, SortBy);
-        Pageable sortedPageable = PageRequest.of(page, size, sort);
-        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
-        List<AudioClip> audioClips = audioClipPage.getContent();
-        List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
-
-        int index = audioAlbum.getAudioClips().size();
-        if(audioClipPage.getTotalElements() > 0) {
-            for (int i = 0; i < audioClips.size(); i++) {
-                AudioClip audioClip = audioClips.get(i);
-                boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
-                audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-                index -= 1;
-            }
-        } else {
-            audioClipResponseDtoList = null;
-        }
-
-        audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
-            @Override
-            public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
-                return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
-            }
-        });
-
-        // 생성된 오디오클립의 개수
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", audioClipPage.getTotalElements());
-
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("result", audioClipResponseDtoList);
-        responseBody.put("metadata", metadata);
-        responseBody.put("is Mine", userDetails.getUsername().equals(audioAlbum.getMember().getMembername()));
-        return StatusResponseDto.success(HttpStatus.OK, responseBody);
-    }
+//    @Transactional
+//    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId, UserDetailsImpl userDetails){
+//        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
+//                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+//        );
+//
+//        Sort sort = Sort.by(Sort.Direction.DESC, SortBy);
+//        Pageable sortedPageable = PageRequest.of(page, size, sort);
+//        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
+//        List<AudioClip> audioClips = audioClipPage.getContent();
+//        List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
+//
+//        int index = audioAlbum.getAudioClips().size();
+//        if(audioClipPage.getTotalElements() > 0) {
+//            for (int i = 0; i < audioClips.size(); i++) {
+//                AudioClip audioClip = audioClips.get(i);
+//                boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+//                audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
+//                index -= 1;
+//            }
+//        } else {
+//            audioClipResponseDtoList = null;
+//        }
+//
+//        audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
+//            @Override
+//            public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
+//                return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
+//            }
+//        });
+//
+//        // 생성된 오디오클립의 개수
+//        Map<String, Object> metadata = new HashMap<>();
+//        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+//
+//        Map<String, Object> responseBody = new HashMap<>();
+//        responseBody.put("result", audioClipResponseDtoList);
+//        responseBody.put("metadata", metadata);
+//        responseBody.put("is Mine", userDetails.getUsername().equals(audioAlbum.getMember().getMembername()));
+//        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+//    }
 
 
     @Transactional
@@ -212,6 +212,14 @@ public class AudioClipService {
             audioClipResponseDtoList = null;
         }
 
+        if (sortBy.equals("likesCount")) {
+            audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
+                @Override
+                public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
+                    return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
+                }
+            });
+        }
         //        // 생성된 오디오클립의 개수
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("audioClipCount", audioClipPage.getTotalElements());
