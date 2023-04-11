@@ -154,7 +154,7 @@ public class AudioClipService {
         Sort sort = Sort.by(Sort.Direction.ASC, SortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
         Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
-        List<AudioClip> audioClips = audioClipPage.getContent().stream().toList();
+        List<AudioClip> audioClips = audioClipPage.getContent();
         List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
 
         int index = 1;
@@ -193,15 +193,15 @@ public class AudioClipService {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
         Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
-        List<AudioClip> audioClips = audioClipPage.getContent().stream().toList();
+        List<AudioClip> audioClips = audioClipPage.getContent();
         List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
 
-        int index = 1;
+        int index = audioAlbum.getAudioClips().size();
         for (int i = 0; i < audioClipPage.getTotalElements(); i++){
             AudioClip audioClip = audioClips.get(i);
             boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
             audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-            index += 1;
+            index -= 1;
         }
 
         //        // 생성된 오디오클립의 개수

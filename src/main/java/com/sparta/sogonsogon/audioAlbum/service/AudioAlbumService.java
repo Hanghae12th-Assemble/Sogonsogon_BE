@@ -7,8 +7,10 @@ import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbumLike;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumLikeRepository;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipOneResponseDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
+import com.sparta.sogonsogon.audioclip.repository.AudioClipLikeRepository;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.CategoryType;
@@ -50,6 +52,7 @@ public class AudioAlbumService {
     private final S3Uploader s3Uploader;
     private final NotificationService notificationService;
     private final FollowRepository followRepository;
+    private  final AudioClipLikeRepository audioClipLikeRepository;
 
 
     // 오디오앨범 생성
@@ -142,10 +145,13 @@ public class AudioAlbumService {
                 .stream()
                 .limit(10)
                 .toList();
-        List<AudioClipResponseDto> audioAlbumResponseDtos = new ArrayList<>();
-        if (!foundAudioClip.isEmpty()) {
-            for (AudioClip audioClip : foundAudioClip) {
-                audioAlbumResponseDtos.add(new AudioClipResponseDto(audioClip));
+        List<AudioClipOneResponseDto> audioAlbumResponseDtos = new ArrayList<>();
+        int index = audioAlbum.getAudioClips().size();
+        if(!foundAudioClip.isEmpty()){
+            for(AudioClip audioClip : foundAudioClip){
+                boolean isLikeCheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+                audioAlbumResponseDtos.add(new AudioClipOneResponseDto(audioClip, index, isLikeCheck));
+                index -= 1;
             }
         } else {
             audioAlbumResponseDtos = null;
