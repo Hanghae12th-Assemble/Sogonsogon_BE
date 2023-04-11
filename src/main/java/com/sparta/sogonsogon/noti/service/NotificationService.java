@@ -48,6 +48,7 @@ public class NotificationService {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
         emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
+        log.info("SSE 연결 됬지롱");
 
         emitter.onCompletion(() -> { // 클라이언트와의 연결이 종료되었을 때 호출
             emitterRepository.deleteById(emitterId);
@@ -68,7 +69,11 @@ public class NotificationService {
     }
     @Transactional
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
-        try (Connection con = DataSourceUtils.getConnection(dataSource)) {
+        Connection con = null;
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+
             Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
             String receiverId = String.valueOf(receiver.getId());
             String eventId = receiverId + "_" + System.currentTimeMillis();
@@ -82,6 +87,15 @@ public class NotificationService {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException e) {
+                    log.info("커넥션 닫을 수 없다!!!!!!!!!!!!!!!!!!!!!!!");
+                }
+            }
         }
     }
 
@@ -124,17 +138,11 @@ public class NotificationService {
     public List<NotificationResponseDto> getAllNotifications(Long memberId) {
 
         List<Notification> notifications;
-
-        try (Connection con = DataSourceUtils.getConnection(dataSource)) {
             notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
             log.info("알림 전체 조회했어");
             return notifications.stream()
                     .map(NotificationResponseDto::create)
                     .collect(Collectors.toList());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
     }
     // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
     @Transactional
@@ -154,13 +162,15 @@ public class NotificationService {
     // 선택된 알림 삭제
     @Transactional
     public void deleteNotification(Long notificationId, Member member) {
-        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
-                () -> new NotFoundException("Notification not found"));
-        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
-        if (!notification.getReceiver().getId().equals(member.getId())) {
-            throw new IllegalArgumentException("접근권한이 없습니다. ");
-        }
-        notificationRepository.deleteById(notificationId);
+
+            Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+                    () -> new NotFoundException("Notification not found"));
+            // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
+            if (!notification.getReceiver().getId().equals(member.getId())) {
+                throw new IllegalArgumentException("접근권한이 없습니다. ");
+            }
+            notificationRepository.deleteById(notificationId);
+
     }
 
 //    // 클라이언트 타임아웃 처리

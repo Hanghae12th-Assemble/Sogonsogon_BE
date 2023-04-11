@@ -13,11 +13,16 @@ import com.sparta.sogonsogon.noti.util.AlarmType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +33,7 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final NotificationService notificationService;
+    private final DataSource dataSource;
 
     // 유저를 팔로잉하는 모든 사용자 가져오기
     @Transactional
@@ -72,7 +78,7 @@ public class FollowService {
     }
 
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public FollowResponseDto toggleFollow(String membername, UserDetailsImpl userDetails) {
         Member follow = memberRepository.findByMembername(membername).orElseThrow(
                 () -> new EntityNotFoundException(ErrorMessage.WRONG_USERNAME.getMessage())
@@ -109,6 +115,7 @@ public class FollowService {
             log.info("팔로우 취소");
             return FollowResponseDto.of(followStatus,follow.getNickname() + "님을 팔로우 취소하였습니다.",isFollow);
         }
+
 
 
     }
