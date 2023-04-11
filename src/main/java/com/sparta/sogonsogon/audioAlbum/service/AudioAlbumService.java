@@ -114,7 +114,7 @@ public class AudioAlbumService {
 
     // 선택한 오디오앨범 조회
     @Transactional
-    public AudioAlbumResponseDto findAudioAlbum(Long audioAlbumId, UserDetailsImpl userDetails) {
+    public Map<String, Object> findAudioAlbum(Long audioAlbumId, UserDetailsImpl userDetails) {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAlbumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
@@ -133,8 +133,14 @@ public class AudioAlbumService {
         boolean isLikeCheck = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser()).isPresent();
         boolean isMine = audioAlbum.getMember().getId().equals(userDetails.getUser().getId());
 
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioClipCount", foundAudioClip.size());
 
-        return new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine));
+        responseBody.put("metadata", metadata);
+
+        return responseBody;
     }
 
     // 선택한 오디오앨범 삭제
