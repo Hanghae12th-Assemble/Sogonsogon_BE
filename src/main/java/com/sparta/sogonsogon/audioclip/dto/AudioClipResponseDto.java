@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -35,7 +36,7 @@ public class AudioClipResponseDto {
     public AudioClipResponseDto(AudioClip audioClip){
         log.info(audioClip.getMember().getProfileImageUrl());
         this.id = audioClip.getId();
-        this.ablumTile = audioClip.getAudio_album().getTitle().toString();
+        this.ablumTile = audioClip.getAudioalbum().getTitle().toString();
         this.title = audioClip.getTitle();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
@@ -73,4 +74,6 @@ public class AudioClipResponseDto {
 
 
     }
+
+
 }
