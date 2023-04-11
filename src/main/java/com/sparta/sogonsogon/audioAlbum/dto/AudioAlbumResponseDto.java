@@ -39,6 +39,8 @@ public class AudioAlbumResponseDto {
 
     private boolean isMine;
 
+    private int likesCount;
+
     @Builder
     public AudioAlbumResponseDto(AudioAlbum audioAlbum) {
         this.id = audioAlbum.getId();
@@ -50,6 +52,7 @@ public class AudioAlbumResponseDto {
         this.modifiedAt = audioAlbum.getModifiedAt().toString();
         this.memberName = audioAlbum.getMember().getMembername();
         this.meberNickname = audioAlbum.getMember().getNickname();
+        this.likesCount = audioAlbum.getLikesCount();
     }
 
 
@@ -66,6 +69,7 @@ public class AudioAlbumResponseDto {
         this.audioClips = audioClips;
         this.isLikeCheck = isLikeCheck;
         this.isMine = isMine;
+        this.likesCount = audioAlbum.getLikesCount();
     }
 
     public static AudioAlbumResponseDto of(AudioAlbum audioAlbum){

@@ -35,7 +35,7 @@ public class AudioAlbumController {
     }
 
     @GetMapping()
-    @Operation(summary = "전체 오디오앨범 조회", description = "생성된 오디오앨범 전체를 조회한다. 최신순으로 정렬 ")
+    @Operation(summary = "전체 오디오앨범 조회", description = "생성된 오디오앨범 전체를 조회한다. 최신순으로 정렬, createdAt, likesCount 적용가능합니다. ")
     public StatusResponseDto<Map<String, Object>> getAudioAlbums(@RequestParam(defaultValue = "1") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
                                                                  @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
