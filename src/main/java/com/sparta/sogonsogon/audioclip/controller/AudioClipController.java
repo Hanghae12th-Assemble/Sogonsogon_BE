@@ -68,14 +68,14 @@ public class AudioClipController {
 
 
 //   오디오 클립 좋아요순으로 전체 조회
-    @GetMapping("/like/{audioAblumId}")
-    @Operation(summary = "좋아요순으로 오디오 클립 전체 가져오기", description = "오디오클립 전체 조회시 좋아요순 정렬")
-    public StatusResponseDto<Map<String, Object>> findByclipOrderbyLike(@PathVariable Long audioAblumId,
-                                                                        @RequestParam(defaultValue = "1") int page,
-                                                                        @RequestParam(defaultValue = "10") int size,
-                                                                        @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
-        return audioClipService.findAllinAblumOrderbyLike(page -1, size, sortBy, audioAblumId);
-    }
+//    @GetMapping("/like/{audioAblumId}")
+//    @Operation(summary = "좋아요순으로 오디오 클립 전체 가져오기", description = "오디오클립 전체 조회시 좋아요순 정렬")
+//    public StatusResponseDto<Map<String, Object>> findByclipOrderbyLike(@PathVariable Long audioAblumId,
+//                                                                        @RequestParam(defaultValue = "1") int page,
+//                                                                        @RequestParam(defaultValue = "10") int size,
+//                                                                        @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
+//        return audioClipService.findAllinAblumOrderbyLike(page -1, size, sortBy, audioAblumId);
+//    }
 
 
 }
