@@ -15,11 +15,13 @@ import java.util.List;
 @Repository
 public interface AudioClipRepository extends JpaRepository<AudioClip, Long> {
 
-    @Query("SELECT a FROM AudioClip a WHERE a.audio_album.id = :audioAlbumId ORDER BY a.createdAt DESC")
+    @Query("SELECT a FROM AudioClip a WHERE a.audioalbum.id = :audioAlbumId ORDER BY a.createdAt DESC")
     List<AudioClip> findTop10ByAudioAlbumIdOrderByCreatedAtDesc(@Param("audioAlbumId") Long audioAlbumId);
 
-    @Query("SELECT a from AudioClip a where a.audio_album.id = :audioAlbumId")
+    @Query("SELECT a from AudioClip a where a.audioalbum.id = :audioAlbumId")
     Page<AudioClip> findAudioClipsByAudio_album_Id(@Param("audioAlbumId")Long audioAlbumId, Pageable sortedPageable);
+
+    Page<AudioClip> findAudioClipsByAudioalbum(AudioAlbum audioAlbum, Pageable sortedPageable);
 
 //    @Query("SELECT ac FROM AudioClip ac JOIN ac.audio_album a" +
 //            " WHERE a.id = :audioAlbumId ORDER BY " +

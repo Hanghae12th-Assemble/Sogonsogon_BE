@@ -1,5 +1,6 @@
 package com.sparta.sogonsogon.audioclip.service;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
@@ -22,6 +23,7 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,12 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.util.List;
+import javax.persistence.EntityManager;
+import java.util.*;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +52,8 @@ public class AudioClipService {
     private final FollowRepository followRepository;
 
     private final S3Uploader s3Uploader;
+
+    private final EntityManager entityManager;
 
     //오디오 클립 생성
     @Transactional
@@ -142,28 +144,32 @@ public class AudioClipService {
         return StatusResponseDto.success(HttpStatus.OK, responseDto);
     }
 
-//    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId){
-//        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
-//                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
-//        );
-//
-//        Sort sort = Sort.by(Sort.Direction.DESC, SortBy);
-//        Pageable sortedPageable = PageRequest.of(page, size, sort);
-//        Page<AudioClip> audioClipPage = audioClipRepository.findByAudio_albumOrderByAudioClipLikesDesc(audioAlbum, sortedPageable);
-//        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent()
-//                .stream()
-//                .map(AudioClipResponseDto::new)
-//                .toList();
-//
-//        // 생성된 오디오클립의 개수
-//        Map<String, Object> metadata = new HashMap<>();
-//        metadata.put("audioClipCount", audioClipPage.getTotalElements());
-//
-//        Map<String, Object> responseBody = new HashMap<>();
-//        responseBody.put("result", audioClipResponseDtoList);
-//        responseBody.put("metadata", metadata);
-//        return StatusResponseDto.success(HttpStatus.OK, responseBody);
-//    }
+    @Transactional
+    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId){
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+
+        Sort sort = Sort.by(Sort.Direction.ASC, SortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
+        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent().stream().map(AudioClipResponseDto::new).toList();
+        audioClipResponseDtoList.sort(new Comparator<AudioClipResponseDto>() {
+            @Override
+            public int compare(AudioClipResponseDto o1, AudioClipResponseDto o2) {
+                return Integer.compare(o1.getIsLikeCount(), o2.getIsLikeCount());
+            }
+        });
+
+        // 생성된 오디오클립의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioClipResponseDtoList);
+        responseBody.put("metadata", metadata);
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+    }
 
 
     @Transactional
