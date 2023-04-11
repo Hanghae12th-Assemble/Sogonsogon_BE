@@ -1,6 +1,7 @@
 package com.sparta.sogonsogon.audioAlbum.repository;
 
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
+import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.enums.CategoryType;
 import com.sparta.sogonsogon.member.entity.Member;
 import org.springframework.data.domain.Page;

@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "audio_album")
+@Table(name = "audioalbum")
 public class AudioAlbum extends Timestamped {
 
     @Id
@@ -36,7 +36,7 @@ public class AudioAlbum extends Timestamped {
     @JoinColumn(name = "member_Id")
     private Member member; // 오디오앨범 생성자
 
-    @OneToMany(mappedBy = "audio_album", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "audioalbum", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     List<AudioClip> audioClips = new ArrayList<>();
 
 

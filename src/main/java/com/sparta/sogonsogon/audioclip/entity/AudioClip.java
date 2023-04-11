@@ -47,8 +47,8 @@ public class AudioClip extends TimeStamped{
     List<AudioClipLike> audioClipLikes = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "audio_album_id")
-    private AudioAlbum audio_album;
+    @JoinColumn(name = "audioalbum_id")
+    private AudioAlbum audioalbum;
 
 
     @Builder
@@ -58,7 +58,7 @@ public class AudioClip extends TimeStamped{
         this.audioclipImageUrl = audioclipImageUrl;
         this.audioclipUrl = audioclipUrl;
         this.member = member;
-        this.audio_album = audio_album;
+        this.audioalbum = audio_album;
     }
 
     public void update (AudioClipRequestDto requestDto, String audioclipUrl, String audioclipImageUrl){

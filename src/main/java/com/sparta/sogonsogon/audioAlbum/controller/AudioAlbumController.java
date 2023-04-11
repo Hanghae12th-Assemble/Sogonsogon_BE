@@ -61,7 +61,7 @@ public class AudioAlbumController {
 
     @GetMapping("/find/{audioAlbumId}")
     @Operation(summary = "선택한 오디오앨범 조회", description = "선택한 오디오앨범 하나를 조회한다.")
-    public StatusResponseDto<AudioAlbumResponseDto> getAudioAlbum(@PathVariable Long audioAlbumId, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public StatusResponseDto<Map<String, Object>> getAudioAlbum(@PathVariable Long audioAlbumId, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findAudioAlbum(audioAlbumId, userDetails));
     }
 
