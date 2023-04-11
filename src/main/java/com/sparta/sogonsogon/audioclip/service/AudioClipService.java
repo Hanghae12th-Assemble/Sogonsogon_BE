@@ -157,12 +157,16 @@ public class AudioClipService {
         List<AudioClip> audioClips = audioClipPage.getContent();
         List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
 
-        int index = 1;
-        for (int i = 0; i < audioClipPage.getTotalElements(); i++){
-            AudioClip audioClip = audioClips.get(i);
-            boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
-            audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-            index += 1;
+        int index = audioAlbum.getAudioClips().size();
+        if(audioClipPage.getTotalElements() > 0) {
+            for (int i = 0; i < audioClipPage.getTotalElements(); i++) {
+                AudioClip audioClip = audioClips.get(i);
+                boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+                audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
+                index -= 1;
+            }
+        } else {
+            audioClipResponseDtoList = null;
         }
 
         audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
@@ -197,11 +201,15 @@ public class AudioClipService {
         List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
 
         int index = audioAlbum.getAudioClips().size();
-        for (int i = 0; i < audioClipPage.getTotalElements(); i++){
-            AudioClip audioClip = audioClips.get(i);
-            boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
-            audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-            index -= 1;
+        if(audioClipPage.getTotalElements() > 0) {
+            for (int i = 0; i < audioClipPage.getTotalElements(); i++) {
+                AudioClip audioClip = audioClips.get(i);
+                boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+                audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
+                index -= 1;
+            }
+        }else{
+            audioClipResponseDtoList = null;
         }
 
         //        // 생성된 오디오클립의 개수
