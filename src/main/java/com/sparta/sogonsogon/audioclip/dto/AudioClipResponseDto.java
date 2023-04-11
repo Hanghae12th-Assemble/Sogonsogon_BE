@@ -36,7 +36,7 @@ public class AudioClipResponseDto {
     public AudioClipResponseDto(AudioClip audioClip){
         log.info(audioClip.getMember().getProfileImageUrl());
         this.id = audioClip.getId();
-        this.ablumTile = audioClip.getAudioalbum().getTitle().toString();
+        this.ablumTile = audioClip.getAudioalbum().getTitle();
         this.title = audioClip.getTitle();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
