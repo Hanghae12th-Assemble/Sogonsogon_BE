@@ -1,6 +1,8 @@
 package com.sparta.sogonsogon.noti.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.sogonsogon.member.entity.Member;
 import com.sparta.sogonsogon.member.repository.MemberRepository;
 import com.sparta.sogonsogon.noti.dto.NotificationResponseDto;
@@ -18,9 +20,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +35,7 @@ public class NotificationService {
 
     private final EmitterRepository emitterRepository ;
     private final NotificationRepository notificationRepository;
+    private final ObjectMapper objectMapper;
 
     private final MemberRepository memberRepository;
     //DEFAULT_TIMEOUT을 기본값으로 설정
@@ -40,33 +45,45 @@ public class NotificationService {
     // Hikari Pool Dead Lock 해결책: connection pool 추가
     // NotificationService 클래스에서 커넥션 풀을 사용하여 데이터베이스 연결을 가져온다
     // DataSource 빈을 NotificationService에서 주입받아 사용하면 커넥션 풀이 적용된 코드가 됩니다.
-    private final DataSource dataSource;
-    private final JdbcTemplate jdbcTemplate;
+//    private final DataSource dataSource;
+//    private final JdbcTemplate jdbcTemplate;
 
+//
+//    @PostConstruct
+//    public void init() {
+//        jdbcTemplate.setDataSource(dataSource);
+//    }
 
-    @PostConstruct
-    public void init() {
-        jdbcTemplate.setDataSource(dataSource);
-    }
-
+    @Transactional
     public SseEmitter subscribe(UserDetailsImpl userDetails) {
+
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
+        // lastEventId가 있을 경우, userId와 비교해서 유실된 데이터일 경우 재전송할 수 있다.
+
+        emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
+
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        /* 이 코드는 SseEmitter 객체를 생성하고 emitterRepository를 사용하여 저장하는 부분입니다.
-        SseEmitter는 Server-Sent Events(SSE)를 사용하여 실시간으로 클라이언트와 통신할 수 있는 객체입니다.
-        save() 메서드를 사용하여 emitterId와 함께 emitterRepository에 저장하면,나중에 해당 emitter를 식별하고 관리할 수 있습니다.
-        이 코드는 subscribe() 메서드에서 클라이언트가 새로운 SSE를 구독할 때마다 실행되며,
-        새로운 SseEmitter 객체를 생성하고 이를 emitterRepository에 저장합니다.
-        이후 생성된 SseEmitter는 클라이언트에게 실시간으로 알림을 보내는 데 사용됩니다. */
 
-//        send(userDetails.getUser(),AlarmType.eventSystem,"회원님이 알림 구독하였습니다.",null,null,null);
-        log.info("본인 구독하였습니다.");
-
-        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); //onCompletion 메서드: SseEmitter가 완료될 때 호출되는 콜백 함수를 정의
-        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); //  SSEEmitter를 찾아 emitterRepository에서 삭제하는 메서드
-
+        emitter.onCompletion(() -> {
+            log.info("SSE 연결 Complete");
+            emitterRepository.deleteById(emitterId);
+//            onClientDisconnect(emitter, "Compeletion");
+        });
+        //시간이 만료된 경우 자동으로 레포지토리에서 삭제하고 클라이언트에서 재요청을 보낸다.
+        emitter.onTimeout(() -> {
+            log.info("SSE 연결 Timeout");
+            emitterRepository.deleteById(emitterId);
+//            onClientDisconnect(emitter, "Timeout");
+        });
+        emitter.onError((e) -> emitterRepository.deleteById(emitterId));
+        //Dummy 데이터를 보내 503에러 방지. (SseEmitter 유효시간 동안 어느 데이터도 전송되지 않으면 503에러 발생)
         String eventId = makeTimeIncludeId(userDetails.getUser().getId());
         sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+
+//        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방한다.
+//        if (hasLostData(lastEventId)) {
+//            sendLostData(lastEventId, userDetails.getUser().getId(), emitterId, emitter);
+//        }
 
         return emitter;
     }
@@ -95,26 +112,29 @@ public class NotificationService {
 
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
+            log.info("eventId : " + eventId);
+            log.info("data" + data);
             emitter.send(SseEmitter.event()
                     .id(eventId)
                     .data(data));
         } catch (IOException exception) {
+            log.info("예외 발생해서 emitter 삭제됨");
             emitterRepository.deleteById(emitterId);
         }
     }
 
 
-    private boolean hasLostData(String lastEventId) {
-        return !lastEventId.isEmpty();
-    }
-
-    private void sendLostData(String lastEventId, Long memberId, String emitterId, SseEmitter emitter) {
-        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
-
-        eventCaches.entrySet().stream()
-                .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                .forEach(entry -> sendNotification(emitter, entry.getKey(), emitterId, entry.getValue()));
-    }
+//    private boolean hasLostData(String lastEventId) {
+//        return !lastEventId.isEmpty();
+//    }
+//
+//    private void sendLostData(String lastEventId, Long memberId, String emitterId, SseEmitter emitter) {
+//        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
+//
+//        eventCaches.entrySet().stream()
+//                .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
+//                .forEach(entry -> sendNotification(emitter, entry.getKey(), emitterId, entry.getValue()));
+//    }
 
 
 
@@ -171,5 +191,28 @@ public class NotificationService {
         }
         notificationRepository.deleteById(notificationId);
 
+    }
+
+
+
+    // 클라이언트 타임아웃 처리
+    private void onClientDisconnect(SseEmitter emitter, String type) {
+        try {
+            emitter.send(SseEmitter.event().name(type).data("Client" + type).id(String.valueOf(UUID.randomUUID())));
+            emitter.complete();
+        } catch (IOException e) {
+            log.error("Failed to send" + type + "event to client", e);
+        }
+    }
+
+    // 처리 된 건이고, 읽은 알림은 삭제 (1일 경과한 데이터)
+    @Transactional
+    public void deleteOldNotification() {
+        List<Notification> notifications = notificationRepository.findOldNotification();
+
+        log.info("총 " + notifications.size() + " 건의 알림 삭제");
+        for(Notification notification : notifications){
+            notificationRepository.deleteById(notification.getId());
+        }
     }
 }
