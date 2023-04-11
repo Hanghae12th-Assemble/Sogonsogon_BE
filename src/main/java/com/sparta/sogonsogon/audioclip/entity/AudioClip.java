@@ -39,8 +39,6 @@ public class AudioClip extends TimeStamped{
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private int order;
-
     @OneToMany(mappedBy = "audioclip", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @OrderBy("createdAt desc")
     List<Comment> commentList = new ArrayList<>();

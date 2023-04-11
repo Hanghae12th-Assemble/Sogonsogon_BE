@@ -161,7 +161,6 @@ public class AudioClipService {
             AudioClip audioClip = audioClipPage.toList().get(i);
             boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
             audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-            audioClip.setOrder(index);
             index += 1;
         }
 
