@@ -69,7 +69,6 @@ public class NotificationService {
     @Transactional
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
         try (Connection con = DataSourceUtils.getConnection(dataSource)) {
-            con.setAutoCommit(false);
             Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
             String receiverId = String.valueOf(receiver.getId());
             String eventId = receiverId + "_" + System.currentTimeMillis();
@@ -80,7 +79,7 @@ public class NotificationService {
                         sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
                     }
             );
-            con.commit();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -121,6 +120,7 @@ public class NotificationService {
     }
 
     //받은 알림 전체 조회
+    @Transactional
     public List<NotificationResponseDto> getAllNotifications(Long memberId) {
 
         List<Notification> notifications;
