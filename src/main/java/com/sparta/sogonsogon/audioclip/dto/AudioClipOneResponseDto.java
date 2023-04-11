@@ -21,14 +21,16 @@ public class AudioClipOneResponseDto {
     private String membernickname;
     private String membername; //오디오 올린 주인 고유 아이디
 
+    private int order;
     private int isLikeCount;
     private boolean isLikeCheck;
 
     @Builder
-    public AudioClipOneResponseDto(AudioClip audioClip, boolean isLikeCheck){
+    public AudioClipOneResponseDto(AudioClip audioClip, int order, boolean isLikeCheck){
         this.id = audioClip.getId();
         this.title = audioClip.getTitle();
         this.aublumTitle = audioClip.getAudioalbum().getTitle();
+        this.order = order;
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
         this.audioclipUrl = audioClip.getAudioclipUrl();
@@ -39,5 +41,7 @@ public class AudioClipOneResponseDto {
         this.isLikeCount = audioClip.getAudioClipLikes().size();
         this.isLikeCheck = isLikeCheck;
     }
+
+
 
 }
