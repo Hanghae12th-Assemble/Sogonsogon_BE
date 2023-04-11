@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,8 +41,10 @@ public class AudioClipCommentController {
 
     @GetMapping("/{audioclipId}")
     @Operation(summary = "오디오 클립 댓글 전체 조회", description = "오디오 클립에 있는 전체 댓글을 볼 수 있습니다.")
-    public StatusResponseDto<List<CommentResponseDto>> getComments(@PathVariable Long audioclipId){
-        return audioClipCommentService.getComments(audioclipId);
+    public StatusResponseDto<Map<String, Object>> getComments(@RequestParam(defaultValue = "1") int page,
+                                              @RequestParam(defaultValue = "10") int size,
+                                              @RequestParam(required = false, defaultValue = "createdAt") String sortBy, @PathVariable Long audioclipId){
+        return audioClipCommentService.getComments(page-1, size, sortBy, audioclipId);
 
     }
 
