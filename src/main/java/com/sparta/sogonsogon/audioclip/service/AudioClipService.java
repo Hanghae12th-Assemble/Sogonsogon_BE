@@ -144,32 +144,32 @@ public class AudioClipService {
         return StatusResponseDto.success(HttpStatus.OK, responseDto);
     }
 
-    @Transactional
-    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId){
-        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
-        );
-
-        Sort sort = Sort.by(Sort.Direction.ASC, SortBy);
-        Pageable sortedPageable = PageRequest.of(page, size, sort);
-        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
-        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent().stream().map(AudioClipResponseDto::new).toList();
-        audioClipResponseDtoList.sort(new Comparator<AudioClipResponseDto>() {
-            @Override
-            public int compare(AudioClipResponseDto o1, AudioClipResponseDto o2) {
-                return Integer.compare(o1.getIsLikeCount(), o2.getIsLikeCount());
-            }
-        });
-
-        // 생성된 오디오클립의 개수
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", audioClipPage.getTotalElements());
-
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("result", audioClipResponseDtoList);
-        responseBody.put("metadata", metadata);
-        return StatusResponseDto.success(HttpStatus.OK, responseBody);
-    }
+//    @Transactional
+//    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId){
+//        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
+//                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+//        );
+//
+//        Sort sort = Sort.by(Sort.Direction.ASC, SortBy);
+//        Pageable sortedPageable = PageRequest.of(page, size, sort);
+//        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
+//        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent().stream().map(AudioClipResponseDto::new).toList();
+//        audioClipResponseDtoList.sort(new Comparator<AudioClipResponseDto>() {
+//            @Override
+//            public int compare(AudioClipResponseDto o1, AudioClipResponseDto o2) {
+//                return Integer.compare(o1.getIsLikeCount(), o2.getIsLikeCount());
+//            }
+//        });
+//
+//        // 생성된 오디오클립의 개수
+//        Map<String, Object> metadata = new HashMap<>();
+//        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+//
+//        Map<String, Object> responseBody = new HashMap<>();
+//        responseBody.put("result", audioClipResponseDtoList);
+//        responseBody.put("metadata", metadata);
+//        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+//    }
 
 
     @Transactional
