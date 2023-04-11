@@ -102,7 +102,7 @@ public class AudioClipCommentService {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("result", responseDtos);
         responseBody.put("metadata", metadata);
-        responseBody.put("AlbumTitle", audioClip.getAudio_album().getTitle());
+        responseBody.put("AlbumTitle", audioClip.getAudioalbum().getTitle());
 
         return StatusResponseDto.success(HttpStatus.OK, responseBody);
     }
