@@ -159,7 +159,7 @@ public class AudioClipService {
 
         int index = audioAlbum.getAudioClips().size();
         if(audioClipPage.getTotalElements() > 0) {
-            for (int i = 0; i < audioClipPage.getTotalElements()-1; i++) {
+            for (int i = 0; i < audioClips.size(); i++) {
                 AudioClip audioClip = audioClips.get(i);
                 boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
                 audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
@@ -202,7 +202,7 @@ public class AudioClipService {
 
         int index = audioAlbum.getAudioClips().size();
         if(audioClipPage.getTotalElements() > 0) {
-            for (int i = 0; i < audioClipPage.getTotalElements()-1; i++) {
+            for (int i = 0; i < audioClips.size(); i++) {
                 AudioClip audioClip = audioClips.get(i);
                 boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
                 audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
