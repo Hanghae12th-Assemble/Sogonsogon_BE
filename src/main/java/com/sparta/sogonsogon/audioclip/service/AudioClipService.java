@@ -3,6 +3,7 @@ package com.sparta.sogonsogon.audioclip.service;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipOneResponseDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipRequestDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
@@ -144,36 +145,47 @@ public class AudioClipService {
         return StatusResponseDto.success(HttpStatus.OK, responseDto);
     }
 
-//    @Transactional
-//    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId){
-//        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
-//                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
-//        );
-//
-//        Sort sort = Sort.by(Sort.Direction.ASC, SortBy);
-//        Pageable sortedPageable = PageRequest.of(page, size, sort);
-//        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
-//        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent().stream().map(AudioClipResponseDto::new).toList();
-//        audioClipResponseDtoList.sort(new Comparator<AudioClipResponseDto>() {
-//            @Override
-//            public int compare(AudioClipResponseDto o1, AudioClipResponseDto o2) {
-//                return Integer.compare(o1.getIsLikeCount(), o2.getIsLikeCount());
-//            }
-//        });
-//
-//        // 생성된 오디오클립의 개수
-//        Map<String, Object> metadata = new HashMap<>();
-//        metadata.put("audioClipCount", audioClipPage.getTotalElements());
-//
-//        Map<String, Object> responseBody = new HashMap<>();
-//        responseBody.put("result", audioClipResponseDtoList);
-//        responseBody.put("metadata", metadata);
-//        return StatusResponseDto.success(HttpStatus.OK, responseBody);
-//    }
+    @Transactional
+    public StatusResponseDto<Map<String, Object>> findAllinAblumOrderbyLike(int page, int size, String SortBy, Long audioAblumId, UserDetailsImpl userDetails){
+        AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
+        );
+
+        Sort sort = Sort.by(Sort.Direction.ASC, SortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudioalbum(audioAlbum, sortedPageable);
+        List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
+
+        int index = 1;
+        for (int i = 0; i < audioClipPage.getTotalElements(); i++){
+            AudioClip audioClip = audioClipPage.toList().get(i);
+            boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+            audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
+            audioClip.setOrder(index);
+            index += 1;
+        }
+
+        audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
+            @Override
+            public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
+                return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
+            }
+        });
+
+        // 생성된 오디오클립의 개수
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", audioClipResponseDtoList);
+        responseBody.put("metadata", metadata);
+        responseBody.put("is Mine", userDetails.getUsername().equals(audioAlbum.getMember().getMembername()));
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
+    }
 
 
     @Transactional
-    public StatusResponseDto<Map<String, Object>> getclips(int page, int size, String sortBy, Long audioAblumId) {
+    public StatusResponseDto<Map<String, Object>> getclips(int page, int size, String sortBy, Long audioAblumId, UserDetailsImpl userDetails) {
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioAblumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
@@ -181,10 +193,16 @@ public class AudioClipService {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
         Page<AudioClip> audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
-        List<AudioClipResponseDto> audioClipResponseDtoList = audioClipPage.getContent()
-                .stream()
-                .map(AudioClipResponseDto::new)
-                .toList();
+        List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
+
+        int index = 1;
+        for (int i = 0; i < audioClipPage.getTotalElements(); i++){
+            AudioClip audioClip = audioClipPage.toList().get(i);
+            boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+            audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
+            index += 1;
+        }
+
         //        // 생성된 오디오클립의 개수
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("audioClipCount", audioClipPage.getTotalElements());
@@ -192,6 +210,7 @@ public class AudioClipService {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("result", audioClipResponseDtoList);
         responseBody.put("metadata", metadata);
+        responseBody.put("is Mine", userDetails.getUsername().equals(audioAlbum.getMember().getMembername()));
         return StatusResponseDto.success(HttpStatus.OK, responseBody);
 
     }
