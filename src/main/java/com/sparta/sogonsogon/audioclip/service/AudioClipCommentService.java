@@ -15,12 +15,18 @@ import com.sparta.sogonsogon.noti.util.AlarmType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -80,12 +86,24 @@ public class AudioClipCommentService {
 
     //오디오 클립 댓글 전체조회
     @Transactional
-    public StatusResponseDto<List<CommentResponseDto>> getComments(Long audioclipId) {
-        List<Comment> list = audioClipCommentRepository.findAllByAudioclipId(audioclipId);
-        List<CommentResponseDto> responseDtos = new ArrayList<>();
-        for(Comment comment : list){
-            responseDtos.add(CommentResponseDto.from(comment));
-        }
-        return StatusResponseDto.success(HttpStatus.OK, responseDtos);
+    public StatusResponseDto<Map<String, Object>> getComments(int page, int size, String sortBy,Long audioclipId) {
+        AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
+                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
+        );
+
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable sortedPageable = PageRequest.of(page, size, sort);
+        Page<Comment> list = audioClipCommentRepository.findAllByAudioclipId(audioclipId, sortedPageable);
+        List<CommentResponseDto> responseDtos = list.getContent().stream().map(CommentResponseDto::new).toList();
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("audioClipCount", list.getTotalElements());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", responseDtos);
+        responseBody.put("metadata", metadata);
+        responseBody.put("AlbumTitle", audioClip.getAudio_album().getTitle());
+
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
     }
 }
