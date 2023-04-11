@@ -279,4 +279,14 @@ public class AudioAlbumService {
         return StatusResponseDto.success(HttpStatus.OK, responseBody);
 
     }
+
+    // 오디오앨범 검색
+    public List<AudioAlbumResponseDto> findByTitle(String title) {
+        List<AudioAlbum> list = audioAlbumRepository.findByTitleContaining(title);
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = new ArrayList<>();
+        for (AudioAlbum audioAlbum : list) {
+            audioAlbumResponseDtoList.add(new AudioAlbumResponseDto(audioAlbum));
+        }
+        return audioAlbumResponseDtoList;
+    }
 }

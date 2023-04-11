@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -88,5 +89,11 @@ public class AudioAlbumController {
                                                           @RequestParam(defaultValue = "10") int size,
                                                           @RequestParam(required = false, defaultValue = "createdAt") String sortBy, @Parameter(hidden = true)@AuthenticationPrincipal UserDetailsImpl userDetails){
         return audioAlbumService.getMine(sortBy, page -1, size, userDetails);
+    }
+
+    @GetMapping("/find")
+    @Operation(summary = "타이틀 조회", description = "해당하는 단어가 들어간 오디오앨범 모두 조회")
+    public StatusResponseDto<List<AudioAlbumResponseDto>> findByTitle(@RequestParam(value = "title") String title) {
+        return StatusResponseDto.success(HttpStatus.OK, audioAlbumService.findByTitle(title));
     }
 }
