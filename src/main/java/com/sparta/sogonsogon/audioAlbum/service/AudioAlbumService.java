@@ -286,6 +286,7 @@ public class AudioAlbumService {
     }
 
     // 오디오앨범 검색
+    @Transactional
     public List<AudioAlbumResponseDto> findByTitle(String title) {
         List<AudioAlbum> list = audioAlbumRepository.findByTitleContaining(title);
         List<AudioAlbumResponseDto> audioAlbumResponseDtoList = new ArrayList<>();
