@@ -1,6 +1,7 @@
 package com.sparta.sogonsogon.audioAlbum.dto;
 
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipOneResponseDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.enums.CategoryType;
@@ -33,7 +34,7 @@ public class AudioAlbumResponseDto {
 
     private String meberNickname;
 
-    private List<AudioClipResponseDto> audioClips;
+    private List<AudioClipOneResponseDto> audioClips;
 
     private boolean isLikeCheck;
 
@@ -56,7 +57,7 @@ public class AudioAlbumResponseDto {
     }
 
 
-    public  AudioAlbumResponseDto (AudioAlbum audioAlbum, List<AudioClipResponseDto> audioClips, boolean isLikeCheck, boolean isMine) {
+    public  AudioAlbumResponseDto (AudioAlbum audioAlbum, List<AudioClipOneResponseDto> audioClips, boolean isLikeCheck, boolean isMine) {
         this.id = audioAlbum.getId();
         this.title = audioAlbum.getTitle();
         this.instruction = audioAlbum.getInstruction();
