@@ -1,10 +1,10 @@
 package com.sparta.sogonsogon.noti.util;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -12,50 +12,45 @@ import javax.sql.DataSource;
 public class DataSourceConfig {
 
     @Value("${spring.datasource.url}")
-    private String dbUrl;
+    private String url;
 
     @Value("${spring.datasource.username}")
-    private String dbUsername;
+    private String username;
 
     @Value("${spring.datasource.password}")
-    private String dbPassword;
+    private String password;
 
     @Value("${spring.datasource.driver-class-name}")
-    private String dbDriverClassName;
-
-    @Value("${spring.datasource.hikari.maximum-pool-size}")
-    private int maximumPoolSize;
-
-    @Value("${spring.datasource.hikari.minimum-idle}")
-    private int minimumIdle;
-
-    @Value("${spring.datasource.hikari.idle-timeout}")
-    private long idleTimeout;
-
-    @Value("${spring.datasource.hikari.connection-timeout}")
-    private long connectionTimeout;
-
-    @Value("${spring.datasource.hikari.max-lifetime}")
-    private long maxLifetime;
-
-    @Value("${spring.datasource.hikari.pool-name}")
-    private String poolName;
+    private String driverClassName;
 
     @Bean
     public DataSource dataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(dbUrl);
-        config.setUsername(dbUsername);
-        config.setPassword(dbPassword);
-        config.setDriverClassName(dbDriverClassName);
-        config.setMaximumPoolSize(maximumPoolSize);
-        config.setMinimumIdle(minimumIdle);
-        config.setIdleTimeout(idleTimeout);
-        config.setConnectionTimeout(connectionTimeout);
-        config.setMaxLifetime(maxLifetime);
-        config.setPoolName(poolName);
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+        dataSource.setDriverClassName(driverClassName);
 
-        return new HikariDataSource(config);
+        // 커넥션 풀 설정
+        /* 데이터베이스 연결 풀에서 유지할 최소한의 유휴 커넥션 개수를 설정하는 코드 */
+        dataSource.setMinimumIdle(5);
+        /* 커넥션 풀의 최대 크기를 61로 설정*/
+        dataSource.setMaximumPoolSize(61);
+        /* 커넥션 풀에 대기중인 커넥션 중에서 얼마나 오랫동안 대기하고 있으면 해당 커넥션을 폐기할지를 결정하는 설정*/
+        dataSource.setIdleTimeout(30000);
+        /* 이 코드는 커넥션의 최대 생존 시간을 설정하는 것입니다.
+        설정된 값은 밀리초 단위이며, 이 시간이 지나면 커넥션이 소멸됩니다.  */
+        dataSource.setMaxLifetime(1800000); //30분
+        /* 커넥션을 가져오기 위한 대기 시간을 설정하는 코드, 10초*/
+        dataSource.setConnectionTimeout(10000);
+
+        return dataSource;
+    }
+
+    @Bean
+    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 }
+
 
