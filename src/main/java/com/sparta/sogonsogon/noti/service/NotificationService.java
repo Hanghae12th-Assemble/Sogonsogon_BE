@@ -1,26 +1,18 @@
 package com.sparta.sogonsogon.noti.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.sogonsogon.member.entity.Member;
-import com.sparta.sogonsogon.member.repository.MemberRepository;
 import com.sparta.sogonsogon.noti.dto.NotificationResponseDto;
 import com.sparta.sogonsogon.noti.entity.Notification;
 import com.sparta.sogonsogon.noti.repository.EmitterRepository;
 import com.sparta.sogonsogon.noti.repository.NotificationRepository;
 import com.sparta.sogonsogon.noti.util.AlarmType;
-import com.sparta.sogonsogon.noti.util.DataSourceConfig;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -28,7 +20,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,7 +63,9 @@ public class NotificationService {
         Connection con = null;
         try {
             con = dataSource.getConnection();
+            // 데이터소스를 통해 데이터베이스와의 연결을 설정하고 Connection 객체를 생성합니다.
             con.setAutoCommit(false);
+            // 트랜잭션을 수동으로 관리하기 위해 자동 커밋 기능을 false로 설정합니다.
 
             Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
             String receiverId = String.valueOf(receiver.getId());
@@ -88,12 +81,18 @@ public class NotificationService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
+            // finally: try 블록에서 사용한 자원들을 정리하는 블록
+            // Connection 객체가 정상적으로 닫히지 않은 경우에 대비하여 커넥션 풀에 반환하는 코드가 여기에 작성
             if (con != null) {
+                // Connection 객체가 null이 아니면, 즉 연결이 정상적으로 이루어졌으면 다음 코드를 실행
                 try {
                     con.setAutoCommit(true);
+                    // 트랜잭션이 완료되면 자동 커밋 기능을 true로 설정합니다.
                     con.close();
+                    // Connection 객체를 반환하여 커넥션 풀에 반환
                 } catch (SQLException e) {
-                    log.info("커넥션 닫을 수 없다!!!!!!!!!!!!!!!!!!!!!!!");
+
+                    log.info("Connection 객체를 닫을 수 없음");
                 }
             }
         }
@@ -173,24 +172,4 @@ public class NotificationService {
 
     }
 
-//    // 클라이언트 타임아웃 처리
-//    private void onClientDisconnect(SseEmitter emitter, String type) {
-//        try {
-//            emitter.send(SseEmitter.event().name(type).data("Client" + type).id(String.valueOf(UUID.randomUUID())));
-//            emitter.complete();
-//        } catch (IOException e) {
-//            log.error("Failed to send" + type + "event to client", e);
-//        }
-//    }
-//
-//    // 처리 된 건이고, 읽은 알림은 삭제 (1일 경과한 데이터)
-//    @Transactional
-//    public void deleteOldNotification() {
-//        List<Notification> notifications = notificationRepository.findOldNotification();
-//
-//        log.info("총 " + notifications.size() + " 건의 알림 삭제");
-//        for(Notification notification : notifications){
-//            notificationRepository.deleteById(notification.getId());
-//        }
-//    }
 }
