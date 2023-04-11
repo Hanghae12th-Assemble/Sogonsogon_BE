@@ -293,6 +293,6 @@ public class AudioAlbumService {
         for (AudioAlbum audioAlbum : list) {
             audioAlbumResponseDtoList.add(new AudioAlbumResponseDto(audioAlbum));
         }
-        return audioAlbumResponseDtoList;
+        return audioAlbumResponseDtoList; // test
     }
 }
