@@ -155,6 +155,7 @@ public class AudioClipService {
         Page<AudioClip> audioClipPage ;
         List<AudioClip> audioClips;
         List<AudioClipOneResponseDto> audioClipResponseDtoList = new ArrayList<>();
+        size = audioAlbum.getAudioClips().size();
 
         if (sortBy.equals("likesCount")) {
 
