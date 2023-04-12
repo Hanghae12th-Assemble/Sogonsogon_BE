@@ -50,6 +50,8 @@ public class AudioClip extends TimeStamped{
     @JoinColumn(name = "audioalbum_id")
     private AudioAlbum audioalbum;
 
+    private int order;
+
 
     @Builder
     public AudioClip(AudioClipRequestDto requestDto, Member member, String audioclipUrl, String audioclipImageUrl, AudioAlbum audioalbum){
@@ -59,6 +61,7 @@ public class AudioClip extends TimeStamped{
         this.audioclipUrl = audioclipUrl;
         this.member = member;
         this.audioalbum = audioalbum;
+        this.order = audioalbum.getAudioClips().size() + 1;
     }
 
     public void update (AudioClipRequestDto requestDto, String audioclipUrl, String audioclipImageUrl){

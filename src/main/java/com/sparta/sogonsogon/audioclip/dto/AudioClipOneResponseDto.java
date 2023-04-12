@@ -26,11 +26,11 @@ public class AudioClipOneResponseDto {
     private boolean isLikeCheck;
 
     @Builder
-    public AudioClipOneResponseDto(AudioClip audioClip, int order, boolean isLikeCheck){
+    public AudioClipOneResponseDto(AudioClip audioClip,  boolean isLikeCheck){
         this.id = audioClip.getId();
         this.title = audioClip.getTitle();
         this.aublumTitle = audioClip.getAudioalbum().getTitle();
-        this.order = order;
+        this.order = audioClip.getOrder();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
         this.audioclipUrl = audioClip.getAudioclipUrl();

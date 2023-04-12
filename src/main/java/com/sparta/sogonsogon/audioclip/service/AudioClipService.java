@@ -54,13 +54,12 @@ public class AudioClipService {
 
     private final S3Uploader s3Uploader;
 
-    private final EntityManager entityManager;
 
     //오디오 클립 생성
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> createdAudioClip(Long audioablumId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage/");
-        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips/");
+        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage");
+        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips");
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioablumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
@@ -160,42 +159,36 @@ public class AudioClipService {
         if (sortBy.equals("likesCount")) {
 
             Pageable sortedPageable = PageRequest.of(page, size);
-            audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
+            audioClipPage = audioClipRepository.findByAudioalbumOrderByAudioClipLikesDesc(audioAlbum, sortedPageable);
             audioClips = audioClipPage.getContent();
 
-            int index = audioAlbum.getAudioClips().size();
             if(audioClipPage.getTotalElements() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
-                    index = (int) (audioAlbum.getAudioClips().size() - (audioClipPage.getNumber() * audioClipPage.getSize())+ i + 2);
                     AudioClip audioClip = audioClips.get(i);
                     boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, member).isPresent();
-                    audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-//                    index -= 1;
+                    audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, islikecheck));
                 }
             }else{
                 audioClipResponseDtoList = null;
             }
 
-            audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
-                @Override
-                public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
-                    return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
-                }
-            });
+//            audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
+//                @Override
+//                public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
+//                    return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
+//                }
+//            });
         }else{
             Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
             Pageable sortedPageable = PageRequest.of(page, size, sort);
             audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
             audioClips = audioClipPage.getContent();
 
-            int index = audioAlbum.getAudioClips().size();
             if(audioClipPage.getTotalElements() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
-                    index = (int) (audioAlbum.getAudioClips().size() - (audioClipPage.getNumber() * audioClipPage.getSize())+ i + 2);
                     AudioClip audioClip = audioClips.get(i);
                     boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, member).isPresent();
-                    audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-//                    index -= 1;
+                    audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip,islikecheck));
                 }
             }else{
                 audioClipResponseDtoList = null;

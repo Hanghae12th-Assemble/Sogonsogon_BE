@@ -150,8 +150,7 @@ public class AudioAlbumService {
         if(!foundAudioClip.isEmpty()){
             for(AudioClip audioClip : foundAudioClip){
                 boolean isLikeCheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
-                audioAlbumResponseDtos.add(new AudioClipOneResponseDto(audioClip, index, isLikeCheck));
-                index -= 1;
+                audioAlbumResponseDtos.add(new AudioClipOneResponseDto(audioClip, isLikeCheck));
             }
         } else {
             audioAlbumResponseDtos = null;
