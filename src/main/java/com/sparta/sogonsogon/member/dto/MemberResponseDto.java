@@ -34,8 +34,8 @@ public class MemberResponseDto {
         }else {
             this.isFollowCheck = true;
         }
-        this.followers = member.getFollower().size();
-        this.followings = member.getFollowing().size();
+        this.followers = member.getFollowing().size();
+        this.followings = member.getFollower().size();
 
     }
 
