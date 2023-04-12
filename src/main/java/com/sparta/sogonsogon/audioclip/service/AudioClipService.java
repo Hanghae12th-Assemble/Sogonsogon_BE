@@ -77,7 +77,7 @@ public class AudioClipService {
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
         for (Follow following : followings) {
             String message = audioClip.getMember().getNickname() + "님이 제목:" + audioClip.getTitle() + "오디오 클립을 생성하였습니다. ";
-            notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
+            notificationService.send(following.getFollower(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
             log.info("생성하였습니다. ");
         }
 
