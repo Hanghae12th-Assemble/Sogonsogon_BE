@@ -30,7 +30,7 @@ public class AudioClipOneResponseDto {
         this.id = audioClip.getId();
         this.title = audioClip.getTitle();
         this.aublumTitle = audioClip.getAudioalbum().getTitle();
-        this.order = audioClip.getOrder();
+        this.order = audioClip.getOrders();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
         this.audioclipUrl = audioClip.getAudioclipUrl();
