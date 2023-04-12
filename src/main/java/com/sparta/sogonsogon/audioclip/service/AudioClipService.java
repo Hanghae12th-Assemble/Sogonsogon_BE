@@ -113,9 +113,9 @@ public class AudioClipService {
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClipRepository.deleteById(audioclipId);
 
-            for (int i = 1 ; i <= audioAlbum.getAudioClips().size(); i++){
+            for (int i = 0 ; i < audioAlbum.getAudioClips().size(); i++){
                 AudioClip audioClip_sub = audioAlbum.getAudioClips().get(i);
-                audioClip_sub.setOrders(i);
+                audioClip_sub.setOrders(i+1);
             }
 
             // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
@@ -176,12 +176,6 @@ public class AudioClipService {
                 audioClipResponseDtoList = null;
             }
 
-//            audioClipResponseDtoList.sort(new Comparator<AudioClipOneResponseDto>() {
-//                @Override
-//                public int compare(AudioClipOneResponseDto o1, AudioClipOneResponseDto o2) {
-//                    return Integer.compare(o2.getIsLikeCount(), o1.getIsLikeCount());
-//                }
-//            });
         }else{
             Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
             Pageable sortedPageable = PageRequest.of(page, size, sort);
