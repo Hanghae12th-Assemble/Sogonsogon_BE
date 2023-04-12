@@ -40,7 +40,7 @@ public class AudioAlbum extends Timestamped {
     List<AudioClip> audioClips = new ArrayList<>();
 
     @OneToMany(mappedBy = "audioAlbum", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AudioAlbumLike> audioAlbumLikes = new ArrayList<>();
+    private List<AudioAlbumLike> audioalbumLikes = new ArrayList<>();
     private int likesCount;
 
     public void updateLikesCnt(int likesCount) {

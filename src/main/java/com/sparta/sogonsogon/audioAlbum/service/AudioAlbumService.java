@@ -112,7 +112,7 @@ public class AudioAlbumService {
         List<AudioAlbumResponseDto> audioAlbumResponseDtoList = sortedAudioAlbums
                 .stream()
                 .peek(audioAlbum -> {
-                    int likesCount = audioAlbum.getAudioAlbumLikes().size();
+                    int likesCount = audioAlbum.getAudioalbumLikes().size();
                     audioAlbum.updateLikesCnt(likesCount);
                 })
                 .map(AudioAlbumResponseDto::new)
@@ -131,7 +131,7 @@ public class AudioAlbumService {
 
     private List<AudioAlbum> sortAudioAlbumsByLikesCount(Page<AudioAlbum> audioAlbums) {
         return audioAlbums.stream()
-                .sorted(Comparator.comparingInt((AudioAlbum a) -> a.getAudioAlbumLikes().size()).reversed())
+                .sorted(Comparator.comparingInt((AudioAlbum a) -> a.getAudioalbumLikes().size()).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -146,7 +146,6 @@ public class AudioAlbumService {
                 .limit(10)
                 .toList();
         List<AudioClipOneResponseDto> audioAlbumResponseDtos = new ArrayList<>();
-        int index = audioAlbum.getAudioClips().size();
         if(!foundAudioClip.isEmpty()){
             for(AudioClip audioClip : foundAudioClip){
                 boolean isLikeCheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
