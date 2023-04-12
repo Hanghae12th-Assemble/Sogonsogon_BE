@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Map;
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/audioclip")
@@ -58,12 +59,13 @@ public class AudioClipController {
     }
 
     @GetMapping("/clips/{audioAblumId}")
-    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 최신순으로 정렬 합니다. 전체 클립을 볼 수 있습니다. ")
+    @Operation(summary = "오디오 클립 전체 조회 ", description = "오디오앨범에서 최신순으로 정렬 합니다. 전체 클립을 볼 수 있습니다. likesCount")
     public StatusResponseDto<Map<String, Object>> findclip( @PathVariable Long audioAblumId,
                                                             @RequestParam(defaultValue = "1") int page,
                                                             @RequestParam(defaultValue = "10") int size,
-                                                            @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
-        return audioClipService.getclips(page -1, size, sortBy, audioAblumId);
+                                                            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+                                                            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return audioClipService.getclips(page -1, size, sortBy, audioAblumId, userDetails);
     }
 
 
@@ -73,8 +75,9 @@ public class AudioClipController {
 //    public StatusResponseDto<Map<String, Object>> findByclipOrderbyLike(@PathVariable Long audioAblumId,
 //                                                                        @RequestParam(defaultValue = "1") int page,
 //                                                                        @RequestParam(defaultValue = "10") int size,
-//                                                                        @RequestParam(required = false, defaultValue = "createdAt") String sortBy){
-//        return audioClipService.findAllinAblumOrderbyLike(page -1, size, sortBy, audioAblumId);
+//                                                                        @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+//                                                                        @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        return audioClipService.findAllinAblumOrderbyLike(page -1, size, sortBy, audioAblumId, userDetails);
 //    }
 
 

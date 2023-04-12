@@ -39,6 +39,14 @@ public class AudioAlbum extends Timestamped {
     @OneToMany(mappedBy = "audioalbum", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     List<AudioClip> audioClips = new ArrayList<>();
 
+    @OneToMany(mappedBy = "audioAlbum", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AudioAlbumLike> audioalbumLikes = new ArrayList<>();
+    private int likesCount;
+
+    public void updateLikesCnt(int likesCount) {
+        this.likesCount = likesCount;
+    }
+
 
     public void update(AudioAlbumRequestDto requestDto, String imageurl) {
         this.title = requestDto.getTitle();
