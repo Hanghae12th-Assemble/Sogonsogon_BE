@@ -1,6 +1,5 @@
 package com.sparta.sogonsogon.audioclip.service;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipOneResponseDto;
@@ -14,7 +13,6 @@ import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.ErrorMessage;
 import com.sparta.sogonsogon.follow.entity.Follow;
 import com.sparta.sogonsogon.follow.repository.FollowRepository;
-import com.sparta.sogonsogon.member.dto.MemberResponseDto;
 import com.sparta.sogonsogon.member.entity.Member;
 import com.sparta.sogonsogon.member.entity.MemberRoleEnum;
 import com.sparta.sogonsogon.member.repository.MemberRepository;
@@ -24,7 +22,6 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import javax.persistence.EntityManager;
 import java.util.*;
 import java.io.IOException;
 import java.util.List;
@@ -111,9 +107,16 @@ public class AudioClipService {
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
+        AudioAlbum audioAlbum = audioClip.getAudioalbum();
+
 
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClipRepository.deleteById(audioclipId);
+
+            for (int i = 1 ; i <= audioAlbum.getAudioClips().size(); i++){
+                AudioClip audioClip_sub = audioAlbum.getAudioClips().get(i);
+                audioClip_sub.setOrders(i);
+            }
 
             // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
             List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
