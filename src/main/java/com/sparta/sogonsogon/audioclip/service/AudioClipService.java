@@ -191,7 +191,7 @@ public class AudioClipService {
             int index = audioAlbum.getAudioClips().size();
             if(audioClipPage.getTotalElements() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
-                    index = (int) (audioAlbum.getAudioClips().size() - (audioClipPage.getNumber() * audioClipPage.getSize() + i + 1));
+                    index = (int) (audioAlbum.getAudioClips().size() - (audioClipPage.getNumber() * audioClipPage.getSize() + i + 2));
                     AudioClip audioClip = audioClips.get(i);
                     boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, member).isPresent();
                     audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
