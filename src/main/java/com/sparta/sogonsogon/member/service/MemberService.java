@@ -12,10 +12,13 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +45,11 @@ public class MemberService {
     private final FollowRepository followRepository;
     private final JwtUtil jwtUtil;
     private final S3Uploader s3Uploader;
+
+    private final JavaMailSender emailSender;
+
+    @Value("${spring.mail.username}")
+    private String sogon;
 
     //회원 가입
     @Transactional
@@ -168,6 +176,26 @@ public class MemberService {
         );
         MemberResponseDto memberResponseDto = new MemberResponseDto(member);
         return StatusResponseDto.success(HttpStatus.OK, memberResponseDto);
+    }
+
+
+    // 회원정보 찾기
+    @Transactional
+    public String findMemberInfo(EmailRequestDto requestDto) {
+        Member member = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_MEMBER.getMessage())
+        );
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+
+
+        message.setFrom(sogon);
+        message.setTo(requestDto.getEmail());
+        message.setSubject("소곤소곤 회원 정보 문의");
+        message.setText(member.getEmail() + " " + member.getPassword());
+        emailSender.send(message);
+        return "이메일이 전송되었습니다.";
     }
 }
 

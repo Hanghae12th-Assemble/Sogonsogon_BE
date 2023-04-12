@@ -50,10 +50,10 @@ public class MemberController {
     @PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "회원 정보 수정", description = "프로필에서 보이는 회원 정보 수정")
     public StatusResponseDto<MemberResponseDto> updateMemberInfo(@PathVariable Long userId,
-                                                                @RequestParam(value = "nickname") String nickname,
-                                                                @RequestParam(value = "memberInfo") String memberInfo,
-                                                                @RequestParam(value = "profileImageUrl") MultipartFile profileImage,
-                                                                @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+                                                                 @RequestParam(value = "nickname") String nickname,
+                                                                 @RequestParam(value = "memberInfo") String memberInfo,
+                                                                 @RequestParam(value = "profileImageUrl") MultipartFile profileImage,
+                                                                 @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
 
         MemberRequestDto requestDto = new MemberRequestDto(nickname, memberInfo, profileImage);
         return StatusResponseDto.success(HttpStatus.OK, memberService.update(userId, requestDto, userDetails));
@@ -69,7 +69,7 @@ public class MemberController {
     //해당 유저 닉네임으로 조회
     @GetMapping("/nickname")
     @Operation(summary = "닉네임 조회", description = "단어로 해당 닉네임에 포함되는 모든 사용자 조회")
-    public StatusResponseDto<List<MemberOneResponseDto>> findListByNickname(@RequestParam(value = "nickname") String nickname){
+    public StatusResponseDto<List<MemberOneResponseDto>> findListByNickname(@RequestParam(value = "nickname") String nickname) {
         return memberService.getListByNickname(nickname);
     }
 
@@ -77,8 +77,8 @@ public class MemberController {
     @GetMapping("/similar-nickname")
     @Operation(summary = "유사한 닉네임으로 유저 조회", description = "유사한 닉네임 조회 무한스크롤 적용")
     public ResponseEntity<List<MemberOneResponseDto>> getMembersBySimilarNickname(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                                  @RequestParam(value = "size",defaultValue = "10") int size,
-                                                                                  @RequestParam(value = "sortBy",defaultValue = "id") String sortBy,
+                                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                  @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
                                                                                   @RequestParam(value = "nickname") String nickname) {
         return ResponseEntity.ok(memberService.getListBySimilarNickname(page, size, sortBy, nickname));
 
@@ -87,8 +87,13 @@ public class MemberController {
     //상세 사용자 조회
     @GetMapping("/{memberId}")
     @Operation(summary = "상세 회원 조회", description = "id 로 조회 하여 해당 회원의 정보를 가져옴")
-    public StatusResponseDto<MemberResponseDto> detailsMember(@PathVariable Long memberId){
+    public StatusResponseDto<MemberResponseDto> detailsMember(@PathVariable Long memberId) {
         return memberService.detailsMember(memberId);
     }
 
+    @PostMapping("/find")
+    @Operation(summary = "회원 정보 찾기", description = "이메일을 입력하면 해당하는 주소로 회원의 정보를 발송합니다.")
+    public StatusResponseDto<String> findMemberInfo(EmailRequestDto requestDto) {
+        return StatusResponseDto.success(HttpStatus.OK, memberService.findMemberInfo(requestDto));
+    }
 }
