@@ -163,13 +163,14 @@ public class AudioClipService {
             audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
             audioClips = audioClipPage.getContent();
 
-            int index = audioAlbum.getAudioClips().size() - audioClipPage.getNumber() * audioClipPage.getSize();
+            int index = audioAlbum.getAudioClips().size();
             if(audioClipPage.getTotalElements() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
+                    index = (int) (audioAlbum.getAudioClips().size() - (audioClipPage.getNumber() * audioClipPage.getSize() + i + 1));
                     AudioClip audioClip = audioClips.get(i);
                     boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, member).isPresent();
                     audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-                    index -= 1;
+//                    index -= 1;
                 }
             }else{
                 audioClipResponseDtoList = null;
@@ -187,13 +188,14 @@ public class AudioClipService {
             audioClipPage = audioClipRepository.findAudioClipsByAudio_album_Id(audioAblumId, sortedPageable);
             audioClips = audioClipPage.getContent();
 
-            int index = audioAlbum.getAudioClips().size() - audioClipPage.getNumber() * audioClipPage.getSize();
+            int index = audioAlbum.getAudioClips().size();
             if(audioClipPage.getTotalElements() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
+                    index = (int) (audioAlbum.getAudioClips().size() - (audioClipPage.getNumber() * audioClipPage.getSize() + i + 1));
                     AudioClip audioClip = audioClips.get(i);
                     boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, member).isPresent();
                     audioClipResponseDtoList.add(new AudioClipOneResponseDto(audioClip, index, islikecheck));
-                    index -= 1;
+//                    index -= 1;
                 }
             }else{
                 audioClipResponseDtoList = null;
