@@ -146,6 +146,12 @@ public class AudioAlbumService {
                 .limit(10)
                 .toList();
         List<AudioClipOneResponseDto> audioAlbumResponseDtos = new ArrayList<>();
+
+        for (int i = 0 ; i < audioAlbum.getAudioClips().size(); i++){
+            AudioClip audioClip_sub = audioAlbum.getAudioClips().get(i);
+            audioClip_sub.setOrders(i+1);
+        }
+
         if(!foundAudioClip.isEmpty()){
             for(AudioClip audioClip : foundAudioClip){
                 boolean isLikeCheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
