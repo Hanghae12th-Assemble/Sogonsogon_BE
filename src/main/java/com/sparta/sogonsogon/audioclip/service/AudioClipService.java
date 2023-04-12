@@ -163,7 +163,7 @@ public class AudioClipService {
         if (sortBy.equals("likesCount")) {
 
             Pageable sortedPageable = PageRequest.of(page, size);
-            audioClips = audioClipRepository.findByAudioalbumOrderByAudioClipLikesDesc(audioAlbum);
+            audioClips = audioClipRepository.findByAudioalbumOrderByAudioClipLikesDesc(audioAblumId);
 
             if(audioClips.size() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
