@@ -208,7 +208,8 @@ public class AudioClipService {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("result", audioClipResponseDtoList);
         responseBody.put("metadata", metadata);
-        responseBody.put("is Mine", userDetails.getUsername().equals(audioAlbum.getMember().getMembername()));
+        responseBody.put("albumTitle", audioAlbum.getTitle().toString());
+        responseBody.put("isMine", userDetails.getUsername().equals(audioAlbum.getMember().getMembername()));
         return StatusResponseDto.success(HttpStatus.OK, responseBody);
 
     }
