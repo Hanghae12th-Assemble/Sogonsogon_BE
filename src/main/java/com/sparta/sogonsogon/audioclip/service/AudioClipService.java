@@ -163,10 +163,9 @@ public class AudioClipService {
         if (sortBy.equals("likesCount")) {
 
             Pageable sortedPageable = PageRequest.of(page, size);
-            audioClipPage = audioClipRepository.findByAudioalbumOrderByAudioClipLikesDesc(audioAlbum, sortedPageable);
-            audioClips = audioClipPage.getContent();
+            audioClips = audioClipRepository.findByAudioalbumOrderByAudioClipLikesDesc(audioAlbum);
 
-            if(audioClipPage.getTotalElements() > 0) {
+            if(audioClips.size() > 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
                     AudioClip audioClip = audioClips.get(i);
                     boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, member).isPresent();
@@ -194,7 +193,7 @@ public class AudioClipService {
         }
         //        // 생성된 오디오클립의 개수
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+        metadata.put("audioClipCount", audioClips.size());
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("result", audioClipResponseDtoList);
