@@ -11,6 +11,11 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import javax.sql.DataSource;
@@ -18,8 +23,14 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,7 +103,6 @@ public class NotificationService {
                     // Connection 객체를 반환하여 커넥션 풀에 반환
                 } catch (SQLException e) {
 
-                    log.info("Connection 객체를 닫을 수 없음");
                 }
             }
         }
@@ -100,8 +110,6 @@ public class NotificationService {
 
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
-            log.info("eventId : " + eventId);
-            log.info("data" + data);
             emitter.send(SseEmitter.event()
                     .id(eventId)
                     .data(data));
@@ -132,17 +140,25 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    //받은 알림 전체 조회
+    //받은 알림 전체 조회, 페이징처리 추가 서버 부하 줄임
     @Transactional
-    public List<NotificationResponseDto> getAllNotifications(Long memberId) {
+    public List<NotificationResponseDto> getAllNotifications(Long memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        List<Notification> notifications;
-            notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
-            log.info("알림 전체 조회했어");
-            return notifications.stream()
-                    .map(NotificationResponseDto::create)
-                    .collect(Collectors.toList());
+        Page<Notification> notificationPage = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId, pageable);
+            log.info("알림 최신순으로 페이징 조회했어");
+
+        // 12시간이 지난 알림 삭제
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(12);
+        List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
+        for (Notification notification : expiredNotifications) {
+            notificationRepository.delete(notification);
+        }
+        return notificationPage.stream()
+                .map(NotificationResponseDto::create)
+                .collect(Collectors.toList());
     }
+
     // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
     @Transactional
     public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
@@ -155,6 +171,7 @@ public class NotificationService {
         if (!notification.getIsRead()) {
             notification.setIsRead(true);
             notificationRepository.save(notification);
+
         }
         return new NotificationResponseDto(notification);
     }
@@ -171,5 +188,7 @@ public class NotificationService {
             notificationRepository.deleteById(notificationId);
 
     }
+
+
 
 }
