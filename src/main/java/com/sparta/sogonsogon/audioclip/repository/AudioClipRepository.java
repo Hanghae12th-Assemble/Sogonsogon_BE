@@ -21,7 +21,10 @@ public interface AudioClipRepository extends JpaRepository<AudioClip, Long> {
     @Query("SELECT a from AudioClip a where a.audioalbum.id = :audioAlbumId")
     Page<AudioClip> findAudioClipsByAudio_album_Id(@Param("audioAlbumId")Long audioAlbumId, Pageable sortedPageable);
 
-    @Query("SELECT a FROM AudioClip a LEFT JOIN AudioClipLike likes ON a.id = likes.audioclip.id WHERE a.audioalbum.id = :audioAlbumId GROUP BY a.id ORDER BY COUNT(likes.id) DESC")
+    @Query("SELECT a FROM AudioClip a " +
+            "LEFT JOIN AudioClipLike likes ON a.id = likes.audioclip.id" +
+            " WHERE a.audioalbum.id = :audioAlbumId GROUP BY a.id" +
+            " ORDER BY COUNT(likes.id) DESC, a.id ASC")
     List<AudioClip> findByAudioalbumOrderByAudioClipLikesDesc(@Param("audioAlbumId")Long audioAlbumId);
 
 
