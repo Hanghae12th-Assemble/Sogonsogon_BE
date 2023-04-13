@@ -60,9 +60,6 @@ public class NotificationService {
         });
         emitter.onError((e) -> emitterRepository.deleteById(emitterId));
 
-        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
-
         return emitter;
     }
     private String makeTimeIncludeId(Long memberId) {
@@ -70,67 +67,31 @@ public class NotificationService {
     }
     @Transactional
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
-        Connection con = null;
-        try {
-            con = dataSource.getConnection();
-            // 데이터소스를 통해 데이터베이스와의 연결을 설정하고 Connection 객체를 생성합니다.
-            con.setAutoCommit(false);
-            // 트랜잭션을 수동으로 관리하기 위해 자동 커밋 기능을 false로 설정합니다.
-
-            Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
-            String receiverId = String.valueOf(receiver.getId());
-            String eventId = receiverId + "_" + System.currentTimeMillis();
-            Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
-            emitters.forEach(
-                    (key, emitter) -> {
-                        emitterRepository.saveEventCache(key, notification);
-                        sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
-                    }
-            );
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            // finally: try 블록에서 사용한 자원들을 정리하는 블록
-            // Connection 객체가 정상적으로 닫히지 않은 경우에 대비하여 커넥션 풀에 반환하는 코드가 여기에 작성
-            if (con != null) {
-                // Connection 객체가 null이 아니면, 즉 연결이 정상적으로 이루어졌으면 다음 코드를 실행
-                try {
-                    con.setAutoCommit(true);
-                    // 트랜잭션이 완료되면 자동 커밋 기능을 true로 설정합니다.
-                    con.close();
-                    // Connection 객체를 반환하여 커넥션 풀에 반환
-                } catch (SQLException e) {
-
-                    log.info("Connection 객체를 닫을 수 없음");
-                }
+        Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(String.valueOf(receiver.getId()));
+        emitters.forEach((key, emitter) -> {
+            try {
+                emitter.send(SseEmitter.event().data(NotificationResponseDto.create(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl))));
+            } catch (IOException e) {
+                emitterRepository.deleteById(key);
             }
-        }
+        });
     }
 
-    public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
-        try {
-            log.info("eventId : " + eventId);
-            log.info("data" + data);
-            emitter.send(SseEmitter.event()
-                    .id(eventId)
-                    .data(data));
-        } catch (IOException exception) {
-            log.info("예외 발생해서 emitter 삭제됨");
-            emitterRepository.deleteById(emitterId);
-        }
 
-    }
-//    private boolean hasLostData(String lastEventId) {
-//        return !lastEventId.isEmpty();
-//    }
-//    private void sendLostData(String lastEventId, Long memberId, String emitterId, SseEmitter emitter) {
-//        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
+//    public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
+//        try {
+//            log.info("eventId : " + eventId);
+//            log.info("data" + data);
+//            emitter.send(SseEmitter.event()
+//                    .id(eventId)
+//                    .data(data));
+//        } catch (IOException exception) {
+//            log.info("예외 발생해서 emitter 삭제됨");
+//            emitterRepository.deleteById(emitterId);
+//        }
 //
-//        eventCaches.entrySet().stream()
-//                .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-//                .forEach(entry -> sendNotification(emitter, entry.getKey(), emitterId, entry.getValue()));
 //    }
+
     private Notification createNotification(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
         Notification notification = new Notification();
         notification.setReceiver(receiver);
@@ -143,44 +104,44 @@ public class NotificationService {
     }
 
     //받은 알림 전체 조회
-    @Transactional
-    public List<NotificationResponseDto> getAllNotifications(Long memberId) {
-
-        List<Notification> notifications;
-            notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
-            log.info("알림 전체 조회했어");
-            return notifications.stream()
-                    .map(NotificationResponseDto::create)
-                    .collect(Collectors.toList());
-    }
-    // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
-    @Transactional
-    public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
-                () -> new NotFoundException("Notification not found"));
-
-        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
-        if (!notification.getReceiver().getId().equals(member.getId())) {
-            throw new IllegalArgumentException("접근권한이 없습니다. ");
-        }
-        if (!notification.getIsRead()) {
-            notification.setIsRead(true);
-            notificationRepository.save(notification);
-        }
-        return new NotificationResponseDto(notification);
-    }
-    // 선택된 알림 삭제
-    @Transactional
-    public void deleteNotification(Long notificationId, Member member) {
-
-            Notification notification = notificationRepository.findById(notificationId).orElseThrow(
-                    () -> new NotFoundException("Notification not found"));
-            // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
-            if (!notification.getReceiver().getId().equals(member.getId())) {
-                throw new IllegalArgumentException("접근권한이 없습니다. ");
-            }
-            notificationRepository.deleteById(notificationId);
-
-    }
+//    @Transactional
+//    public List<NotificationResponseDto> getAllNotifications(Long memberId) {
+//
+//        List<Notification> notifications;
+//            notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
+//            log.info("알림 전체 조회했어");
+//            return notifications.stream()
+//                    .map(NotificationResponseDto::create)
+//                    .collect(Collectors.toList());
+//    }
+//    // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
+//    @Transactional
+//    public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
+//        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+//                () -> new NotFoundException("Notification not found"));
+//
+//        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
+//        if (!notification.getReceiver().getId().equals(member.getId())) {
+//            throw new IllegalArgumentException("접근권한이 없습니다. ");
+//        }
+//        if (!notification.getIsRead()) {
+//            notification.setIsRead(true);
+//            notificationRepository.save(notification);
+//        }
+//        return new NotificationResponseDto(notification);
+//    }
+//    // 선택된 알림 삭제
+//    @Transactional
+//    public void deleteNotification(Long notificationId, Member member) {
+//
+//            Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+//                    () -> new NotFoundException("Notification not found"));
+//            // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
+//            if (!notification.getReceiver().getId().equals(member.getId())) {
+//                throw new IllegalArgumentException("접근권한이 없습니다. ");
+//            }
+//            notificationRepository.deleteById(notificationId);
+//
+//    }
 
 }
