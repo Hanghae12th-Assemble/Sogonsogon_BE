@@ -72,6 +72,20 @@ public class AudioAlbumResponseDto {
         this.isMine = isMine;
         this.likesCount = audioAlbum.getLikesCount();
     }
+    @Builder
+    public AudioAlbumResponseDto(AudioAlbum audioAlbum, boolean isLikeCheck) {
+        this.id = audioAlbum.getId();
+        this.title = audioAlbum.getTitle();
+        this.instruction = audioAlbum.getInstruction();
+        this.backgroundImageUrl = audioAlbum.getBackgroundImageUrl();
+        this.categoryType = audioAlbum.getCategoryType().getValue();
+        this.createdAt = audioAlbum.getCreatedAt().toString();
+        this.modifiedAt = audioAlbum.getModifiedAt().toString();
+        this.memberName = audioAlbum.getMember().getMembername();
+        this.meberNickname = audioAlbum.getMember().getNickname();
+        this.likesCount = audioAlbum.getLikesCount();
+        this.isLikeCheck = isLikeCheck;
+    }
 
     public static AudioAlbumResponseDto of(AudioAlbum audioAlbum){
         return new AudioAlbumResponseDto(audioAlbum);

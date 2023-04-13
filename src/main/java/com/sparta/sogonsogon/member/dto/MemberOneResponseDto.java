@@ -35,8 +35,8 @@ public class MemberOneResponseDto {
                 .profileImageUrl(member.getProfileImageUrl())
                 .introduction(member.getMemberInfo())
                 .isFollowCheck(check)
-                .followers(member.getFollower().size())
-                .followings(member.getFollowing().size())
+                 .followers(member.getFollowing().size())
+                .followings(member.getFollower().size())
                 .build();
     }
 }

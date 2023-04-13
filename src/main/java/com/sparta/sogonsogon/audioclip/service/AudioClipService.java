@@ -128,7 +128,7 @@ public class AudioClipService {
 
     //오디오 클립 상세 조회
     @Transactional
-    public StatusResponseDto<AudioClipResponseDto> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<Map<String, Object>> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails) {
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
@@ -137,7 +137,10 @@ public class AudioClipService {
 
         boolean isLikeCheck = audioClipLike.isPresent();
         AudioClipResponseDto responseDto = new AudioClipResponseDto(audioClip, isLikeCheck);
-        return StatusResponseDto.success(HttpStatus.OK, responseDto);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", responseDto);
+        responseBody.put("totalCommentCount", audioClip.getCommentList().size());
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
     }
 
 
@@ -161,9 +164,10 @@ public class AudioClipService {
         if (sortBy.equals("likesCount")) {
 
             Pageable sortedPageable = PageRequest.of(page, size);
-            audioClips = audioClipRepository.findByAudioalbumOrderByAudioClipLikesDesc(audioAlbum);
+            audioClipPage = audioClipRepository.findByAudioalbumOrderByAudioClipLikesDesc(audioAblumId, sortedPageable);
+            audioClips = audioClipPage.getContent();
 
-            if(audioClips.size() > 0) {
+            if(audioClips.size()> 0) {
                 for (int i = 0; i < audioClips.size(); i++) {
                     AudioClip audioClip = audioClips.get(i);
                     boolean islikecheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, member).isPresent();
@@ -191,7 +195,7 @@ public class AudioClipService {
         }
         //        // 생성된 오디오클립의 개수
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", audioClips.size());
+        metadata.put("audioClipCount", audioClipPage.getTotalElements());
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("result", audioClipResponseDtoList);
