@@ -35,10 +35,9 @@ public class NotificationService {
 
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
-//    private final MemberRepository memberRepository;
 
     //DEFAULT_TIMEOUT을 기본값으로 설정
-    private static final Long DEFAULT_TIMEOUT = 60 * 60 * 10000L;
+    private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L;
     private final DataSource dataSource;
 
     @Transactional
@@ -74,12 +73,12 @@ public class NotificationService {
 
     @Transactional
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
-//        Connection con = null;
-//        try {
-//            con = dataSource.getConnection();
-//            // 데이터소스를 통해 데이터베이스와의 연결을 설정하고 Connection 객체를 생성합니다.
-//            con.setAutoCommit(false);
-//            // 트랜잭션을 수동으로 관리하기 위해 자동 커밋 기능을 false로 설정합니다.
+        Connection con = null;
+        try {
+            con = dataSource.getConnection();
+            // 데이터소스를 통해 데이터베이스와의 연결을 설정하고 Connection 객체를 생성합니다.
+            con.setAutoCommit(false);
+            // 트랜잭션을 수동으로 관리하기 위해 자동 커밋 기능을 false로 설정합니다.
 
             Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
             String receiverId = String.valueOf(receiver.getId());
@@ -93,23 +92,23 @@ public class NotificationService {
                         sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
                     }
             );
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        } finally {
-//            // finally: try 블록에서 사용한 자원들을 정리하는 블록
-//            // Connection 객체가 정상적으로 닫히지 않은 경우에 대비하여 커넥션 풀에 반환하는 코드가 여기에 작성
-//            if (con != null) {
-//                // Connection 객체가 null이 아니면, 즉 연결이 정상적으로 이루어졌으면 다음 코드를 실행
-//                try {
-//                    con.setAutoCommit(true);
-//                    // 트랜잭션이 완료되면 자동 커밋 기능을 true로 설정합니다.
-//                    con.close();
-//                    // Connection 객체를 반환하여 커넥션 풀에 반환
-//                } catch (SQLException e) {
-//
-//                }
-//            }
-//        }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            // finally: try 블록에서 사용한 자원들을 정리하는 블록
+            // Connection 객체가 정상적으로 닫히지 않은 경우에 대비하여 커넥션 풀에 반환하는 코드가 여기에 작성
+            if (con != null) {
+                // Connection 객체가 null이 아니면, 즉 연결이 정상적으로 이루어졌으면 다음 코드를 실행
+                try {
+                    con.setAutoCommit(true);
+                    // 트랜잭션이 완료되면 자동 커밋 기능을 true로 설정합니다.
+                    con.close();
+                    // Connection 객체를 반환하여 커넥션 풀에 반환
+                } catch (SQLException e) {
+
+                }
+            }
+        }
     }
 
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
