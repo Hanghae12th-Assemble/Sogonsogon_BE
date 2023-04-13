@@ -82,6 +82,10 @@ dependencies {
 //    implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'com.zaxxer:HikariCP:5.0.1'
 
+    // email
+    implementation 'javax.mail:javax.mail-api:1.6.2'
+    implementation 'com.sun.mail:javax.mail:1.6.2'
+
 
 
 }
