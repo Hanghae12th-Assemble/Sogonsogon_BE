@@ -130,7 +130,7 @@ public class AudioClipService {
 
     //오디오 클립 상세 조회
     @Transactional
-    public StatusResponseDto<AudioClipResponseDto> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<Map<String, Object>> detailsAudioClip(Long audioclipId, UserDetailsImpl userDetails) {
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
@@ -139,7 +139,10 @@ public class AudioClipService {
 
         boolean isLikeCheck = audioClipLike.isPresent();
         AudioClipResponseDto responseDto = new AudioClipResponseDto(audioClip, isLikeCheck);
-        return StatusResponseDto.success(HttpStatus.OK, responseDto);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("result", responseDto);
+        responseBody.put("totalCommentCount", audioClip.getCommentList().size());
+        return StatusResponseDto.success(HttpStatus.OK, responseBody);
     }
 
 
