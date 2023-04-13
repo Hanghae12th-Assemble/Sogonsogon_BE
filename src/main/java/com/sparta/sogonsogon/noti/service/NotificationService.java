@@ -53,16 +53,33 @@ public class NotificationService {
         log.info("SSE 연결 됬지롱");
 
         emitter.onCompletion(() -> { // 클라이언트와의 연결이 종료되었을 때 호출
-            emitterRepository.deleteById(emitterId);
+            try {
+                emitterRepository.deleteById(emitterId);
+            } catch (Exception e) {
+                log.error("Failed to delete emitter with id: {}", emitterId, e);
+            }
         });
-        emitter.onTimeout(() -> { // SseEmitter의 유효시간이 지났을 때 호출
-            log.info("SSE 연결 Timeout");
+        emitter.onTimeout(() -> {
+            // ping 메시지를 20분마다 전송
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleAtFixedRate(() -> {
+                try {
+                    emitter.send(SseEmitter.event().name("ping").data(""));
+                } catch (IOException e) {
+                    log.error("Failed to send ping event", e);
+                    emitterRepository.deleteById(emitterId);
+                }
+            }, 0, 20, TimeUnit.MINUTES);
+            try {
             emitterRepository.deleteById(emitterId);
+            } catch (Exception e) {
+                log.error("Failed to delete emitter with id: {}", emitterId, e);
+            }
         });
-        emitter.onError((e) -> emitterRepository.deleteById(emitterId));
-
-        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+        emitter.onError((e) -> {
+            emitterRepository.deleteById(emitterId);
+            log.error("SSE emitter error occurred: {}", e.getMessage());
+        });
 
         return emitter;
     }
@@ -148,12 +165,12 @@ public class NotificationService {
         Page<Notification> notificationPage = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId, pageable);
             log.info("알림 최신순으로 페이징 조회했어");
 
-        // 12시간이 지난 알림 삭제
-        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(12);
-        List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
-        for (Notification notification : expiredNotifications) {
-            notificationRepository.delete(notification);
-        }
+//        // 12시간이 지난 알림 삭제
+//        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(12);
+//        List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
+//        for (Notification notification : expiredNotifications) {
+//            notificationRepository.delete(notification);
+//        }
         return notificationPage.stream()
                 .map(NotificationResponseDto::create)
                 .collect(Collectors.toList());
