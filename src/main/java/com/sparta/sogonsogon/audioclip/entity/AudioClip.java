@@ -35,6 +35,9 @@ public class AudioClip extends TimeStamped{
     @Column(nullable = false)
     private String audioclipUrl;
 
+    @Column(nullable = true)
+    private int orders;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -51,6 +54,8 @@ public class AudioClip extends TimeStamped{
     private AudioAlbum audioalbum;
 
 
+
+
     @Builder
     public AudioClip(AudioClipRequestDto requestDto, Member member, String audioclipUrl, String audioclipImageUrl, AudioAlbum audioalbum){
         this.title = requestDto.getTitle();
@@ -59,6 +64,7 @@ public class AudioClip extends TimeStamped{
         this.audioclipUrl = audioclipUrl;
         this.member = member;
         this.audioalbum = audioalbum;
+        this.orders = audioalbum.getAudioClips().size() + 1;
     }
 
     public void update (AudioClipRequestDto requestDto, String audioclipUrl, String audioclipImageUrl){

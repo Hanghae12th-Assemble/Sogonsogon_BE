@@ -29,7 +29,7 @@ public class AudioClipResponseDto {
     private String memberprofileImageUrl;
     private int isLikeCount;
     private boolean isLikeCheck;
-
+    private int order;
     private List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
 
     @Builder
@@ -38,6 +38,7 @@ public class AudioClipResponseDto {
         this.id = audioClip.getId();
         this.ablumTile = audioClip.getAudioalbum().getTitle();
         this.title = audioClip.getTitle();
+        this.order = audioClip.getOrders();
         this.contents = audioClip.getContents();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
         this.audioclipUrl = audioClip.getAudioclipUrl();
@@ -58,7 +59,9 @@ public class AudioClipResponseDto {
     public AudioClipResponseDto(AudioClip audioClip, boolean isLikeCheck) {
         this.id = audioClip.getId();
         this.title = audioClip.getTitle();
+        this.ablumTile = audioClip.getAudioalbum().getTitle();
         this.contents = audioClip.getContents();
+        this.order = audioClip.getOrders();
         this.audioclipImageUrl = audioClip.getAudioclipImageUrl();
         this.audioclipUrl = audioClip.getAudioclipUrl();
         this.membernickname = audioClip.getMember().getNickname();

@@ -19,6 +19,18 @@ public class CommentResponseDto {
     private String createdAt;
     private String modifiedAt;
     private String memberImageUrl;
+    private boolean isMine;
+
+    public CommentResponseDto(Comment comment, boolean isMine){
+        this.id = comment.getId();
+        this.content = comment.getContent();
+        this.membername = comment.getMember().getMembername();
+        this.memberImageUrl = comment.getMember().getProfileImageUrl().toString();
+        this.nickname = comment.getMember().getNickname();
+        this.createdAt = comment.getCreatedAt().toString();
+        this.modifiedAt = comment.getModifiedAt().toString();
+        this.isMine = isMine;
+    }
 
     public CommentResponseDto(Comment comment){
         this.id = comment.getId();

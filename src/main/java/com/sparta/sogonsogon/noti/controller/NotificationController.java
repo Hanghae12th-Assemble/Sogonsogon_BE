@@ -41,9 +41,11 @@ public class NotificationController {
 
     @Operation(summary = "받은 알림 전체 조회", description = "받은 알림 전체 조회")
     @GetMapping("/AllNotifications")
-    public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(value = "size",defaultValue = "10") int size) {
 
-        return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId()));
+        return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId(),page,size));
     }
 
     @PutMapping("/{notificationId}/confirm")

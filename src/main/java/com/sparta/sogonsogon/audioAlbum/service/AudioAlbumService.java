@@ -7,8 +7,10 @@ import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbumLike;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumLikeRepository;
 import com.sparta.sogonsogon.audioAlbum.repository.AudioAlbumRepository;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipOneResponseDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
+import com.sparta.sogonsogon.audioclip.repository.AudioClipLikeRepository;
 import com.sparta.sogonsogon.audioclip.repository.AudioClipRepository;
 import com.sparta.sogonsogon.dto.StatusResponseDto;
 import com.sparta.sogonsogon.enums.CategoryType;
@@ -21,6 +23,7 @@ import com.sparta.sogonsogon.noti.service.NotificationService;
 import com.sparta.sogonsogon.noti.util.AlarmType;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import com.sparta.sogonsogon.util.S3Uploader;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -35,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -42,13 +46,13 @@ import java.util.*;
 public class AudioAlbumService {
 
     private final MemberRepository memberRepository;
-    private  final AudioAlbumRepository audioAlbumRepository;
+    private final AudioAlbumRepository audioAlbumRepository;
     private final AudioClipRepository audioClipRepository;
     private final AudioAlbumLikeRepository audioAlbumLikeRepository;
     private final S3Uploader s3Uploader;
     private final NotificationService notificationService;
     private final FollowRepository followRepository;
-
+    private  final AudioClipLikeRepository audioClipLikeRepository;
 
 
     // 오디오앨범 생성
@@ -82,7 +86,7 @@ public class AudioAlbumService {
         // NotificationService를 통해 팔로우한  유저들에게 알림을 보낸다.
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
         for (Follow following : followings) {
-            String message = audioAlbum.getMember().getNickname() +"님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범을 생성하였습니다. ";
+            String message = audioAlbum.getMember().getNickname() + "님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범을 생성하였습니다. ";
             notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
             log.info("앨범 생성하였습니다. ");
         }
@@ -93,11 +97,24 @@ public class AudioAlbumService {
     // 오디오앨범 전체 조회
     @Transactional
     public Map<String, Object> findAllAudioAlbum(int page, int size, String sortBy) {
-        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
-        Pageable sortedPageable = PageRequest.of(page, size, sort);
-        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAll(sortedPageable);
-        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent()
+        Page<AudioAlbum> audioAlbumPage;
+        List<AudioAlbum> sortedAudioAlbums;
+
+        if (sortBy.equals("likesCount")) {
+            audioAlbumPage = audioAlbumRepository.findAll(PageRequest.of(page, size));
+            sortedAudioAlbums = sortAudioAlbumsByLikesCount(audioAlbumPage);
+        } else {
+            Pageable sortedPageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
+            audioAlbumPage = audioAlbumRepository.findAll(sortedPageable);
+            sortedAudioAlbums = audioAlbumPage.getContent();
+        }
+
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = sortedAudioAlbums
                 .stream()
+                .peek(audioAlbum -> {
+                    int likesCount = audioAlbum.getAudioalbumLikes().size();
+                    audioAlbum.updateLikesCnt(likesCount);
+                })
                 .map(AudioAlbumResponseDto::new)
                 .toList();
 
@@ -112,6 +129,12 @@ public class AudioAlbumService {
         return responseBody;
     }
 
+    private List<AudioAlbum> sortAudioAlbumsByLikesCount(Page<AudioAlbum> audioAlbums) {
+        return audioAlbums.stream()
+                .sorted(Comparator.comparingInt((AudioAlbum a) -> a.getAudioalbumLikes().size()).reversed())
+                .collect(Collectors.toList());
+    }
+
     // 선택한 오디오앨범 조회
     @Transactional
     public Map<String, Object> findAudioAlbum(Long audioAlbumId, UserDetailsImpl userDetails) {
@@ -122,22 +145,29 @@ public class AudioAlbumService {
                 .stream()
                 .limit(10)
                 .toList();
-        List<AudioClipResponseDto> audioAlbumResponseDtos = new ArrayList<>();
+        List<AudioClipOneResponseDto> audioAlbumResponseDtos = new ArrayList<>();
+
+        for (int i = 0 ; i < audioAlbum.getAudioClips().size(); i++){
+            AudioClip audioClip_sub = audioAlbum.getAudioClips().get(i);
+            audioClip_sub.setOrders(i+1);
+        }
+
         if(!foundAudioClip.isEmpty()){
             for(AudioClip audioClip : foundAudioClip){
-                audioAlbumResponseDtos.add(new AudioClipResponseDto(audioClip));
+                boolean isLikeCheck = audioClipLikeRepository.findByAudioclipAndMember(audioClip, userDetails.getUser()).isPresent();
+                audioAlbumResponseDtos.add(new AudioClipOneResponseDto(audioClip, isLikeCheck));
             }
-        }else {
+        } else {
             audioAlbumResponseDtos = null;
         }
         boolean isLikeCheck = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser()).isPresent();
         boolean isMine = audioAlbum.getMember().getId().equals(userDetails.getUser().getId());
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", foundAudioClip.size());
+        metadata.put("audioClipCount", audioAlbum.getAudioClips().size());
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("result", new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine));
         responseBody.put("metadata", metadata);
+        responseBody.put("result", new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine));
 
         return responseBody;
     }
@@ -161,7 +191,7 @@ public class AudioAlbumService {
         audioAlbumRepository.deleteById(audioAlbumId);
 
         //  앨범 삭제하면 알림 보내기
-        String message = audioAlbum.getMember().getNickname() +"님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범이 삭제되었습니다.  ";
+        String message = audioAlbum.getMember().getNickname() + "님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범이 삭제되었습니다.  ";
         notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
 
     }
@@ -171,7 +201,7 @@ public class AudioAlbumService {
     public Map<String, Object> findByCategory(int page, int size, String sortBy, CategoryType categoryType) {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
-        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAllByCategoryType(categoryType,sortedPageable);
+        Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findAllByCategoryType(categoryType, sortedPageable);
         List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent().stream().map(AudioAlbumResponseDto::new).toList();
 
         // 생성된 오디오앨범의 개수
@@ -224,13 +254,15 @@ public class AudioAlbumService {
         Optional<AudioAlbumLike> audioAlbumLike = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbum, userDetails.getUser());
         if (audioAlbumLike.isPresent()) {
             audioAlbumLikeRepository.deleteById(audioAlbumLike.get().getId());
+            audioAlbum.updateLikesCnt(audioAlbum.getLikesCount() - 1);
             return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 취소 되었습니다.", false));
         }
 
         audioAlbumLikeRepository.save(new AudioAlbumLike(audioAlbum, userDetails.getUser()));
+        audioAlbum.updateLikesCnt(audioAlbum.getLikesCount() + 1);
 
         // 좋아요 클릭하면 앨범생성자 한테 알림 보내기
-        String message = audioAlbum.getMember().getNickname() +"님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범에 좋아요가 추가 되었습니다. ";
+        String message = audioAlbum.getMember().getNickname() + "님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범에 좋아요가 추가 되었습니다. ";
         notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
 
         return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
@@ -238,18 +270,20 @@ public class AudioAlbumService {
 
 
     @Transactional
-    public  StatusResponseDto<Map<String, Object>> getMine(String sortBy, int page, int size, UserDetailsImpl userDetails) {
+    public StatusResponseDto<Map<String, Object>> getMine(String sortBy, int page, int size, UserDetailsImpl userDetails) {
         Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_MEMBER.getMessage())
+                () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_MEMBER.getMessage())
         );
 
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
         Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findByMember(member, sortedPageable);
-        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent()
-                .stream()
-                .map(AudioAlbumResponseDto::new)
-                .toList();
+        List<AudioAlbum> audioAlbums = audioAlbumPage.getContent();
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = new ArrayList<>();
+        for(int i = 0 ; i < audioAlbums.size(); i ++){
+            boolean isLikeCheck = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbums.get(i), member).isPresent();
+            audioAlbumResponseDtoList.add(new AudioAlbumResponseDto(audioAlbums.get(i), isLikeCheck));
+        }
 
         // 생성된 오디오앨범의 개수
         Map<String, Object> metadata = new HashMap<>();
@@ -261,5 +295,16 @@ public class AudioAlbumService {
 
         return StatusResponseDto.success(HttpStatus.OK, responseBody);
 
+    }
+
+    // 오디오앨범 검색
+    @Transactional
+    public List<AudioAlbumResponseDto> findByTitle(String title) {
+        List<AudioAlbum> list = audioAlbumRepository.findByTitleContaining(title);
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = new ArrayList<>();
+        for (AudioAlbum audioAlbum : list) {
+            audioAlbumResponseDtoList.add(new AudioAlbumResponseDto(audioAlbum));
+        }
+        return audioAlbumResponseDtoList; // test
     }
 }

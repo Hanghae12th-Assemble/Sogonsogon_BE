@@ -1,6 +1,7 @@
 package com.sparta.sogonsogon.member.dto;
 
 
+import com.sparta.sogonsogon.follow.dto.FollowResponseDto;
 import com.sparta.sogonsogon.member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,13 +30,9 @@ public class MemberResponseDto {
         this.email = member.getEmail();
         this.profileImageUrl = member.getProfileImageUrl();
         this.introduction = member.getMemberInfo();
-        if (member.getFollowing().isEmpty()){
-            this.isFollowCheck = false;
-        }else {
-            this.isFollowCheck = true;
-        }
-        this.followers = member.getFollower().size();
-        this.followings = member.getFollowing().size();
+        this.isFollowCheck = member.getIsFollowCheck();
+        this.followers = member.getFollowing().size();
+        this.followings = member.getFollower().size();
 
     }
 

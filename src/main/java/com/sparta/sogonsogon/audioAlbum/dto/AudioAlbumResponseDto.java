@@ -1,6 +1,7 @@
 package com.sparta.sogonsogon.audioAlbum.dto;
 
 import com.sparta.sogonsogon.audioAlbum.entity.AudioAlbum;
+import com.sparta.sogonsogon.audioclip.dto.AudioClipOneResponseDto;
 import com.sparta.sogonsogon.audioclip.dto.AudioClipResponseDto;
 import com.sparta.sogonsogon.audioclip.entity.AudioClip;
 import com.sparta.sogonsogon.enums.CategoryType;
@@ -33,11 +34,13 @@ public class AudioAlbumResponseDto {
 
     private String meberNickname;
 
-    private List<AudioClipResponseDto> audioClips;
+    private List<AudioClipOneResponseDto> audioClips;
 
     private boolean isLikeCheck;
 
     private boolean isMine;
+
+    private int likesCount;
 
     @Builder
     public AudioAlbumResponseDto(AudioAlbum audioAlbum) {
@@ -50,10 +53,11 @@ public class AudioAlbumResponseDto {
         this.modifiedAt = audioAlbum.getModifiedAt().toString();
         this.memberName = audioAlbum.getMember().getMembername();
         this.meberNickname = audioAlbum.getMember().getNickname();
+        this.likesCount = audioAlbum.getLikesCount();
     }
 
 
-    public  AudioAlbumResponseDto (AudioAlbum audioAlbum, List<AudioClipResponseDto> audioClips, boolean isLikeCheck, boolean isMine) {
+    public  AudioAlbumResponseDto (AudioAlbum audioAlbum, List<AudioClipOneResponseDto> audioClips, boolean isLikeCheck, boolean isMine) {
         this.id = audioAlbum.getId();
         this.title = audioAlbum.getTitle();
         this.instruction = audioAlbum.getInstruction();
@@ -66,6 +70,21 @@ public class AudioAlbumResponseDto {
         this.audioClips = audioClips;
         this.isLikeCheck = isLikeCheck;
         this.isMine = isMine;
+        this.likesCount = audioAlbum.getLikesCount();
+    }
+    @Builder
+    public AudioAlbumResponseDto(AudioAlbum audioAlbum, boolean isLikeCheck) {
+        this.id = audioAlbum.getId();
+        this.title = audioAlbum.getTitle();
+        this.instruction = audioAlbum.getInstruction();
+        this.backgroundImageUrl = audioAlbum.getBackgroundImageUrl();
+        this.categoryType = audioAlbum.getCategoryType().getValue();
+        this.createdAt = audioAlbum.getCreatedAt().toString();
+        this.modifiedAt = audioAlbum.getModifiedAt().toString();
+        this.memberName = audioAlbum.getMember().getMembername();
+        this.meberNickname = audioAlbum.getMember().getNickname();
+        this.likesCount = audioAlbum.getLikesCount();
+        this.isLikeCheck = isLikeCheck;
     }
 
     public static AudioAlbumResponseDto of(AudioAlbum audioAlbum){

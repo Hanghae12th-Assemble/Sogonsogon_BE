@@ -93,27 +93,29 @@ public class FollowService {
 
         Follow followStatus = followRepository.findByFollowingAndFollower(follower, follow).orElse(null);
 
-        Boolean isFollow = false; // 팔로우여부 확인
+//        Boolean isFollow = false; // 팔로우여부 확인
 
         if (followStatus == null) {
             Follow newFollow = new Follow(new FollowRequestDto(follow, follower));
+            newFollow.getFollower().setIsFollowCheck(true);
+
             followRepository.save(newFollow);
-            isFollow = true;
 
             String message = "회원 " + follower.getNickname() + " 님이 회원님을 팔로우하였습니다.";
             notificationService.send(follow, AlarmType.eventFollower, message,follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
             log.info("팔로우했지");
-            return FollowResponseDto.of(newFollow,follow.getNickname() + "님을 팔로우하였습니다.", isFollow);
+            return FollowResponseDto.of(newFollow,follow.getNickname() + "님을 팔로우하였습니다.",newFollow.getFollower().getIsFollowCheck());
 
         } else {
             followRepository.deleteById(followStatus.getId());
-            isFollow = false;
+//            isFollow = false;
+            followStatus.getFollower().setIsFollowCheck(false);
 
             // 유저가 알림 구독 중인지 조회
             String message = "회원 " + follower.getNickname() + " 님이 회원님을 팔로우 취소하였습니다.";
             notificationService.send(follow, AlarmType.eventFollower, message,follower.getMembername(),follower.getNickname(),follower.getProfileImageUrl());
             log.info("팔로우 취소");
-            return FollowResponseDto.of(followStatus,follow.getNickname() + "님을 팔로우 취소하였습니다.",isFollow);
+            return FollowResponseDto.of(followStatus,follow.getNickname() + "님을 팔로우 취소하였습니다.",followStatus.getFollower().getIsFollowCheck());
         }
 
 
