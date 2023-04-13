@@ -51,6 +51,9 @@ public class Member extends TimeStamped{
     @Enumerated(value = EnumType.STRING)
     private MemberRoleEnum role ;
 
+    @Column
+    private  Boolean isFollowCheck = false;
+
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notification = new ArrayList<>();
