@@ -263,8 +263,9 @@ public class AudioAlbumService {
         audioAlbum.updateLikesCnt(audioAlbum.getLikesCount() + 1);
 
         // 좋아요 클릭하면 앨범생성자 한테 알림 보내기
-        String message = audioAlbum.getMember().getNickname() + "님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범에 좋아요가 추가 되었습니다. ";
-        notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
+        String message = userDetails.getUser().getNickname() + "님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범에 좋아요가 추가 되었습니다. ";
+        notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, userDetails.getUser().getMembername(), userDetails.getUser().getNickname(), userDetails.getUser().getProfileImageUrl());
+
 
         return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
     }
