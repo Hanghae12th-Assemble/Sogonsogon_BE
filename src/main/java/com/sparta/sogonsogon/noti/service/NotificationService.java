@@ -29,6 +29,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,11 +39,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Setter
 public class NotificationService {
-    private final ObjectMapper objectMapper;
+//    private final ObjectMapper objectMapper;
 
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
-    private final MemberRepository memberRepository;
+//    private final MemberRepository memberRepository;
 
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 60 * 60 * 10000L;
@@ -58,12 +61,21 @@ public class NotificationService {
         });
         //시간이 만료된 경우 자동으로 레포지토리에서 삭제하고 클라이언트에서 재요청을 보낸다.
         emitter.onTimeout(() -> {
+            // ping 메시지를 15분마다 전송
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleAtFixedRate(() -> {
+                try {
+                    emitter.send(SseEmitter.event().name("ping").data(""));
+                } catch (IOException e) {
+                    log.error("Failed to send ping event", e);
+                }
+            }, 0, 15, TimeUnit.MINUTES);
             emitterRepository.deleteById(emitterId);
         });
         emitter.onError((e) -> emitterRepository.deleteById(emitterId));
-        //Dummy 데이터를 보내 503에러 방지. (SseEmitter 유효시간 동안 어느 데이터도 전송되지 않으면 503에러 발생)
-        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+//        //Dummy 데이터를 보내 503에러 방지. (SseEmitter 유효시간 동안 어느 데이터도 전송되지 않으면 503에러 발생)
+//        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
+//        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
 
         return emitter;
     }
@@ -84,10 +96,6 @@ public class NotificationService {
             Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
             String receiverId = String.valueOf(receiver.getId());
             String eventId = receiverId + "_" + System.currentTimeMillis();
-
-//            Optional<Member> sender = memberRepository.findByMembername(senderMembername);
-//
-//            String finalJsonResult = convertToJson(sender, notification);
 
             // Emitter는 유저가 로그인하면 바로 구독할 것이다. 그럼 Admin 의 Emitter도 있을듯 본인 것만 보내기 때문에 노상관
             Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
