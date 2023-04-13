@@ -148,6 +148,7 @@ public class NotificationService {
     public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId).orElseThrow(
                 () -> new NotFoundException("Notification not found"));
+
         // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
         if (!notification.getReceiver().getId().equals(member.getId())) {
             throw new IllegalArgumentException("접근권한이 없습니다. ");
