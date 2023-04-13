@@ -129,7 +129,7 @@ public class NotificationService {
             log.info("알림 최신순으로 페이징 조회했어");
 
         // 12시간이 지난 알림 삭제
-        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(12);
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(36);
         List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
         for (Notification notification : expiredNotifications) {
             notificationRepository.delete(notification);
