@@ -49,6 +49,7 @@ public class MemberService {
     private final JavaMailSender emailSender;
 
     @Value("${spring.mail.username}")
+
     private String sogon;
 
     //회원 가입
