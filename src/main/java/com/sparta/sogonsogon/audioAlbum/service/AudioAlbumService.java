@@ -63,14 +63,15 @@ public class AudioAlbumService {
                 () -> new InsufficientAuthenticationException(ErrorMessage.ACCESS_DENIED.getMessage()) // 401 Unauthorized
         );
 
-        // 오디오앨범 제목 중복 확인
-        Optional<AudioAlbum> found = audioAlbumRepository.findByTitle(requestDto.getTitle());
-        if (found.isPresent()) {
-            throw new DuplicateKeyException(ErrorMessage.DUPLICATE_AUDIOALBUM_NAME.getMessage()); // 409 Conflict
-        }
-
         // 오디오앨범 사진 추가
-        String imageUrl = s3Uploader.upload(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
+        String imageUrl;
+        if (requestDto.getBackgroundImageUrl().isEmpty()) {
+            // 이미지를 첨부하지 않았을 경우 기본 이미지 사용
+            imageUrl = "https://my-aws-bucket-image.s3.ap-northeast-2.amazonaws.com/기본이미지또는+오디오/오디오+앨범+기본+이미지+.png";
+        } else {
+            // 이미지가 첨부 되었다면 첨부된 이미지 사용
+            imageUrl = s3Uploader.upload(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
+        }
 
         log.info(requestDto.getCategoryType().toString());
         AudioAlbum audioAlbum = AudioAlbum.builder()
