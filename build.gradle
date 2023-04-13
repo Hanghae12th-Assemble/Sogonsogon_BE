@@ -37,7 +37,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 // h2
-//    implementation 'com.h2database:h2'
+    implementation 'com.h2database:h2'
 
     testImplementation 'org.springframework.security:spring-security-test'
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
@@ -70,7 +70,7 @@ dependencies {
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
     // h2
-//    runtimeOnly 'com.h2database:h2:'
+    runtimeOnly 'com.h2database:h2:'
 
     //query dsl
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
@@ -82,6 +82,9 @@ dependencies {
 //    implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'com.zaxxer:HikariCP:5.0.1'
 
+    // email
+    implementation 'javax.mail:javax.mail-api:1.6.2'
+    implementation 'com.sun.mail:javax.mail:1.6.2'
 
 
 }
