@@ -54,14 +54,33 @@ public class AudioClipService {
     //오디오 클립 생성
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> createdAudioClip(Long audioablumId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage");
-        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips");
+
         AudioAlbum audioAlbum = audioAlbumRepository.findById(audioablumId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOALBUM.getMessage())
         );
         Member member = memberRepository.findByMembername(userDetails.getUsername()).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
+
+        String audioclipImageUrl = "";
+        String audioclipUrl = "";
+        if(requestDto.getAudioclip().isEmpty()){
+            audioclipUrl = "https://my-aws-bucket-image.s3.ap-northeast-2.amazonaws.com/%EA%B8%B0%EB%B3%B8%EC%9D%B4%EB%AF%B8%EC%A7%80%EB%98%90%EB%8A%94+%EC%98%A4%EB%94%94%EC%98%A4/intro.mp3";
+        }else {
+            audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips");
+        }
+        if(requestDto.getAudioclipImage().isEmpty()){
+            audioclipImageUrl = "https://my-aws-bucket-image.s3.ap-northeast-2.amazonaws.com/%EA%B8%B0%EB%B3%B8%EC%9D%B4%EB%AF%B8%EC%A7%80%EB%98%90%EB%8A%94+%EC%98%A4%EB%94%94%EC%98%A4/%EC%98%A4%EB%94%94%EC%98%A4+%ED%81%B4%EB%A6%BD+%EA%B8%B0%EB%B3%B8%EC%9D%B4%EB%AF%B8%EC%A7%80.png";
+        }else {
+            audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage");
+        }
+        if(requestDto.getTitle().isEmpty() || requestDto.getTitle().isBlank()){
+            requestDto.setTitle(audioAlbum.getTitle() + "의 " + (audioAlbum.getAudioClips().size() + 1) + "번째 클립");
+        }
+        if(requestDto.getContents().isBlank() || requestDto.getContents().isEmpty()){
+            requestDto.setContents(audioAlbum.getTitle() + "의 " + (audioAlbum.getAudioClips().size() + 1) + "번째 클립입니다. ");
+        }
+
 
         AudioClip audioClip = new AudioClip(requestDto, member, audioclipUrl, audioclipImageUrl, audioAlbum);
         audioClipRepository.save(audioClip);
@@ -81,14 +100,33 @@ public class AudioClipService {
     //오디오 클립 수정
     @Transactional
     public StatusResponseDto<AudioClipResponseDto> updateAudioClip(Long audioclipId, AudioClipRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
-        String audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage/");
-        String audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips/");
+
         Member member = memberRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.WRONG_USERNAME.getMessage())
         );
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
+
+        String audioclipImageUrl = "";
+        String audioclipUrl = "";
+        if(requestDto.getAudioclip().isEmpty()){
+            audioclipUrl = audioClip.getAudioclipUrl();
+        }else {
+            audioclipUrl = s3Uploader.upload(requestDto.getAudioclip(), "audioclips");
+        }
+        if(requestDto.getAudioclipImage().isEmpty()){
+            audioclipImageUrl = audioClip.getAudioclipImageUrl();
+        }else {
+            audioclipImageUrl = s3Uploader.upload(requestDto.getAudioclipImage(), "audioclipImage");
+        }
+        if(requestDto.getTitle().isEmpty() || requestDto.getTitle().isBlank()){
+            requestDto.setTitle(audioClip.getTitle());
+        }
+        if (requestDto.getContents().isBlank() || requestDto.getContents().isEmpty()){
+            requestDto.setContents(audioClip.getContents());
+        }
+
 
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClip.update(requestDto, audioclipUrl, audioclipImageUrl);
@@ -105,8 +143,6 @@ public class AudioClipService {
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
-        AudioAlbum audioAlbum = audioClip.getAudioalbum();
-
 
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClipRepository.deleteById(audioclipId);
