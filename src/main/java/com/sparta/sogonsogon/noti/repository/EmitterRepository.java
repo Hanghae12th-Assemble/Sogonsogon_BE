@@ -35,8 +35,5 @@ public interface EmitterRepository {
 
     //해당 회원과 관련된 모든 이벤트를 지운다.
     void deleteAllEventCacheStartWithId(String memberId);
-//
-//    Map<String, Object> findAllEventCacheStartWithId(String valueOf);
-//
-//    Map<String, SseEmitter> findAllStartWithById(String id);
+
 }

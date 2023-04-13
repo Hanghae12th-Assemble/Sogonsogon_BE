@@ -11,10 +11,13 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import javax.sql.DataSource;
@@ -38,6 +41,11 @@ public class NotificationService {
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 60 * 60 * 10000L;
     private final DataSource dataSource;
+
+    // 캐시 이름 설정
+    private static final String NOTIFICATIONS_CACHE_NAME = "notifications";
+    private static final String EXPIRED_NOTIFICATIONS_CACHE_NAME = "expiredNotifications";
+
 
     @Transactional
     public synchronized SseEmitter subscribe(UserDetailsImpl userDetails) {
@@ -122,7 +130,12 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    //받은 알림 전체 조회, 페이징처리 추가 서버 부하 줄임
+    //받은 알림 전체 조회, 매번 새로운 쿼리를 수행하지 않도록 캐시를 적용. 메모리 캐시를 활용하여 성능을 향상
+    // Spring Cache abstraction을 사용하면 쉽게 캐싱 기능을 구현
+    // 캐시할 메서드에 @Cacheable 애노테이션을 추가하고,
+    // 이 메서드가 실행될 때 캐시를 검색해 존재한다면 결과를 반환하고,
+    // 존재하지 않는다면 새로운 쿼리를 수행한 뒤 결과를 캐시에 저장하는 방식
+    @Cacheable(value = NOTIFICATIONS_CACHE_NAME, key = "#memberId + '-' + #page + '-' + #size")
     @Transactional
     public List<NotificationResponseDto> getAllNotifications(Long memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -130,15 +143,20 @@ public class NotificationService {
         Page<Notification> notificationPage = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId, pageable);
             log.info("알림 최신순으로 페이징 조회했어");
 
-        // 12시간이 지난 알림 삭제
+        List<NotificationResponseDto> notificationResponseDtos = notificationPage.stream()
+                .map(NotificationResponseDto::create)
+                .collect(Collectors.toList());
+
+        return notificationResponseDtos;
+    }
+    @Scheduled(cron = "0 0 1 * * ?")
+    @CacheEvict(value = {NOTIFICATIONS_CACHE_NAME, EXPIRED_NOTIFICATIONS_CACHE_NAME}, allEntries = true)
+    public void deleteExpiredNotifications() {
         LocalDateTime cutoffTime = LocalDateTime.now().minusHours(12);
         List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
         for (Notification notification : expiredNotifications) {
             notificationRepository.delete(notification);
         }
-        return notificationPage.stream()
-                .map(NotificationResponseDto::create)
-                .collect(Collectors.toList());
     }
 
     // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
