@@ -26,7 +26,7 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 //            "AND n.is_read = 'true' AND NOW()", nativeQuery = true)
 //    List<Notification> findOldNotification();
 
-    @Query("SELECT n FROM notification n WHERE n.createdAt < :cutoffTime")
-    List<Notification> findExpiredNotification(@Param("cutoffTime") LocalDateTime cutoffTime);
+//    @Query("SELECT n FROM notification n WHERE n.createdAt < :cutoffTime")
+//    List<Notification> findExpiredNotification(@Param("cutoffTime") LocalDateTime cutoffTime);
 
 }
