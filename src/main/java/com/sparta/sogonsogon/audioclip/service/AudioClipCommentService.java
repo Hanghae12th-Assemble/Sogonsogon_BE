@@ -86,7 +86,7 @@ public class AudioClipCommentService {
 
     //오디오 클립 댓글 전체조회
     @Transactional
-    public StatusResponseDto<Map<String, Object>> getComments(int page, int size, String sortBy,Long audioclipId) {
+    public StatusResponseDto<Map<String, Object>> getComments(int page, int size, String sortBy,Long audioclipId, UserDetailsImpl userDetails) {
         AudioClip audioClip = audioClipRepository.findById(audioclipId).orElseThrow(
                 ()-> new IllegalArgumentException(ErrorMessage.NOT_FOUND_AUDIOCLIP.getMessage())
         );
@@ -94,7 +94,12 @@ public class AudioClipCommentService {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
         Page<Comment> list = audioClipCommentRepository.findAllByAudioclipId(audioclipId, sortedPageable);
-        List<CommentResponseDto> responseDtos = list.getContent().stream().map(CommentResponseDto::new).toList();
+        List<Comment> commentList = list.getContent();
+        List<CommentResponseDto> responseDtos = new ArrayList<>();
+        for (int i = 0; i < commentList.size(); i++){
+            boolean isMine = commentList.get(i).getMember().getMembername().equals(userDetails.getUsername());
+            responseDtos.add(new CommentResponseDto(commentList.get(i), isMine));
+        }
 
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("audioClipCount", list.getTotalElements());

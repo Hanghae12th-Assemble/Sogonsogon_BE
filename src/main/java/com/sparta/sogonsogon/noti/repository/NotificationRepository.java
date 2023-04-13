@@ -18,18 +18,15 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     List<Notification> findByReceiver_IdOrderByCreatedAtDesc(Long receiverId);
 
-//    List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId,pageable);
-    Page<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+    List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId);
+//    Page<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
 
 //    @Query(value = "SELECT * FROM notification n " +
 //            "WHERE n.created_at < date_add(now(), INTERVAL -1 DAY) " +
 //            "AND n.is_read = 'true' AND NOW()", nativeQuery = true)
 //    List<Notification> findOldNotification();
 
-    @Query("SELECT n FROM notification n WHERE n.createdAt < :cutoffTime")
-    List<Notification> findExpiredNotification(@Param("cutoffTime") LocalDateTime cutoffTime);
+//    @Query("SELECT n FROM notification n WHERE n.createdAt < :cutoffTime")
+//    List<Notification> findExpiredNotification(@Param("cutoffTime") LocalDateTime cutoffTime);
 
-
-
-//    List<Notification> findByMemberId(Long MemberId);
 }

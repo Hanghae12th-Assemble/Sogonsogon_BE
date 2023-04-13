@@ -164,7 +164,7 @@ public class AudioAlbumService {
         boolean isMine = audioAlbum.getMember().getId().equals(userDetails.getUser().getId());
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", foundAudioClip.size());
+        metadata.put("audioClipCount", audioAlbum.getAudioClips().size());
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("metadata", metadata);
         responseBody.put("result", new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine));
@@ -278,10 +278,12 @@ public class AudioAlbumService {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable sortedPageable = PageRequest.of(page, size, sort);
         Page<AudioAlbum> audioAlbumPage = audioAlbumRepository.findByMember(member, sortedPageable);
-        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = audioAlbumPage.getContent()
-                .stream()
-                .map(AudioAlbumResponseDto::new)
-                .toList();
+        List<AudioAlbum> audioAlbums = audioAlbumPage.getContent();
+        List<AudioAlbumResponseDto> audioAlbumResponseDtoList = new ArrayList<>();
+        for(int i = 0 ; i < audioAlbums.size(); i ++){
+            boolean isLikeCheck = audioAlbumLikeRepository.findByAudioAlbumAndMember(audioAlbums.get(i), member).isPresent();
+            audioAlbumResponseDtoList.add(new AudioAlbumResponseDto(audioAlbums.get(i), isLikeCheck));
+        }
 
         // 생성된 오디오앨범의 개수
         Map<String, Object> metadata = new HashMap<>();

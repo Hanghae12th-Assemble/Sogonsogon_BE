@@ -43,8 +43,9 @@ public class AudioClipCommentController {
     @Operation(summary = "오디오 클립 댓글 전체 조회", description = "오디오 클립에 있는 전체 댓글을 볼 수 있습니다.")
     public StatusResponseDto<Map<String, Object>> getComments(@RequestParam(defaultValue = "1") int page,
                                               @RequestParam(defaultValue = "10") int size,
-                                              @RequestParam(required = false, defaultValue = "createdAt") String sortBy, @PathVariable Long audioclipId){
-        return audioClipCommentService.getComments(page-1, size, sortBy, audioclipId);
+                                              @RequestParam(required = false, defaultValue = "createdAt") String sortBy, @PathVariable Long audioclipId,
+                                                              @Parameter(hidden = true) UserDetailsImpl userDetails){
+        return audioClipCommentService.getComments(page-1, size, sortBy, audioclipId, userDetails);
 
     }
 

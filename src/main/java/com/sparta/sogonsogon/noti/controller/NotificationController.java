@@ -39,31 +39,29 @@ public class NotificationController {
     클라이언트(유저)는 이를 수신할 수 있는 SSE 연결이 없기 때문에 알림 메시지를 실시간으로 받을 수 없게 됩니다. */
 
 
-    @Operation(summary = "받은 알림 전체 조회", description = "받은 알림 전체 조회")
-    @GetMapping("/AllNotifications")
-    public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                                @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                                @RequestParam(value = "size",defaultValue = "10") int size) {
-
-        return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId(),page,size));
-    }
-
-    @PutMapping("/{notificationId}/confirm")
-    @Operation(summary = "알림확인", description = "알림확인")
-    public StatusResponseDto<NotificationResponseDto> confirmNotification(@PathVariable Long notificationId,
-                                                                          @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        NotificationResponseDto notificationResponseDto = notificationService.confirmNotification(userDetails.getUser(),notificationId);
-        return StatusResponseDto.success(HttpStatus.OK, notificationResponseDto);
-//        return ResponseEntity.ok("Notification confirmed successfully");
-
-    }
-
-    @DeleteMapping("/{notificationId}")
-    @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")
-    public StatusResponseDto<NotificationResponseDto> deleteNotification(@PathVariable Long notificationId,
-                                                                         @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        notificationService.deleteNotification(notificationId,userDetails.getUser());
-        return StatusResponseDto.success(HttpStatus.OK,null);
-    }
+//    @Operation(summary = "받은 알림 전체 조회", description = "받은 알림 전체 조회")
+//    @GetMapping("/AllNotifications")
+//    public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//
+//        return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId()));
+//    }
+//
+//    @PutMapping("/{notificationId}/confirm")
+//    @Operation(summary = "알림확인", description = "알림확인")
+//    public StatusResponseDto<NotificationResponseDto> confirmNotification(@PathVariable Long notificationId,
+//                                                                          @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
+//    ) {
+//        NotificationResponseDto notificationResponseDto = notificationService.confirmNotification(userDetails.getUser(),notificationId);
+//        return StatusResponseDto.success(HttpStatus.OK, notificationResponseDto);
+////        return ResponseEntity.ok("Notification confirmed successfully");
+//
+//    }
+//
+//    @DeleteMapping("/{notificationId}")
+//    @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")
+//    public StatusResponseDto<NotificationResponseDto> deleteNotification(@PathVariable Long notificationId,
+//                                                                         @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        notificationService.deleteNotification(notificationId,userDetails.getUser());
+//        return StatusResponseDto.success(HttpStatus.OK,null);
+//    }
 }
