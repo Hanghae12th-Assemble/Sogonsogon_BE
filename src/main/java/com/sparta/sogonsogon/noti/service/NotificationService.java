@@ -44,13 +44,11 @@ public class NotificationService {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
         emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        log.info("SSE 연결 됬지롱");
 
         emitter.onCompletion(() -> { // 클라이언트와의 연결이 종료되었을 때 호출
             emitterRepository.deleteById(emitterId);
         });
         emitter.onTimeout(() -> { // SseEmitter의 유효시간이 지났을 때 호출
-            log.info("SSE 연결 Timeout");
             emitterRepository.deleteById(emitterId);
         });
         emitter.onError((e) -> emitterRepository.deleteById(emitterId));
