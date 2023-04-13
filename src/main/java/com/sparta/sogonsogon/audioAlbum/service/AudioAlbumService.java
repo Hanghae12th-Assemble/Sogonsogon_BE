@@ -63,12 +63,6 @@ public class AudioAlbumService {
                 () -> new InsufficientAuthenticationException(ErrorMessage.ACCESS_DENIED.getMessage()) // 401 Unauthorized
         );
 
-        // 오디오앨범 제목 중복 확인
-        Optional<AudioAlbum> found = audioAlbumRepository.findByTitle(requestDto.getTitle());
-        if (found.isPresent()) {
-            throw new DuplicateKeyException(ErrorMessage.DUPLICATE_AUDIOALBUM_NAME.getMessage()); // 409 Conflict
-        }
-
         // 오디오앨범 사진 추가
         String imageUrl = s3Uploader.upload(requestDto.getBackgroundImageUrl(), "audioAlbumImages");
 
