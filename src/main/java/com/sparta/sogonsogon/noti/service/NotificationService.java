@@ -46,7 +46,7 @@ public class NotificationService {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
         emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        log.info("SSE 연결 됬지롱");
+        log.info("SSE 연결 됨");
 
         emitter.onCompletion(() -> {
             emitterRepository.deleteById(emitterId);
@@ -54,14 +54,14 @@ public class NotificationService {
         //시간이 만료된 경우 자동으로 레포지토리에서 삭제하고 클라이언트에서 재요청을 보낸다.
         emitter.onTimeout(() -> {
             // ping 메시지를 15분마다 전송
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(() -> {
-                try {
-                    emitter.send(SseEmitter.event().name("ping").data(""));
-                } catch (IOException e) {
-                    log.error("Failed to send ping event", e);
-                }
-            }, 0, 15, TimeUnit.MINUTES);
+//            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//            scheduler.scheduleAtFixedRate(() -> {
+//                try {
+//                    emitter.send(SseEmitter.event().name("ping").data(""));
+//                } catch (IOException e) {
+//                    log.error("Failed to send ping event", e);
+//                }
+//            }, 0, 15, TimeUnit.MINUTES);
             emitterRepository.deleteById(emitterId);
         });
         emitter.onError((e) -> emitterRepository.deleteById(emitterId));
@@ -74,12 +74,12 @@ public class NotificationService {
 
     @Transactional
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
-        Connection con = null;
-        try {
-            con = dataSource.getConnection();
-            // 데이터소스를 통해 데이터베이스와의 연결을 설정하고 Connection 객체를 생성합니다.
-            con.setAutoCommit(false);
-            // 트랜잭션을 수동으로 관리하기 위해 자동 커밋 기능을 false로 설정합니다.
+//        Connection con = null;
+//        try {
+//            con = dataSource.getConnection();
+//            // 데이터소스를 통해 데이터베이스와의 연결을 설정하고 Connection 객체를 생성합니다.
+//            con.setAutoCommit(false);
+//            // 트랜잭션을 수동으로 관리하기 위해 자동 커밋 기능을 false로 설정합니다.
 
             Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
             String receiverId = String.valueOf(receiver.getId());
@@ -93,23 +93,23 @@ public class NotificationService {
                         sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
                     }
             );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            // finally: try 블록에서 사용한 자원들을 정리하는 블록
-            // Connection 객체가 정상적으로 닫히지 않은 경우에 대비하여 커넥션 풀에 반환하는 코드가 여기에 작성
-            if (con != null) {
-                // Connection 객체가 null이 아니면, 즉 연결이 정상적으로 이루어졌으면 다음 코드를 실행
-                try {
-                    con.setAutoCommit(true);
-                    // 트랜잭션이 완료되면 자동 커밋 기능을 true로 설정합니다.
-                    con.close();
-                    // Connection 객체를 반환하여 커넥션 풀에 반환
-                } catch (SQLException e) {
-
-                }
-            }
-        }
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            // finally: try 블록에서 사용한 자원들을 정리하는 블록
+//            // Connection 객체가 정상적으로 닫히지 않은 경우에 대비하여 커넥션 풀에 반환하는 코드가 여기에 작성
+//            if (con != null) {
+//                // Connection 객체가 null이 아니면, 즉 연결이 정상적으로 이루어졌으면 다음 코드를 실행
+//                try {
+//                    con.setAutoCommit(true);
+//                    // 트랜잭션이 완료되면 자동 커밋 기능을 true로 설정합니다.
+//                    con.close();
+//                    // Connection 객체를 반환하여 커넥션 풀에 반환
+//                } catch (SQLException e) {
+//
+//                }
+//            }
+//        }
     }
 
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
