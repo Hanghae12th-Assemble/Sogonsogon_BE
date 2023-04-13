@@ -54,7 +54,7 @@ public class AudioClipController {
 
     @GetMapping("/{audioclipId}")
     @Operation(summary = "원하는 오디오 클립 상세 조회", description = "오디오 클립 아이디를 가고 상세 조회 합니다. 내가 좋아요 했는지 여부확인 가능합니다.")
-    public StatusResponseDto<AudioClipResponseDto> detailsAudipClip(@PathVariable Long audioclipId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<Map<String, Object>> detailsAudipClip(@PathVariable Long audioclipId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return audioClipService.detailsAudioClip(audioclipId, userDetails);
     }
 
@@ -69,16 +69,6 @@ public class AudioClipController {
     }
 
 
-//   오디오 클립 좋아요순으로 전체 조회
-//    @GetMapping("/like/{audioAblumId}")
-//    @Operation(summary = "좋아요순으로 오디오 클립 전체 가져오기", description = "오디오클립 전체 조회시 좋아요순 정렬")
-//    public StatusResponseDto<Map<String, Object>> findByclipOrderbyLike(@PathVariable Long audioAblumId,
-//                                                                        @RequestParam(defaultValue = "1") int page,
-//                                                                        @RequestParam(defaultValue = "10") int size,
-//                                                                        @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
-//                                                                        @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-//        return audioClipService.findAllinAblumOrderbyLike(page -1, size, sortBy, audioAblumId, userDetails);
-//    }
 
 
 }
