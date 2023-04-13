@@ -20,6 +20,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,13 +42,20 @@ public class NotificationService {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
         emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        log.info("SSE 연결 됬지롱");
 
         emitter.onCompletion(() -> { // 클라이언트와의 연결이 종료되었을 때 호출
             emitterRepository.deleteById(emitterId);
         });
-        emitter.onTimeout(() -> { // SseEmitter의 유효시간이 지났을 때 호출
-            log.info("SSE 연결 Timeout");
+        emitter.onTimeout(() -> {
+            // ping 메시지를 20분마다 전송
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleAtFixedRate(() -> {
+                try {
+                    emitter.send(SseEmitter.event().name("ping").data(""));
+                } catch (IOException e) {
+                    log.error("Failed to send ping event", e);
+                }
+            }, 0, 20, TimeUnit.MINUTES);
             emitterRepository.deleteById(emitterId);
         });
         emitter.onError((e) -> emitterRepository.deleteById(emitterId));
