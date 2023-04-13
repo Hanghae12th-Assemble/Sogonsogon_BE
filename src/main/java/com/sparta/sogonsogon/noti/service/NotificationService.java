@@ -79,6 +79,7 @@ public class NotificationService {
     }
     @Transactional
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
+        log.info("알림 보냈다. ");
         Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(String.valueOf(receiver.getId()));
         emitters.forEach((key, emitter) -> {
             try {
