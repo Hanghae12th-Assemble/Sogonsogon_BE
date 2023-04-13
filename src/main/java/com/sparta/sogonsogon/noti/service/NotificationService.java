@@ -34,7 +34,7 @@ public class NotificationService {
     private final EmitterRepository emitterRepository ;
     private final NotificationRepository notificationRepository;
     //DEFAULT_TIMEOUT을 기본값으로 설정
-    private static final Long DEFAULT_TIMEOUT = 60 * 60 * 10000L;
+    private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L; //15분
     private final DataSource dataSource;
 
     @Transactional
@@ -44,7 +44,11 @@ public class NotificationService {
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
         emitter.onCompletion(() -> { // 클라이언트와의 연결이 종료되었을 때 호출
-            emitterRepository.deleteById(emitterId);
+            try {
+                emitterRepository.deleteById(emitterId);
+            } catch (Exception e) {
+                log.error("Failed to delete emitter with id: {}", emitterId, e);
+            }
         });
         emitter.onTimeout(() -> {
             // ping 메시지를 20분마다 전송
@@ -54,11 +58,19 @@ public class NotificationService {
                     emitter.send(SseEmitter.event().name("ping").data(""));
                 } catch (IOException e) {
                     log.error("Failed to send ping event", e);
+                    emitterRepository.deleteById(emitterId);
                 }
             }, 0, 20, TimeUnit.MINUTES);
-            emitterRepository.deleteById(emitterId);
+            try {
+                emitterRepository.deleteById(emitterId);
+            } catch (Exception e) {
+                log.error("Failed to delete emitter with id: {}", emitterId, e);
+            }
         });
-        emitter.onError((e) -> emitterRepository.deleteById(emitterId));
+        emitter.onError((e) -> {
+            emitterRepository.deleteById(emitterId);
+            log.error("SSE emitter error occurred: {}", e.getMessage());
+        });
 
         return emitter;
     }
