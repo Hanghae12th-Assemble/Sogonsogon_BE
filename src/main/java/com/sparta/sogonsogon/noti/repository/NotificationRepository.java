@@ -21,6 +21,7 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 //    List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId);
     Page<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
 
+
 //    @Query(value = "SELECT * FROM notification n " +
 //            "WHERE n.created_at < date_add(now(), INTERVAL -1 DAY) " +
 //            "AND n.is_read = 'true' AND NOW()", nativeQuery = true)
