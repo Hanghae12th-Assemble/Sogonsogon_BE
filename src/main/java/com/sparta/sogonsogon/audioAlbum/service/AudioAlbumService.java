@@ -164,7 +164,7 @@ public class AudioAlbumService {
         boolean isMine = audioAlbum.getMember().getId().equals(userDetails.getUser().getId());
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", foundAudioClip.size());
+        metadata.put("audioClipCount", audioAlbum.getAudioClips().size());
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("metadata", metadata);
         responseBody.put("result", new AudioAlbumResponseDto(audioAlbum, audioAlbumResponseDtos, isLikeCheck, isMine));
