@@ -73,7 +73,7 @@ public class AudioClipCommentService {
     public StatusResponseDto<String> deleteComment(Long commetId, UserDetailsImpl userDetails) {
         Member member = userDetails.getUser();
         Comment comment = audioClipCommentRepository.findById(commetId).orElseThrow(
-                () -> new NullPointerException("댓글을 찾을 수 없음")
+                () -> new NullPointerException(ErrorMessage.NOT_FOUND_COMMENT.getMessage())
         );
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(comment.getMember().getMembername())) {
             audioClipCommentRepository.delete(comment);
