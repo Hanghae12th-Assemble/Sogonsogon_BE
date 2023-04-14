@@ -121,9 +121,11 @@ public class NotificationService {
     }
 //    받은 알림 전체 조회
     @Transactional
-    public List<NotificationResponseDto> getAllNotifications(Long memberId, int size, int page) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId,pageable);
+    public List<NotificationResponseDto> getAllNotifications(Long memberId) {
+
+        List<Notification> notifications;
+        notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
+        log.info("알림 전체 조회했어");
 
         return notifications.stream()
                 .map(NotificationResponseDto::create)

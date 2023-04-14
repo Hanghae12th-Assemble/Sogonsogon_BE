@@ -18,10 +18,10 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     List<Notification> findByReceiver_IdOrderByCreatedAtDesc(Long receiverId);
 
-//    List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId);
+    List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId);
 
 
-    Page<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+//    Page<Notification> findAllByReceiverIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
 
 
 //    @Query(value = "SELECT * FROM notification n " +
