@@ -79,9 +79,9 @@ public class AudioClipService {
         } else if ( requestDto.getTitle().isBlank()) {
             requestDto.setTitle(audioAlbum.getTitle() + "의 " + (audioAlbum.getAudioClips().size() + 1) + "번째 클립");
         }
-        if(requestDto.getContents().isBlank() ){
+        if(requestDto.getContents()== null ){
             requestDto.setContents(audioAlbum.getTitle() + "의 " + (audioAlbum.getAudioClips().size() + 1) + "번째 클립입니다. ");
-        } else if (requestDto.getContents()== null) {
+        } else if (requestDto.getContents().isBlank()) {
             requestDto.setContents(audioAlbum.getTitle() + "의 " + (audioAlbum.getAudioClips().size() + 1) + "번째 클립입니다. ");
         }
 
