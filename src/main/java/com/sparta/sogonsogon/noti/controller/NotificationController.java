@@ -58,13 +58,13 @@ public class NotificationController {
 //
 //    }
 
-    @DeleteMapping("/{notificationId}")
-    @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")
-    public StatusResponseDto<NotificationResponseDto> deleteNotification(@PathVariable Long notificationId,
-                                                                         @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        notificationService.deleteNotification(notificationId,userDetails.getUser());
-        return StatusResponseDto.success(HttpStatus.OK,null);
-    }
+//    @DeleteMapping("/{notificationId}")
+//    @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")
+//    public StatusResponseDto<NotificationResponseDto> deleteNotification(@PathVariable Long notificationId,
+//                                                                         @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        notificationService.deleteNotification(notificationId,userDetails.getUser());
+//        return StatusResponseDto.success(HttpStatus.OK,null);
+//    }
 
     @Scheduled(cron = "0 0 0 1/1 * ? *") // 매일 자정 실행한다.
     public void deleteOldNotification(){
