@@ -130,32 +130,32 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
     // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
-//    @Transactional
-//    public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
-//        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
-//                () -> new NotFoundException("Notification not found"));
-//        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
-//        if (!notification.getReceiver().getId().equals(member.getId())) {
-//            throw new IllegalArgumentException("접근권한이 없습니다. ");
-//        }
-//        if (!notification.getIsRead()) {
-//            notification.setIsRead(true);
-//            notificationRepository.save(notification);
-//        }
-//        return new NotificationResponseDto(notification);
-//    }
-//    // 선택된 알림 삭제
-//    @Transactional
-//    public void deleteNotification(Long notificationId, Member member) {
-//
-//        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
-//                () -> new NotFoundException("Notification not found"));
-//        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
-//        if (!notification.getReceiver().getId().equals(member.getId())) {
-//            throw new IllegalArgumentException("접근권한이 없습니다. ");
-//        }
-//        notificationRepository.deleteById(notificationId);
-//    }
+    @Transactional
+    public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+                () -> new NotFoundException("Notification not found"));
+        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
+        if (!notification.getReceiver().getId().equals(member.getId())) {
+            throw new IllegalArgumentException("접근권한이 없습니다. ");
+        }
+        if (!notification.getIsRead()) {
+            notification.setIsRead(true);
+            notificationRepository.save(notification);
+        }
+        return new NotificationResponseDto(notification);
+    }
+    // 선택된 알림 삭제
+    @Transactional
+    public void deleteNotification(Long notificationId, Member member) {
+
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+                () -> new NotFoundException("Notification not found"));
+        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
+        if (!notification.getReceiver().getId().equals(member.getId())) {
+            throw new IllegalArgumentException("접근권한이 없습니다. ");
+        }
+        notificationRepository.deleteById(notificationId);
+    }
 
     private String convertToJson(Member sender, Notification notification){
         String jsonResult = "";

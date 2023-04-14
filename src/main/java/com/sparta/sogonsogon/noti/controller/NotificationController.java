@@ -46,25 +46,25 @@ public class NotificationController {
                                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
         return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId(),page,size));
     }
-//
-//    @PutMapping("/{notificationId}/confirm")
-//    @Operation(summary = "알림확인", description = "알림확인")
-//    public StatusResponseDto<NotificationResponseDto> confirmNotification(@PathVariable Long notificationId,
-//                                                                          @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
-//    ) {
-//        NotificationResponseDto notificationResponseDto = notificationService.confirmNotification(userDetails.getUser(),notificationId);
-//        return StatusResponseDto.success(HttpStatus.OK, notificationResponseDto);
-////        return ResponseEntity.ok("Notification confirmed successfully");
-//
-//    }
 
-//    @DeleteMapping("/{notificationId}")
-//    @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")
-//    public StatusResponseDto<NotificationResponseDto> deleteNotification(@PathVariable Long notificationId,
-//                                                                         @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-//        notificationService.deleteNotification(notificationId,userDetails.getUser());
-//        return StatusResponseDto.success(HttpStatus.OK,null);
-//    }
+    @PutMapping("/{notificationId}/confirm")
+    @Operation(summary = "알림확인", description = "알림확인")
+    public StatusResponseDto<NotificationResponseDto> confirmNotification(@PathVariable Long notificationId,
+                                                                          @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        NotificationResponseDto notificationResponseDto = notificationService.confirmNotification(userDetails.getUser(),notificationId);
+        return StatusResponseDto.success(HttpStatus.OK, notificationResponseDto);
+//        return ResponseEntity.ok("Notification confirmed successfully");
+
+    }
+
+    @DeleteMapping("/{notificationId}")
+    @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")
+    public StatusResponseDto<NotificationResponseDto> deleteNotification(@PathVariable Long notificationId,
+                                                                         @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        notificationService.deleteNotification(notificationId,userDetails.getUser());
+        return StatusResponseDto.success(HttpStatus.OK,null);
+    }
 
     @Scheduled(cron = "0 0 0 1/1 * ? *") // 매일 자정 실행한다.
     public void deleteOldNotification(){
