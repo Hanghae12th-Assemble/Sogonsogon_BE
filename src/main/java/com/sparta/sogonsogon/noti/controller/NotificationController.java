@@ -30,8 +30,7 @@ public class NotificationController {
     @Operation(summary = "알림 구독", description = "알림 구독")
     @GetMapping(value = "/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)///subscribe 엔드포인트로 들어오는 요청을 처리. produces 속성은 해당 메서드가 반환하는 데이터 형식을 지정
     @ResponseStatus(HttpStatus.OK)
-    public SseEmitter subscribe(
-                                @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return notificationService.subscribe(userDetails);
     }
         /*  subscribe() 메서드는 불필요한 코드가 아니며, 삭제하면 클라이언트(유저)는 SSE 구독을 요청할 수 없게 됩니다.
@@ -41,9 +40,11 @@ public class NotificationController {
 
     @Operation(summary = "받은 알림 전체 조회", description = "받은 알림 전체 조회")
     @GetMapping("/AllNotifications")
-    public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId()));
+        return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId(),page,size));
     }
 
     @PutMapping("/{notificationId}/confirm")
