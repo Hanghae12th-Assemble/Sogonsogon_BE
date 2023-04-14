@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 // 뒤에 구분자로 회원의 ID를 사용하기 때문에 해당 회원과 관련된 Emitter와 이벤트들을 찾아오는 것이다.
 @Repository
 @NoArgsConstructor
+@Slf4j
 public class EmitterRepositoryImpl implements EmitterRepository {
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
@@ -54,7 +55,7 @@ public class EmitterRepositoryImpl implements EmitterRepository {
     public void deleteAllEmitterStartWithId(String memberId) {
         emitters.forEach(
                 (key, emitter) -> {
-                    if (Arrays.stream(key.split("_")).findFirst().get().equals(memberId)) {
+                    if (key.startsWith(memberId)) {
                         emitters.remove(key);
                     }
                 }

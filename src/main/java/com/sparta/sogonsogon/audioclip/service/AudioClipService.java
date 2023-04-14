@@ -85,15 +85,12 @@ public class AudioClipService {
         AudioClip audioClip = new AudioClip(requestDto, member, audioclipUrl, audioclipImageUrl, audioAlbum);
         audioClipRepository.save(audioClip);
 
-        // 본인이 알림 구독을 하였는지 확인
-        notificationService.send(member, AlarmType.eventAudioClipUploaded, "제목: " + audioClip.getTitle() + "오디오 클립이 생성되었습니다. ", audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getAudioclipImageUrl());
-
-        // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
+        // NotificationService를 통해 팔로우한  유저들에게 알림을 보낸다.
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
         for (Follow following : followings) {
-            String message = audioClip.getMember().getNickname() + "님이 제목:" + audioClip.getTitle() + "오디오 클립을 생성하였습니다. ";
+            String message = audioClip.getMember().getNickname() + "님이 [ " + audioClip.getTitle() + " ]오디오 클립을 생성하였습니다. ";
             notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
-            log.info("생성하였습니다. ");
+            log.info("앨범클립 생성하였습니다. ");
         }
 
         return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));
@@ -153,7 +150,7 @@ public class AudioClipService {
             List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
             for (Follow following : followings) {
 
-                String message = audioClip.getMember().getNickname() + "님이 제목:" + audioClip.getTitle() + "오디오 클립을 삭제하였습니다. ";
+                String message = audioClip.getMember().getNickname() + "님이 [ " + audioClip.getTitle() + " ]오디오 클립을 삭제하였습니다. ";
                 notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
             }
 

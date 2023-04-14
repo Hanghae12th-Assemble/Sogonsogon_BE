@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 
 @Entity(name = "notification")
+@EqualsAndHashCode(of = "id")
 @Setter
 @Getter //각 래퍼 클래스에 대한 추출 메소드이다.
 @NoArgsConstructor
@@ -24,9 +25,12 @@ public class Notification extends TimeStamped{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE) //한 번 알림을 읽으면 읽음 표시되어 더이상 우리에게 반짝이지 않는다
-    private Member receiver;     //    private Member receiver;
+    private Member receiver;
+    @Column//    private Member receiver;
     private String senderMembername;
+    @Column
     private String senderNickname;
+    @Column
     private String senderProfileImageUrl;
 
     @Column
@@ -54,19 +58,6 @@ public class Notification extends TimeStamped{
         this.senderNickname = senderNickname;
         this.senderProfileImageUrl = senderProfileImageUrl;
     }
-
-    public void setSenderMembername(String senderMembername) {
-        this.senderMembername = senderMembername;
-    }
-
-    public void setSenderNickname(String senderNickname) {
-        this.senderNickname = senderNickname;
-    }
-
-    public void setSenderProfileImageUrl(String senderProfileImageUrl) {
-        this.senderProfileImageUrl = senderProfileImageUrl;
-    }
-
 
 
 

@@ -23,15 +23,15 @@ import java.util.List;
 @RequiredArgsConstructor //생성자를 자동으로 생성
 @RequestMapping("/api/notificaiton")
 public class NotificationController {
-    private final NotificationRepository notificationRepository;
 
     private final NotificationService notificationService;
     @ApiOperation(value = "알림 구독", notes = "알림을 구독한다.")
     @Operation(summary = "알림 구독", description = "알림 구독")
     @GetMapping(value = "/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)///subscribe 엔드포인트로 들어오는 요청을 처리. produces 속성은 해당 메서드가 반환하는 데이터 형식을 지정
     @ResponseStatus(HttpStatus.OK)
-    public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return notificationService.subscribe( userDetails);
+    public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId)  {
+        return notificationService.subscribe( userDetails,lastEventId);
     }
         /*  subscribe() 메서드는 불필요한 코드가 아니며, 삭제하면 클라이언트(유저)는 SSE 구독을 요청할 수 없게 됩니다.
     send() 메서드를 통해 알림 메시지를 전송할 수는 있지만,
@@ -45,16 +45,6 @@ public class NotificationController {
         return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId()));
     }
 
-    @PutMapping("/{notificationId}/confirm")
-    @Operation(summary = "알림확인", description = "알림확인")
-    public StatusResponseDto<NotificationResponseDto> confirmNotification(@PathVariable Long notificationId,
-                                                                          @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        NotificationResponseDto notificationResponseDto = notificationService.confirmNotification(userDetails.getUser(),notificationId);
-        return StatusResponseDto.success(HttpStatus.OK, notificationResponseDto);
-//        return ResponseEntity.ok("Notification confirmed successfully");
-
-    }
 
     @DeleteMapping("/{notificationId}")
     @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")

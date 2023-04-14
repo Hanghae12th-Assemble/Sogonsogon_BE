@@ -87,7 +87,7 @@ public class AudioAlbumService {
         // NotificationService를 통해 팔로우한  유저들에게 알림을 보낸다.
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
         for (Follow following : followings) {
-            String message = audioAlbum.getMember().getNickname() + "님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범을 생성하였습니다. ";
+            String message = audioAlbum.getMember().getNickname() + "님이 [ " + audioAlbum.getTitle() + " ]오디오 클립 앨범을 생성하였습니다. ";
             notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
             log.info("앨범 생성하였습니다. ");
         }
@@ -262,9 +262,13 @@ public class AudioAlbumService {
         audioAlbumLikeRepository.save(new AudioAlbumLike(audioAlbum, userDetails.getUser()));
         audioAlbum.updateLikesCnt(audioAlbum.getLikesCount() + 1);
 
+        if (!userDetails.getUser().getMembername().equals(audioAlbum.getMember().getMembername())) {
+            // 본인 아닌 다른 사람 알림만 받기
         // 좋아요 클릭하면 앨범생성자 한테 알림 보내기
-        String message = audioAlbum.getMember().getNickname() + "님이 제목:" + audioAlbum.getTitle() + "오디오 클립 앨범에 좋아요가 추가 되었습니다. ";
-        notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
+            String message = userDetails.getUser().getNickname() + " [ " + audioAlbum.getTitle() + " ] 앨범에 좋아요를 눌렀습니다";
+            notificationService.send(audioAlbum.getMember(), AlarmType.eventAudioClipUploaded, message, userDetails.getUser().getMembername(), userDetails.getUser().getNickname(), userDetails.getUser().getProfileImageUrl());
+
+        }
 
         return StatusResponseDto.success(HttpStatus.OK, new AudioAlbumIsLikeResponseDto("해당 오디오앨범 좋아요가 추가 되었습니다.", true));
     }

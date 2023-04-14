@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
@@ -72,7 +73,7 @@ public class FollowService {
     }
 
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public FollowResponseDto toggleFollow(String membername, UserDetailsImpl userDetails) {
         Member follow = memberRepository.findByMembername(membername).orElseThrow(
                 () -> new EntityNotFoundException(ErrorMessage.WRONG_USERNAME.getMessage())
