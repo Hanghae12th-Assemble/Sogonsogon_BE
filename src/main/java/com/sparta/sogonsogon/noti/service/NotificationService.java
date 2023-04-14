@@ -10,6 +10,7 @@ import com.sparta.sogonsogon.noti.entity.Notification;
 import com.sparta.sogonsogon.noti.repository.EmitterRepository;
 import com.sparta.sogonsogon.noti.repository.NotificationRepository;
 import com.sparta.sogonsogon.noti.util.AlarmType;
+import com.sparta.sogonsogon.noti.util.DataSourceConfig;
 import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,6 +43,7 @@ public class NotificationService {
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L;
     private final JdbcTemplate jdbcTemplate;
+    private final DataSourceConfig dataSourceConfig;
 //    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
@@ -63,18 +67,12 @@ public class NotificationService {
     }
     @Transactional
     public void send(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
-        // JdbcTemplate를 사용하여 데이터베이스 연결
-        // jdbcTemplate.update() 메서드를 사용하여 INSERT 쿼리를 실행하면
-        // JdbcTemplate 내부에서 커넥션을 가져오고, 사용 후 자동으로 반환
-        jdbcTemplate.update(
-                "INSERT INTO notification (receiver_id, alarm_type, message, sender_membername, sender_nickname, sender_profile_image_url) VALUES (?, ?, ?, ?, ?, ?)",
-                receiver.getId(),
-                alarmType.toString(),
-                message,
-                senderMembername,
-                senderNickname,
-                senderProfileImageUrl
-        );
+        Connection con = null;
+        try {
+            con = dataSourceConfig.dataSource().getConnection();
+            // 데이터소스를 통해 데이터베이스와의 연결을 설정하고 Connection 객체를 생성합니다.
+            con.setAutoCommit(false);
+            // 트랜잭션을 수동으로 관리하기 위해 자동 커밋 기능을 false로 설정합니다.
         Notification notification = notificationRepository.save(createNotification(receiver, alarmType, message, senderMembername, senderNickname, senderProfileImageUrl));
         String receiverId = String.valueOf(receiver.getId());
         String eventId = receiverId + "_" + System.currentTimeMillis();
@@ -86,8 +84,21 @@ public class NotificationService {
         String finalJsonResult = convertToJson(sender, notification);
         emitters.forEach((key, emitter) -> {
                     emitterRepository.saveEventCache(key, notification);
-                    sendNotification(emitter, eventId, key, finalJsonResult);
-        });
+                        sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
+                    }
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException e) {
+
+                }
+            }
+        }
     }
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
@@ -108,16 +119,16 @@ public class NotificationService {
         notification.setSenderProfileImageUrl(senderProfileImageUrl);
         return notificationRepository.save(notification);
     }
-//    //받은 알림 전체 조회
-//    @Transactional
-//    public List<NotificationResponseDto> getAllNotifications(Long memberId, int size, int page) {
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-//        Page<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId,pageable);
-//
-//        return notifications.stream()
-//                .map(NotificationResponseDto::create)
-//                .collect(Collectors.toList());
-//    }
+    //받은 알림 전체 조회
+    @Transactional
+    public List<NotificationResponseDto> getAllNotifications(Long memberId, int size, int page) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId,pageable);
+
+        return notifications.stream()
+                .map(NotificationResponseDto::create)
+                .collect(Collectors.toList());
+    }
     // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
 //    @Transactional
 //    public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
