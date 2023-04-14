@@ -55,7 +55,7 @@ public class EmitterRepositoryImpl implements EmitterRepository {
     public void deleteAllEmitterStartWithId(String memberId) {
         emitters.forEach(
                 (key, emitter) -> {
-                    if (Arrays.stream(key.split("_")).findFirst().get().equals(memberId)) {
+                    if (key.startsWith(memberId)) {
                         emitters.remove(key);
                     }
                 }
@@ -71,11 +71,6 @@ public class EmitterRepositoryImpl implements EmitterRepository {
                     }
                 }
         );
-    }
-    @Override
-    public void closeAllEmitters() {
-        emitters.values().forEach(SseEmitter::complete);
-        emitters.clear();
     }
 
 }

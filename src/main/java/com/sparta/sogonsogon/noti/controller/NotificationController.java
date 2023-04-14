@@ -23,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor //생성자를 자동으로 생성
 @RequestMapping("/api/notificaiton")
 public class NotificationController {
-    private final NotificationRepository notificationRepository;
 
     private final NotificationService notificationService;
     @ApiOperation(value = "알림 구독", notes = "알림을 구독한다.")
@@ -46,16 +45,6 @@ public class NotificationController {
         return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId()));
     }
 
-    @PutMapping("/{notificationId}/confirm")
-    @Operation(summary = "알림확인", description = "알림확인")
-    public StatusResponseDto<NotificationResponseDto> confirmNotification(@PathVariable Long notificationId,
-                                                                          @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        NotificationResponseDto notificationResponseDto = notificationService.confirmNotification(userDetails.getUser(),notificationId);
-        return StatusResponseDto.success(HttpStatus.OK, notificationResponseDto);
-//        return ResponseEntity.ok("Notification confirmed successfully");
-
-    }
 
     @DeleteMapping("/{notificationId}")
     @Operation(summary = "받은 알림 선택하여 삭제", description = "받은 알림 선택하여 삭제")

@@ -1,6 +1,7 @@
 package com.sparta.sogonsogon.noti.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.sogonsogon.member.entity.Member;
 import com.sparta.sogonsogon.member.repository.MemberRepository;
 import com.sparta.sogonsogon.noti.dto.NotificationResponseDto;
@@ -12,7 +13,9 @@ import com.sparta.sogonsogon.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -26,28 +29,42 @@ public class NotificationService {
     private final EmitterRepository emitterRepository ;
     private final NotificationRepository notificationRepository;
 
-    private final MemberRepository memberRepository;
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L;
 
 
     public SseEmitter subscribe(UserDetailsImpl userDetails, String lastEventId) {
-        String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
+        Long userId = userDetails.getUser().getId();
+        String emitterId = makeTimeIncludeId(userId);
+        // lastEventId가 있을 경우, userId와 비교해서 유실된 데이터일 경우 재전송할 수 있다.
+
+        emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userId));
+
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
-        log.info("본인 구독하였습니다.");
+        emitter.onCompletion(() -> {
+            log.info("SSE 연결 Complete");
+            emitterRepository.deleteById(emitterId);
+//            onClientDisconnect(emitter, "Compeletion");
+        });
+        //시간이 만료된 경우 자동으로 레포지토리에서 삭제하고 클라이언트에서 재요청을 보낸다.
+        emitter.onTimeout(() -> {
+            log.info("SSE 연결 Timeout");
+            emitterRepository.deleteById(emitterId);
+//            onClientDisconnect(emitter, "Timeout");
+        });
+        emitter.onError((e) -> emitterRepository.deleteById(emitterId));
+        //Dummy 데이터를 보내 503에러 방지. (SseEmitter 유효시간 동안 어느 데이터도 전송되지 않으면 503에러 발생)
+        String eventId = makeTimeIncludeId(userId);
+        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); //onCompletion 메서드: SseEmitter가 완료될 때 호출되는 콜백 함수를 정의
-        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); //  SSEEmitter를 찾아 emitterRepository에서 삭제하는 메서드
-
-        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
-
-        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
+        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방한다.
         if (hasLostData(lastEventId)) {
-            sendLostData(lastEventId, userDetails.getUser().getId(), emitterId, emitter);
+            sendLostData(lastEventId, userId, emitterId, emitter);
         }
+
         return emitter;
+
     }
 
     private String makeTimeIncludeId(Long memberId) {
@@ -74,10 +91,14 @@ public class NotificationService {
 
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
+            log.info("eventId : " + eventId);
+            log.info("data" + data);
             emitter.send(SseEmitter.event()
                     .id(eventId)
-                    .data(data));
+                    .data(String.valueOf(data)));
+
         } catch (IOException exception) {
+            log.info("예외 발생해서 emitter 삭제됨");
             emitterRepository.deleteById(emitterId);
         }
     }
@@ -99,14 +120,14 @@ public class NotificationService {
 
 
     private Notification createNotification(Member receiver, AlarmType alarmType, String message, String senderMembername, String senderNickname, String senderProfileImageUrl) {
-        Notification notification = new Notification();
-        notification.setReceiver(receiver);
-        notification.setAlarmType(alarmType);
-        notification.setMessage(message);
-        notification.setSenderMembername(senderMembername);
-        notification.setSenderNickname(senderNickname);
-        notification.setSenderProfileImageUrl(senderProfileImageUrl);
-        return notificationRepository.save(notification);
+        return Notification.builder()
+                .receiver(receiver)
+                .alarmType(alarmType)
+                .message(message)
+                .senderMembername(senderMembername)
+                .senderNickname(senderNickname)
+                .senderProfileImageUrl(senderProfileImageUrl)
+                .build();
     }
 
 
@@ -116,30 +137,14 @@ public class NotificationService {
         List<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId);
         log.info("알림 전체 조회했어");
         return notifications.stream()
-                .map(NotificationResponseDto::create)
+                .map(NotificationResponseDto::create )
                 .collect(Collectors.toList());
 
     }
 
 
-    // 특정 회원이 받은 알림을 확인했다는 것을 서비스에 알리는 기능
-    public NotificationResponseDto confirmNotification(Member member, Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
-                () -> new NotFoundException("Notification not found"));
-
-        // 확인한 유저가 알림을 받은 대상자가 아니라면 예외 발생
-        if (!notification.getReceiver().getId().equals(member.getId())) {
-            throw new IllegalArgumentException("접근권한이 없습니다. ");
-        }
-
-        if (!notification.getIsRead()) {
-            notification.setIsRead(true);
-            notificationRepository.save(notification);
-        }
-        return new NotificationResponseDto(notification);
-    }
-
     // 선택된 알림 삭제
+    @Transactional
     public void deleteNotification(Long notificationId, Member member) {
         Notification notification = notificationRepository.findById(notificationId).orElseThrow(
                 () -> new NotFoundException("Notification not found"));
