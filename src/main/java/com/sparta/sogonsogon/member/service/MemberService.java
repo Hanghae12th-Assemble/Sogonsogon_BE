@@ -106,17 +106,21 @@ public class MemberService {
         );
 
         String profileImageUrl = "";
-        if(memberRequestDto.getProfileImage().isEmpty()){
+        if(memberRequestDto.getProfileImage()== null){
             profileImageUrl = member.getProfileImageUrl();
         }else{
             profileImageUrl = s3Uploader.upload(memberRequestDto.getProfileImage(), "profileImages");
         }
 
-        if(memberRequestDto.getMemberInfo().isEmpty()){
-            memberRequestDto.setMemberInfo(null);
+        if(memberRequestDto.getMemberInfo() == null){
+            memberRequestDto.setMemberInfo(member.getMemberInfo());
+        } else if (memberRequestDto.getMemberInfo().isBlank()) {
+            memberRequestDto.setMemberInfo(member.getMemberInfo());
         }
 
-        if(memberRequestDto.getNickname().isEmpty()){
+        if(memberRequestDto.getNickname() == null){
+            memberRequestDto.setNickname(member.getNickname());
+        }else if (memberRequestDto.getNickname().isBlank()) {
             memberRequestDto.setNickname(member.getNickname());
         }
 
@@ -198,10 +202,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(
                 () -> new IllegalArgumentException(ErrorMessage.NOT_FOUND_MEMBER.getMessage())
         );
-
         SimpleMailMessage message = new SimpleMailMessage();
-
-
 
         message.setFrom(sogon);
         message.setTo(requestDto.getEmail());
