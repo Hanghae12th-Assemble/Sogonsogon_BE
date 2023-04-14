@@ -50,9 +50,9 @@ public class MemberController {
     @PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "회원 정보 수정", description = "프로필에서 보이는 회원 정보 수정")
     public StatusResponseDto<MemberResponseDto> updateMemberInfo(@PathVariable Long userId,
-                                                                 @RequestParam(value = "nickname") String nickname,
-                                                                 @RequestParam(value = "memberInfo") String memberInfo,
-                                                                 @RequestParam(value = "profileImageUrl") MultipartFile profileImage,
+                                                                 @RequestParam(value = "nickname", required = false) String nickname,
+                                                                 @RequestParam(value = "memberInfo", required = false) String memberInfo,
+                                                                 @RequestParam(value = "profileImageUrl", required = false) MultipartFile profileImage,
                                                                  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
 
         MemberRequestDto requestDto = new MemberRequestDto(nickname, memberInfo, profileImage);
