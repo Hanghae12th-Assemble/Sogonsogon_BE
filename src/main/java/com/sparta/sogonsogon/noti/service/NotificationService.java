@@ -84,7 +84,7 @@ public class NotificationService {
         String finalJsonResult = convertToJson(sender, notification);
         emitters.forEach((key, emitter) -> {
                     emitterRepository.saveEventCache(key, notification);
-                        sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
+                        sendNotification(emitter, eventId, key, finalJsonResult);
                     }
             );
         } catch (SQLException e) {
@@ -119,7 +119,7 @@ public class NotificationService {
         notification.setSenderProfileImageUrl(senderProfileImageUrl);
         return notificationRepository.save(notification);
     }
-    //받은 알림 전체 조회
+//    받은 알림 전체 조회
     @Transactional
     public List<NotificationResponseDto> getAllNotifications(Long memberId, int size, int page) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
