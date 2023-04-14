@@ -86,7 +86,7 @@ public class AudioClipService {
         audioClipRepository.save(audioClip);
 
         // 본인이 알림 구독을 하였는지 확인
-        notificationService.send(member, AlarmType.eventAudioClipUploaded, "제목: " + audioClip.getTitle() + "오디오 클립이 생성되었습니다. ", null, null, null);
+        notificationService.send(member, AlarmType.eventAudioClipUploaded, "제목: " + audioClip.getTitle() + "오디오 클립이 생성되었습니다. ", audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getAudioclipImageUrl());
 
         // NotificationService를 통해 알림을 구독한 유저들에게 알림을 보낸다.
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
