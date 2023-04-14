@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class NotificationService {
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L;
     private final JdbcTemplate jdbcTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
+//    private final RedisTemplate<String, Object> redisTemplate;
 
 
     @Transactional
@@ -78,17 +79,12 @@ public class NotificationService {
         String receiverId = String.valueOf(receiver.getId());
         String eventId = receiverId + "_" + System.currentTimeMillis();
 
-//        Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
-//        emitters.forEach((key, emitter) -> {
-//                    emitterRepository.saveEventCache(key, notification);
-//                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
-//        });
-        Set<String> emitters = redisTemplate.keys(receiverId + "*");
-        emitters.forEach(emitterId -> {
-            redisTemplate.opsForList().rightPush(emitterId, notification);
-            SseEmitter emitter = (SseEmitter) redisTemplate.opsForValue().get(emitterId);
-            sendNotification(emitter, eventId, emitterId, NotificationResponseDto.create(notification));
+        Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
+        emitters.forEach((key, emitter) -> {
+                    emitterRepository.saveEventCache(key, notification);
+                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
         });
+
     }
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
@@ -150,18 +146,5 @@ public class NotificationService {
         }
         notificationRepository.deleteById(notificationId);
     }
-//
-//    private String convertToJson(Member sender, Notification notification) {
-//        String jsonResult = "";
-//
-//        NotificationResponseDto notificationResponseDto = NotificationResponseDto.of(notification, sender.getImage());
-//
-//        try {
-//            jsonResult = objectMapper.writeValueAsString(notificationResponseDto);
-//        } catch (JsonProcessingException e) {
-//            throw new IllegalArgumentException("찾을 수 없음");
-//        }
-//
-//        return jsonResult;
-//    }
+
 }
