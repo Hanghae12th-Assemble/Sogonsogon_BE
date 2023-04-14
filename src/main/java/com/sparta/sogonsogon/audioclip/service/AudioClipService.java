@@ -88,9 +88,9 @@ public class AudioClipService {
         // NotificationService를 통해 팔로우한  유저들에게 알림을 보낸다.
         List<Follow> followings = followRepository.findByFollower(userDetails.getUser());
         for (Follow following : followings) {
-            String message = audioClip.getMember().getNickname() + "님이 [ " + audioClip.getTitle() + " ]오디오 클립을 생성하였습니다. ";
-            notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioClip.getMember().getMembername(), audioClip.getMember().getNickname(), audioClip.getMember().getProfileImageUrl());
-            log.info("앨범클립 생성하였습니다. ");
+            String message = audioAlbum.getMember().getNickname() + "님이 [ " + audioAlbum.getTitle() + " ]오디오 클립을 생성하였습니다. ";
+            notificationService.send(following.getFollowing(), AlarmType.eventAudioClipUploaded, message, audioAlbum.getMember().getMembername(), audioAlbum.getMember().getNickname(), audioAlbum.getMember().getProfileImageUrl());
+            log.info("앨범 생성하였습니다. ");
         }
 
         return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));
