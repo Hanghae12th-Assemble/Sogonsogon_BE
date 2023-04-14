@@ -40,10 +40,11 @@ public class AudioClipLikeService {
             return StatusResponseDto.success(HttpStatus.OK, new AudioClipIsLikeResponseDto("해당 오디오 클립에 좋아요가 취소 되었습니다. ", false));
         }
 
-        // 좋아요를 눌렀을때 오디오 클립 생성자에게 알림 보내기
-        String message = userDetails.getUser().getNickname() + " 님이 제목: " + audioClip.getTitle() + " 오디오의 좋아요를 눌렀습니다. ";
-        notificationService.send(audioClip.getMember(), AlarmType.eventAudioClipLike, message, userDetails.getUsername(), userDetails.getUser().getNickname(), userDetails.getUser().getProfileImageUrl());
-
+        if (!userDetails.getUser().getMembername().equals(audioClip.getMember().getMembername())) {
+            // 좋아요를 눌렀을때 오디오 클립 생성자에게 알림 보내기
+            String message = userDetails.getUser().getNickname() + " [ " + audioClip.getTitle() + " ] 오디오의 좋아요를 눌렀습니다. ";
+            notificationService.send(audioClip.getMember(), AlarmType.eventAudioClipLike, message, userDetails.getUsername(), userDetails.getUser().getNickname(), userDetails.getUser().getProfileImageUrl());
+        }
         audioClipLikeRepository.save(new AudioClipLike(audioClip, userDetails.getUser()));
         return StatusResponseDto.success(HttpStatus.OK, new AudioClipIsLikeResponseDto("해당 오디오 클립에 좋아요가 추가 되었습니다.", true));
     }
