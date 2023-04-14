@@ -56,6 +56,8 @@ public class NotificationResponseDto {
         this.createdAt = Chrono.timesAgo(notification.getCreatedAt());
     }
 
+
+
     public static NotificationResponseDto create(Notification notification) {
         String createdAt = Chrono.timesAgo(notification.getCreatedAt());
 
@@ -71,4 +73,18 @@ public class NotificationResponseDto {
                 .build();
     }
 
+    public static NotificationResponseDto of(Notification notification, String profileImageUrl) {
+        String createdAt = Chrono.timesAgo(notification.getCreatedAt());
+        return builder()
+                .id(notification.getId())
+                .message(notification.getMessage())
+                .alarmType(notification.getAlarmType())
+                .readStatus(notification.getIsRead())
+                .senderMembername(notification.getSenderMembername())
+                .senderNickname(notification.getSenderNickname())
+                .senderProfileImageUrl(profileImageUrl)
+                .createdAt(createdAt)
+                .build();
+
+    }
 }

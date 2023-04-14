@@ -1,7 +1,10 @@
 package com.sparta.sogonsogon.noti.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.sogonsogon.member.entity.Member;
+import com.sparta.sogonsogon.member.repository.MemberRepository;
 import com.sparta.sogonsogon.noti.dto.NotificationResponseDto;
 import com.sparta.sogonsogon.noti.entity.Notification;
 import com.sparta.sogonsogon.noti.repository.EmitterRepository;
@@ -19,6 +22,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,7 +38,10 @@ import java.util.stream.Collectors;
 @Setter
 public class NotificationService {
 
+    private final ObjectMapper objectMapper;
+
     private final EmitterRepository emitterRepository;
+    private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L;
@@ -44,7 +52,7 @@ public class NotificationService {
     @Transactional
     public SseEmitter subscribe(UserDetailsImpl userDetails) {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
-//        emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
+        emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
         log.info("SSE 연결 됨");
 
@@ -80,9 +88,13 @@ public class NotificationService {
         String eventId = receiverId + "_" + System.currentTimeMillis();
 
         Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
+        Member sender = memberRepository.findByMembername(senderMembername).orElseThrow(
+                ()-> new EntityNotFoundException("해당 사용자를 찾을 수 없습니다. ")
+        );
+        String finalJsonResult = convertToJson(sender, notification);
         emitters.forEach((key, emitter) -> {
                     emitterRepository.saveEventCache(key, notification);
-                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
+                    sendNotification(emitter, eventId, key, finalJsonResult);
         });
 
     }
@@ -110,10 +122,6 @@ public class NotificationService {
     public List<NotificationResponseDto> getAllNotifications(Long memberId, int size, int page) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId,pageable);
-        // 36시간이 지난 알림 삭제
-        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(36);
-        List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
-        notificationRepository.deleteAll(expiredNotifications);
 
         return notifications.stream()
                 .map(NotificationResponseDto::create)
@@ -147,4 +155,35 @@ public class NotificationService {
         notificationRepository.deleteById(notificationId);
     }
 
+    private String convertToJson(Member sender, Notification notification){
+        String jsonResult = "";
+
+        NotificationResponseDto notificationResponseDto = NotificationResponseDto.of(notification, sender.getProfileImageUrl());
+
+        try{
+            jsonResult = objectMapper.writeValueAsString(notificationResponseDto);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("변경불가");
+        }
+
+        return jsonResult;
+    }
+
+    // 처리 된 건이고, 읽은 알림은 삭제 (1일 경과한 데이터)
+
+    @Transactional
+    public void deleteOldNotification() {
+        List<Notification> notifications = notificationRepository.findOldNotification();
+
+        log.info("총 " + notifications.size() + " 건의 알림 삭제");
+        for(Notification notification : notifications){
+            notificationRepository.deleteById(notification.getId());
+        }
+    }
+
 }
+
+//         // 36시간이 지난 알림 삭제
+//        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(36);
+//        List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
+//        notificationRepository.deleteAll(expiredNotifications);

@@ -12,6 +12,7 @@ import com.sparta.sogonsogon.noti.service.NotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -41,9 +42,8 @@ public class NotificationController {
     @Operation(summary = "받은 알림 전체 조회", description = "받은 알림 전체 조회")
     @GetMapping("/AllNotifications")
     public StatusResponseDto<List<NotificationResponseDto>> getAllNotifications(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(value = "page", defaultValue = "1") int page,
                                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
-
         return StatusResponseDto.success(HttpStatus.OK, notificationService.getAllNotifications(userDetails.getUser().getId(),page,size));
     }
 
@@ -64,5 +64,10 @@ public class NotificationController {
                                                                          @ApiIgnore @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         notificationService.deleteNotification(notificationId,userDetails.getUser());
         return StatusResponseDto.success(HttpStatus.OK,null);
+    }
+
+    @Scheduled(cron = "0 0 0 1/1 * ? *") // 매일 자정 실행한다.
+    public void deleteOldNotification(){
+        notificationService.deleteOldNotification();
     }
 }
