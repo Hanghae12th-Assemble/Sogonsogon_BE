@@ -18,18 +18,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,9 +33,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Setter
 public class NotificationService {
-
     private final ObjectMapper objectMapper;
-
     private final EmitterRepository emitterRepository;
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
@@ -48,13 +42,11 @@ public class NotificationService {
     private final JdbcTemplate jdbcTemplate;
 //    private final RedisTemplate<String, Object> redisTemplate;
 
-
     @Transactional
     public SseEmitter subscribe(UserDetailsImpl userDetails) {
         String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
         emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userDetails.getUser().getId()));
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        log.info("SSE 연결 됨");
 
         emitter.onCompletion(() -> {
             emitterRepository.deleteById(emitterId);
@@ -96,7 +88,6 @@ public class NotificationService {
                     emitterRepository.saveEventCache(key, notification);
                     sendNotification(emitter, eventId, key, finalJsonResult);
         });
-
     }
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
@@ -159,31 +150,20 @@ public class NotificationService {
         String jsonResult = "";
 
         NotificationResponseDto notificationResponseDto = NotificationResponseDto.of(notification, sender.getProfileImageUrl());
-
         try{
             jsonResult = objectMapper.writeValueAsString(notificationResponseDto);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("변경불가");
         }
-
         return jsonResult;
     }
-
     // 처리 된 건이고, 읽은 알림은 삭제 (1일 경과한 데이터)
-
     @Transactional
     public void deleteOldNotification() {
         List<Notification> notifications = notificationRepository.findOldNotification();
-
         log.info("총 " + notifications.size() + " 건의 알림 삭제");
         for(Notification notification : notifications){
             notificationRepository.deleteById(notification.getId());
         }
     }
-
 }
-
-//         // 36시간이 지난 알림 삭제
-//        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(36);
-//        List<Notification> expiredNotifications = notificationRepository.findExpiredNotification(cutoffTime);
-//        notificationRepository.deleteAll(expiredNotifications);
