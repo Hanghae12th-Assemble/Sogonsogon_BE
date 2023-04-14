@@ -25,7 +25,7 @@ import java.util.Map;
 public class AudioClipController {
 
     private final AudioClipService audioClipService;
-    private final S3Uploader s3Uploader;
+
 
     @PostMapping(value = "/uploaded/{audioablumId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "오디오 클립 생성", description = "오디오 클립을 생성 할 수 있습니다. ")
