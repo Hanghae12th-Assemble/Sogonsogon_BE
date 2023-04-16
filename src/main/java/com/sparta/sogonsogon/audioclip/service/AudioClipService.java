@@ -238,7 +238,7 @@ public class AudioClipService {
         }
         //        // 생성된 오디오클립의 개수
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("audioClipCount", audioClipPage.getTotalElements());
+        metadata.put("audioClipCount", audioClips.size());
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("result", audioClipResponseDtoList);
