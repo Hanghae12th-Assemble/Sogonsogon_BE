@@ -134,7 +134,6 @@ public class AudioClipService {
             requestDto.setContents(audioClip.getContents());
         }
 
-
         if (member.getRole() == MemberRoleEnum.USER || member.getMembername().equals(userDetails.getUser().getMembername())) {
             audioClip.update(requestDto, audioclipUrl, audioclipImageUrl);
             return StatusResponseDto.success(HttpStatus.OK, new AudioClipResponseDto(audioClip));

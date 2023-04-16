@@ -44,8 +44,13 @@ public class FollowService {
         for(Follow follow : followings) {
             FollowResponseDto responseDto = new FollowResponseDto();
             responseDto.setId(follow.getId());
-            responseDto.setFollowername(follow.getFollower().getMembername());
-            responseDto.setFollowingname(follow.getFollowing().getMembername());
+            responseDto.setFollowerNickname(follow.getFollowing().getNickname());
+            responseDto.setFollowerMembername(follow.getFollowing().getMembername());
+            responseDto.setFollowerProfileImageUrl(follow.getFollowing().getProfileImageUrl());
+            responseDto.setFollowerId(follow.getFollowing().getId());
+            responseDto.setFollowingId(follow.getFollower().getId());
+            responseDto.setFollowingMembername(follow.getFollower().getMembername());
+            responseDto.setFollowingNickname(follow.getFollower().getNickname());
             followingList.add(responseDto);
         }
         return followingList;
@@ -62,12 +67,8 @@ public class FollowService {
 
         List<FollowResponseDto> responseDtos = new ArrayList<>();
         for(Follow follow : follows){
-            FollowResponseDto responseDto = new FollowResponseDto();
-            responseDto.setFollowername(follow.getFollower().getMembername());
-            responseDto.setFollowingname(follow.getFollowing().getMembername());
-//            responseDto.setFollowed(true);
+            FollowResponseDto responseDto = new FollowResponseDto(follow.getFollower(), follow.getFollowing());
             responseDtos.add(responseDto);
-
         }
         return  responseDtos;
     }
