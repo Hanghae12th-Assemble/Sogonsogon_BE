@@ -48,7 +48,9 @@ public class FollowService {
             responseDto.setFollowerMembername(follow.getFollowing().getMembername());
             responseDto.setFollowerProfileImageUrl(follow.getFollowing().getProfileImageUrl());
             responseDto.setFollowerId(follow.getFollowing().getId());
-            responseDto.setFollowingname(follow.getFollower().getMembername());
+            responseDto.setFollowingId(follow.getFollower().getId());
+            responseDto.setFollowingMembername(follow.getFollower().getMembername());
+            responseDto.setFollowingNickname(follow.getFollower().getNickname());
             followingList.add(responseDto);
         }
         return followingList;
