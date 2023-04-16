@@ -21,7 +21,7 @@ public class AudioAlbumRequestDto {
     @Size(max = 100)
     private String instruction;
 
-    private MultipartFile backgroundImageUrl;
+    private MultipartFile backgroundImageUrl; // 이미지
     private CategoryType categoryType;
 
 }
