@@ -33,7 +33,7 @@ public class NotificationService {
     private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L;
 
 
-    public SseEmitter subscribe(UserDetailsImpl userDetails, String lastEventId) {
+    public SseEmitter subscribe(UserDetailsImpl userDetails) {
         Long userId = userDetails.getUser().getId();
         String emitterId = makeTimeIncludeId(userId);
         // lastEventId가 있을 경우, userId와 비교해서 유실된 데이터일 경우 재전송할 수 있다.
@@ -58,10 +58,10 @@ public class NotificationService {
         String eventId = makeTimeIncludeId(userId);
         sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
 
-        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방한다.
-        if (hasLostData(lastEventId)) {
-            sendLostData(lastEventId, userId, emitterId, emitter);
-        }
+//        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방한다.
+//        if (hasLostData(lastEventId)) {
+//            sendLostData(lastEventId, userId, emitterId, emitter);
+//        }
 
         return emitter;
 
