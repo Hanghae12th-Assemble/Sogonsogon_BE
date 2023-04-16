@@ -31,6 +31,7 @@ public class NotificationService {
 
     //DEFAULT_TIMEOUT을 기본값으로 설정
     private static final Long DEFAULT_TIMEOUT = 15 * 60 * 10000L;
+    private final ObjectMapper objectMapper;
 
 
     public SseEmitter subscribe(UserDetailsImpl userDetails) {
@@ -93,10 +94,13 @@ public class NotificationService {
         try {
             log.info("eventId : " + eventId);
             log.info("data" + data);
-            emitter.send(SseEmitter.event()
+            ObjectMapper objectMapper = new ObjectMapper(); // JSON 변환을 위한 ObjectMapper
+            String jsonMessage = objectMapper.writeValueAsString(data); // 메시지를 JSON 형식으로 변환
+            SseEmitter.SseEventBuilder eventBuilder = SseEmitter.event()
                     .id(eventId)
-                    .data(String.valueOf(data)));
-
+                    .name(emitterId)
+                    .data(jsonMessage);
+            emitter.send(eventBuilder);
         } catch (IOException exception) {
             log.info("예외 발생해서 emitter 삭제됨");
             emitterRepository.deleteById(emitterId);
