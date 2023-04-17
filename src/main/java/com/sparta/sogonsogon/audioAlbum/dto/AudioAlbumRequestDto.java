@@ -15,10 +15,8 @@ import javax.validation.constraints.Size;
 public class AudioAlbumRequestDto {
 
     @NotBlank
-    @Size(min = 3, max = 30)
     private String title;
 
-    @Size(max = 100)
     private String instruction;
 
     private MultipartFile backgroundImageUrl; // 이미지
