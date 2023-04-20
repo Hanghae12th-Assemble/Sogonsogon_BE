@@ -29,6 +29,8 @@
 개인이 만든 음악, 오디오 드라마, 오디오 북등 다양한 음성 파일을 앨범을 만들어서 공유하는 플랫폼입니다. 
 
 💛[지금 바로 소곤소곤 서비스 이용하기](https://sogonsogon.live/) 
+---
+💛 [어셈블 노션](https://keen-echinodon-bad.notion.site/A-1-SA-19dd65c62a814104982a0f69eb8c7527)
 
 🍊***Backend Repository:*** https://github.com/Hanghae12th-Assemble/Sogonsogon_BE 
 
